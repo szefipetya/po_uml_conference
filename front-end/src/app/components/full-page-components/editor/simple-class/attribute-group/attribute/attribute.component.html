@@ -1,0 +1,53 @@
+<div *ngIf="this.renderMode == 'TITLE_EDIT'">
+  <input
+    class="{{ this.clname }}"
+    id="editor-input"
+    type="text"
+    (oninput)="this.onInput($event)"
+    [style.width]="this.inputWidth + 'px'"
+    defaultValue="{{ this.model.name }}"
+  />
+</div>
+<div *ngIf="this.renderMode == 'TITLE'">
+  <div
+    id="{{ model.id }}"
+    (click)="this.onClick($event)"
+    class="{{ this.clname }}"
+  >
+    {{ this.showedText }}
+    <span class="class-element-dots">{{ this.dots }}</span>
+  </div>
+</div>
+
+<div *ngIf="this.renderMode == 'ATTRIBUTE_EDIT'">
+  <div
+    id="{{ model.id }}"
+    (click)="this.onClick($event)"
+    class="{{ this.clname }}"
+  >
+    <input
+      id="editor-input"
+      type="text"
+      (oninput)="this.onInput($event)"
+      [style.width]="this.inputWidth + 'px'"
+      defaultValue="{{
+        this.model.visibility + this.model.name + this.str + this.model.type
+      }}"
+    />
+  </div>
+</div>
+<div class="attribute" *ngIf="this.renderMode == 'ATTRIBUTE'">
+  <div
+    id="{{ model.id }}"
+    (click)="this.onClick($event)"
+    class="{{ this.clname }}"
+  >
+    <span class="class-element-visibility">
+      {{ this.model.visibility }}
+    </span>
+    <span class="class-element-name">{{ this.name }}</span>
+    <span class="class-element-separator">{{ this.str_displayed }}</span>
+    <span class="class-element-type">{{ this.type_dispayed }}</span>
+    <span class="class-element-dots">{{ this.dots }}</span>
+  </div>
+</div>

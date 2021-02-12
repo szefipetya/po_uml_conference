@@ -1,0 +1,39 @@
+<div class="a">
+  <div class="edit-box-container">
+    <div
+      class="edit-box-clip"
+      [style.width]="this.editorService.model.clip.width + 'px'"
+      [style.height]="this.editorService.model.clip.height + 'px'"
+    >
+      <div
+        id="dgbox"
+        class="edit-box"
+        [style.top]="editorService.model.canvas.posy.toString() + 'px'"
+        [style.left]="editorService.model.canvas.posx.toString() + 'px'"
+        [style.width]="this.editorService.model.canvas.width.toString() + 'px'"
+        [style.height]="
+          this.editorService.model.canvas.height.toString() + 'px'
+        "
+        [style.backgroundImage]="
+          'linear-gradient(to right, rgba(255, 255, 255, 0.11) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.11) 1px, transparent 1px)'
+        "
+        [style.background-size]="
+          editorService.model.canvas.gridSize.toString() +
+          'px ' +
+          editorService.model.canvas.gridSize.toString() +
+          'px'
+        "
+        (mousemove)="onMouseMove($event)"
+        (mouseup)="onMouseUp($event)"
+        (mousedown)="onMouseDown($event)"
+        (wheel)="zoom($event)"
+      >
+        <div
+          *ngFor="let item of this.editorService.model.classes; let i = index"
+        >
+          <app-simple-class [id]="item.id" [model]="item"> </app-simple-class>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

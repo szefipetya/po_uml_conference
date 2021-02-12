@@ -1,0 +1,11 @@
+window_sizes 1920 1017 450 1350 720 82
+diagrams
+  active  classdiagram_ref 128003 // Controller
+    1464 859 100 4 0 0
+end
+show_stereotypes
+selected class_ref 128003 // PrimaryAuthorizationController
+open
+  classview_ref 128003 // Logic
+end
+end

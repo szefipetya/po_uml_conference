@@ -1,0 +1,22 @@
+<div class="class-element-group" (onmouseover)="this.onMouseOver($event)">
+  <div class="class-element-group-name">
+    {{ this.model.group_name }}
+  </div>
+
+  <app-attribute
+    *ngFor="let item of this.model.attributes"
+    [model]="item"
+    [parent]="this"
+    [isTitle]="false"
+  >
+  </app-attribute>
+
+  <div class="class-element-group-new_element-button-wrapper">
+    <div
+      class="class-element class-element-group-new_element-button"
+      (onClick)="this.onNewButtonClick($event)"
+    >
+      +
+    </div>
+  </div>
+</div>
