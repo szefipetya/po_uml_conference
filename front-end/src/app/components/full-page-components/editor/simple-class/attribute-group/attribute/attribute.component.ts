@@ -1,4 +1,12 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { supportsPassiveEventListeners } from '@angular/cdk/platform';
+import { rendererTypeName } from '@angular/compiler';
+import {
+  AfterContentInit,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+} from '@angular/core';
 import { SimpleClassAttributeGroup } from 'src/app/components/models/SimpleClassAttributeGroup';
 import { AttributeElement } from '../../../../../models/AttributeElement';
 import { AttributeGroupComponent } from '../attribute-group.component';
@@ -7,7 +15,7 @@ import { AttributeGroupComponent } from '../attribute-group.component';
   templateUrl: './attribute.component.html',
   styleUrls: ['./attribute.component.scss'],
 })
-export class AttributeComponent implements OnInit, OnChanges {
+export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
   targetDOM: any;
   inputDOM: Element;
   clname: string;
@@ -19,46 +27,62 @@ export class AttributeComponent implements OnInit, OnChanges {
   type: string;
 
   constructor() {}
-  @Input() parent: AttributeGroupComponent;
+  ngAfterContentInit(): void {
+    this.model.viewModel = this;
+    this.render();
+  }
+  @Input() parent: any;
+
   @Input() isTitle: boolean;
   @Input() model: AttributeElement;
   ngOnInit(): void {
-    this.render();
+    // this.render();
   }
   ngOnChanges() {
-    this.render();
+    //  this.render();
   }
 
+  save() {
+    console.log('save');
+    this.saveEvent();
+    this.render();
+  }
   parentClass;
   deleteSelfFromParent = () => {
     this.parent.delete(this.model.id);
   };
-  force = (e) => {
-    this.render();
-  };
-  saveEvent = () => {
+  saveEvent() {
     if (this.isTitle) {
-    } else if (this.model.name == '') {
-      this.deleteSelfFromParent();
-      console.log('deleted', this.model);
+      if (this.model.name == '') {
+        this.deleteSelfFromParent();
+        console.log('deleted', this.model);
+        this.model.name = 'Class';
+        this.model.edit = true;
+      }
+    } else {
+      //NOT TITLE
+      if (this.model.name == '') {
+        this.deleteSelfFromParent();
+        console.log('deleted', this.model);
+      }
     }
-    this.force(null);
-  };
+  }
 
   onClick(e) {
     console.log('editing');
     this.model.edit = true;
     this.targetDOM = e.target;
-    this.parent.editorService.model.canvas.edit_element_id = this.model.id;
+    console.log(this.parent.editorService);
+    this.parent.editorService.model.canvas.edit_element = this;
     if (!this.isTitle) this.renderMode = 'ATTRIBUTE_EDIT';
+
     this.render();
-    this.force(() => {
-      let inputDOM = document.querySelector('#editor-input');
-      if (inputDOM) {
-        this.inputDOM = inputDOM;
-        // inputDOM.focus();
-      }
-    });
+
+    let inputDOM = document.querySelector('#editor-input');
+    if (inputDOM) {
+      this.inputDOM = inputDOM;
+      // inputDOM.focus();
+    }
   }
   setVisibility = (e) => {
     let vis = '+';
@@ -88,15 +112,16 @@ export class AttributeComponent implements OnInit, OnChanges {
   };
   onInput = (e) => {
     let isVisibilitySymbolWritten = this.setVisibility(e);
-
+    console.log(this.model);
     this.setNameAndType(e, isVisibilitySymbolWritten);
-    this.force(null);
+    this.render();
   };
   showedText = '';
   titleScale = 1.5;
   elementScale = 2.35;
   inputWidth = 20;
   renderMode: string;
+
   str;
   render() {
     if (this.model) {
@@ -114,25 +139,25 @@ export class AttributeComponent implements OnInit, OnChanges {
       }
       this.showedText = strfull;
 
-      let clname;
       if (this.isTitle) {
         this.clname = 'class-title class-element';
+
         if (this.model.edit) {
-          this.renderMode = 'TITLE_EDIT';
-          let inputwidth;
+          //TITLE_EDIT
           let val1 =
             (this.parent.editorService.model.class_general.fontsize_scaled /
               this.elementScale) *
-            (strfull.length + 1);
+            1.418 *
+            strfull.length;
           let val2 =
-            this.parent.parent.model.scaledModel.width_scaled -
+            this.parent.model.scaledModel.width_scaled -
             (this.parent.editorService.model.class_general.padding_scaled +
               this.parent.editorService.model.class_general.border_scaled) *
               2;
-          inputwidth = Math.max(val1, val2);
+          this.inputWidth = Math.max(val1, val2);
           //old width: `${(strfull.length + 1) * (this.state.parent.parent.model.class_general.fontsize_scaled / this.titleScale)}px`
         } else {
-          this.renderMode = 'TITLE';
+          //TITLE
           let rescale = this.titleScale;
           let charwidth =
             this.parent.editorService.model.class_general.fontsize_scaled /
@@ -142,47 +167,48 @@ export class AttributeComponent implements OnInit, OnChanges {
               rescale) *
             strfull.length;
           let width =
-            this.parent.parent.model.scaledModel.width_scaled -
+            this.parent.model.scaledModel.width_scaled -
             (this.parent.editorService.model.class_general.padding_scaled +
               this.parent.editorService.model.class_general.border_scaled) *
               2;
           let l = false;
+
+          this.showedText = this.model.name.substr(
+            0,
+            this.model.name.length -
+              Math.round(((textwidth - width) / charwidth) * 1.1 + 1.5)
+          );
           if (textwidth > width) {
-            this.showedText = strfull.substr(
-              0,
-              strfull.length - Math.round((textwidth - width) / charwidth + 1.5)
-            );
             l = true;
           }
-          name = this.showedText.split(':')[0];
+
           this.dots = '';
           if (l) {
             this.dots += '...';
           }
-          this.renderMode = 'ATTRIBUTE';
         }
       } else {
-        //not title
-
         this.clname = 'class-element';
         if (this.model.edit) {
-          console.log('attr edit');
+          //ATTRIBUTE EDIT
+
           this.renderMode = 'ATTRIBUTE_EDIT';
-          let inputwidth;
+
           let val1 =
             (this.parent.editorService.model.class_general.fontsize_scaled /
               this.elementScale) *
-            (strfull.length + 1);
+            0.92 *
+            strfull.length;
           let val2 =
             this.parent.parent.model.scaledModel.width_scaled -
             (this.parent.editorService.model.class_general.padding_scaled +
               this.parent.editorService.model.class_general.border_scaled) *
               2;
-          inputwidth = Math.max(val1, val2);
+          this.inputWidth = Math.max(val1, val2);
         } else {
-          this.renderMode = 'ATTRIBUTE';
+          //ATTRIBUTE
           let l = false;
-          clname = this.clname;
+
           let rescale = this.elementScale;
           let charwidth =
             this.parent.editorService.model.class_general.fontsize_scaled /
@@ -199,7 +225,7 @@ export class AttributeComponent implements OnInit, OnChanges {
           if (textwidth > width) {
             this.showedText = strfull.substr(
               0,
-              strfull.length - Math.round((textwidth - width) / charwidth + 1.5)
+              strfull.length - Math.round((textwidth - width) / charwidth)
             );
             l = true;
           }
@@ -212,7 +238,7 @@ export class AttributeComponent implements OnInit, OnChanges {
             this.str_displayed = ':';
           } else this.str_displayed = '';
           if (type) {
-            this.type_dispayed = type;
+            this.type_dispayed = this.type;
           } else this.type_dispayed = '';
           this.dots = '';
           if (l) {

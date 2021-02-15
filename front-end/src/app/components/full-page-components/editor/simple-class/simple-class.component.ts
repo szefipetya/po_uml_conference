@@ -1,20 +1,30 @@
-import { Component, OnInit,Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  OnChanges,
+  AfterContentInit,
+} from '@angular/core';
+import { AttributeElement } from 'src/app/components/models/AttributeElement';
 import { SimpleClass } from 'src/app/components/models/SimpleClass';
-import {GlobalEditorService} from '../services/global-editor/global-editor.service'
+import { GlobalEditorService } from '../services/global-editor/global-editor.service';
 
 @Component({
   selector: 'app-simple-class',
   templateUrl: './simple-class.component.html',
-  styleUrls: ['./simple-class.component.scss']
+  styleUrls: ['./simple-class.component.scss'],
 })
-export class SimpleClassComponent implements OnInit {
-editorService;
-  constructor(editorService:GlobalEditorService) {
-    this.editorService=editorService;
+export class SimpleClassComponent
+  implements OnInit, OnChanges, AfterContentInit {
+  editorService;
+  constructor(editorService: GlobalEditorService) {
+    this.editorService = editorService;
   }
-  @Input() model:SimpleClass;
+  ngAfterContentInit(): void {}
+  @Input() model: SimpleClass;
   @Input() id: string;
-  ngOnInit(): void {
+  ngOnInit(): void {}
+  ngOnChanges(): void {
+    console.log('changed');
   }
-
 }

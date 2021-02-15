@@ -16,7 +16,8 @@
   "
   class="d-class"
 >
-  <app-attribute [parent]="this.model" [isTitle]="true"> </app-attribute>
+  <app-attribute [parent]="this" [isTitle]="true" [model]="model.titleModel">
+  </app-attribute>
   <!-- <ClassElement parent={this.state} obj={this.state} istitle='true' /> -->
   <div class="class-elements">
     <div *ngFor="let item of this.model.groups">

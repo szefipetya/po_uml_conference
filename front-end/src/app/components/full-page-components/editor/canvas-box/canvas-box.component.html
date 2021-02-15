@@ -28,9 +28,7 @@
         (mousedown)="onMouseDown($event)"
         (wheel)="zoom($event)"
       >
-        <div
-          *ngFor="let item of this.editorService.model.classes; let i = index"
-        >
+        <div *ngFor="let item of this.editorService.model.classes">
           <app-simple-class [id]="item.id" [model]="item"> </app-simple-class>
         </div>
       </div>

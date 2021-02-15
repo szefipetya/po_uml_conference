@@ -22,15 +22,27 @@ export class CanvasBoxComponent implements OnInit {
     console.log('zoom');
     event.preventDefault();
     let scale = 1;
-    const canvas = { ...this.editorService.model.canvas };
-    scale += event.deltaY * -0.004;
+
+    scale += event.deltaY * -0.0006;
     // Restrict scale
-    scale = clamp(scale, 0.96, 1.04);
+    //scale = clamp(scale, 0.96, 1.04);
     this.editorService.model.classes.map((e) => {
       e.scaledModel.posx_scaled *= scale;
       e.scaledModel.posy_scaled *= scale;
       e.scaledModel.width_scaled *= scale;
       e.scaledModel.height_scaled *= scale;
+
+      if (e.titleModel.edit) {
+        e.titleModel.viewModel.render();
+      }
+      e.groups.map((group) => {
+        group.attributes.map((e2) => {
+          if (e2.edit) {
+            e2.inputWidth *= scale;
+            e2.viewModel.render();
+          }
+        });
+      });
     });
     this.editorService.model.class_general.fontsize_scaled *= scale;
     this.editorService.model.class_general.padding_scaled *= scale;
@@ -46,7 +58,7 @@ export class CanvasBoxComponent implements OnInit {
 
     this.borderString_scale = `${this.editorService.model.class_general.border_scaled}px gold solid`;
     this.onMouseUp(null);
-    this.forceUpdate();
+    //this.forceUpdate();
   }
 
   drawedClassX: number;
@@ -242,6 +254,13 @@ export class CanvasBoxComponent implements OnInit {
           this.editorService.model.class_general.min_height_scaled,
           this.editorService.model.canvas.gridSize
         );
+
+      this.targetClass.groups.map((group) => {
+        group.attributes.map((a) => {
+          a.viewModel.render();
+        });
+      });
+      this.targetClass.titleModel.viewModel.render();
     }
   };
   targetResizeGrabXR: boolean;

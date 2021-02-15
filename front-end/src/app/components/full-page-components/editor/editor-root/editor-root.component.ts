@@ -5,7 +5,7 @@ import { GlobalEditorService } from '../services/global-editor/global-editor.ser
 @Component({
   selector: 'app-editor-root',
   templateUrl: './editor-root.component.html',
-  styleUrls: ['./editor-root.component.scss']
+  styleUrls: ['./editor-root.component.scss'],
 })
 export class EditorRootComponent implements OnInit {
   editorService;
@@ -13,9 +13,10 @@ export class EditorRootComponent implements OnInit {
   menuBarHeight = 80;
   fullWidth: number;
   fullHeight: number;
+  //
 
-  constructor(editorService:GlobalEditorService) {
-    this.editorService=editorService;
+  constructor(editorService: GlobalEditorService) {
+    this.editorService = editorService;
     this.fullWidth = document.querySelector('html').clientWidth;
     this.fullHeight = document.querySelector('html').clientHeight;
     this.editorService.model.clip.width =
@@ -24,8 +25,7 @@ export class EditorRootComponent implements OnInit {
       this.fullHeight - this.editorService.model.menubar.height;
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
   newButton;
   newButtonTransition;
   newButtonFontSize;
@@ -48,7 +48,7 @@ export class EditorRootComponent implements OnInit {
     const isElem = Array.from(e.target.classList).includes('class-element');
     if (bool || e.target.nodeName != 'INPUT') {
       console.log('false on all');
-      this.editorService.model.classes.map(clas => {
+      this.editorService.model.classes.map((clas) => {
         if (clas.edit)
           if (clas.name.trim() != '') {
             clas.edit = false;
@@ -58,14 +58,16 @@ export class EditorRootComponent implements OnInit {
             clas.edit = false;
             this.editorService.model.canvas.edit_classTitle_id = null;
           }
-       // if (clas.save) clas.save();
-        clas.groups.map(egroup => {
-          egroup.attributes.map(e => {
+        clas.titleModel.edit = false;
+        clas.titleModel.viewModel.save();
+
+        clas.groups.map((egroup) => {
+          egroup.attributes.map((e) => {
             if (e && e.edit) {
               this.editorService.model.canvas.edit_element_id = null;
               console.log('EDITED FOUND ');
               e.edit = false;
-             // e.save();
+              e.viewModel.save();
               //e.forceUpdate();
             }
           });
@@ -75,17 +77,17 @@ export class EditorRootComponent implements OnInit {
     } else if (e.target.id == '#editor-input') this.inputDOM = e.target;
   };
 
-  handleAsync = async e => {
+  handleAsync = async (e) => {
     await this.disableEdits(e, false);
-
   };
 
-  onMouseDown = e => {
-    e.persist();
+  onMouseDown = (e) => {
+    // e.persist();
+    console.log('handle');
     this.handleAsync(e);
   };
 
-  onKeyPress = e => {
+  onKeyPress = (e) => {
     if (e.which == 13 || e.keyCode == 13) {
       // enter
       this.disableEdits(e, true);
@@ -93,17 +95,17 @@ export class EditorRootComponent implements OnInit {
     if (e.key.match('Delete') || e.keyCode == 46) {
       console.log('del');
       e.preventDefault();
-      this.editorService.model.canvas.selectedClassIds.map(id => {
+      this.editorService.model.canvas.selectedClassIds.map((id) => {
         this.editorService.model.classes = this.editorService.model.classes.filter(
-          clas => clas.id != id
+          (clas) => clas.id != id
         );
       });
       console.log(this.editorService.model.classes);
     }
-  //  this.forceUpdate();
+    //  this.forceUpdate();
   };
 
-  onMouseUp = e => {
+  onMouseUp = (e) => {
     const prop = this.findPropertyByRegex(
       document.querySelector('.edit-box'),
       '__reactEventHandlers*'
@@ -116,7 +118,7 @@ export class EditorRootComponent implements OnInit {
     }
   };
 
-  onMouseMove = e => {
+  onMouseMove = (e) => {
     const prop = this.findPropertyByRegex(
       document.querySelector('.edit-box'),
       '__reactEventHandlers*'
@@ -134,6 +136,4 @@ export class EditorRootComponent implements OnInit {
     }
     return undefined;
   };
-
-
 }

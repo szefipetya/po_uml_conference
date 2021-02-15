@@ -17,7 +17,10 @@ body {
 }
 
 /* Optional: show position indicator in red */
-
+input {
+  font-size: inherit;
+  font-family: "Roboto Mono", monospace;
+}
 body {
   width: 100vw;
   height: 100vh;
@@ -113,7 +116,7 @@ body {
 }
 
 .class-title {
-  font-family: "Roboto", sans-serif !important;
+  /*   font-family: "Roboto", sans-serif; */
   font-size: 1.1em !important;
   margin-top: 5px;
 }

@@ -1,7 +1,6 @@
-export class AttributeElement{
-  id: number;
+import { from } from 'rxjs';
+import { Element_c } from './Element_c';
+export class AttributeElement extends Element_c {
   visibility: string;
-  edit: boolean;
-  name: string;
   type: string;
 }

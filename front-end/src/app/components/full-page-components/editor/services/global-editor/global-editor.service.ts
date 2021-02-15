@@ -1,13 +1,18 @@
-import { Injectable, ModuleWithComponentFactories, NgModuleRef } from '@angular/core';
-import {Model} from '../../../../models/Model'
+import {
+  Injectable,
+  ModuleWithComponentFactories,
+  NgModuleRef,
+} from '@angular/core';
+import { Element_c } from 'src/app/components/models/Element_c';
+import { Model } from '../../../../models/Model';
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GlobalEditorService {
-model;
+  model;
   constructor() {
-    this.model={
-      user:{userid:'001'},
+    this.model = {
+      user: { userid: '001' },
 
       toolbox: {
         width: 120,
@@ -56,31 +61,36 @@ model;
           width: 114,
           height: 250,
           min_height: 75,
-          scaledModel:{
+          scaledModel: {
             posx_scaled: 110,
             posy_scaled: 220,
             width_scaled: 114,
             height_scaled: 250,
-            min_height_scaled: 75
+            min_height_scaled: 75,
           },
           z: 2,
           edit: false,
           name: 'Class1',
           class_type: 'classDG',
+          titleModel: {
+            id: '-1',
+            edit: false,
+            name: 'attr2',
+          },
           groups: [
             {
               group_name: 'attributes',
               group_syntax: 'attribute',
               attributes: [
                 {
-                  id: 1,
+                  id: '1',
                   visibility: '+',
                   edit: false,
                   name: 'attr1',
                   type: 'int',
                 },
                 {
-                  id: 2,
+                  id: '2',
                   visibility: '+',
                   edit: false,
                   name: 'attr2',
@@ -93,14 +103,14 @@ model;
               group_syntax: 'function',
               attributes: [
                 {
-                  id: 3,
+                  id: '3',
                   visibility: '-',
                   edit: false,
                   name: 'func1',
                   type: 'int',
                 },
                 {
-                  id: 4,
+                  id: '4',
                   visibility: '#',
                   edit: false,
                   name: 'func2',
@@ -117,31 +127,36 @@ model;
           width: 114,
           height: 250,
           min_height: 75,
-          scaledModel:{
+          scaledModel: {
             posx_scaled: 310,
             posy_scaled: 420,
             width_scaled: 114,
             height_scaled: 250,
-            min_height_scaled: 75
+            min_height_scaled: 75,
           },
           z: 1,
           edit: false,
           name: 'Person',
           class_type: 'classDG',
+          titleModel: {
+            id: '-2',
+            edit: false,
+            name: 'attr2',
+          },
           groups: [
             {
               group_name: 'attributes',
               group_syntax: 'attribute',
               attributes: [
                 {
-                  id: 5,
+                  id: '5',
                   visibility: '+',
                   edit: false,
                   name: 'name',
                   type: 'string',
                 },
                 {
-                  id: 6,
+                  id: '6',
                   visibility: '#',
                   edit: false,
                   name: 'age',
@@ -154,14 +169,14 @@ model;
               group_syntax: 'function',
               attributes: [
                 {
-                  id: 7,
+                  id: '7',
                   visibility: '-',
                   edit: false,
                   name: 'apply()',
                   type: 'void',
                 },
                 {
-                  id: 8,
+                  id: '8',
                   visibility: '#',
                   edit: false,
                   name: 'promote()',
@@ -171,11 +186,7 @@ model;
             },
           ],
         },
-      ]
+      ],
     };
   }
-
-
 }
-
-
