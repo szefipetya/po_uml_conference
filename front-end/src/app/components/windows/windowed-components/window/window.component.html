@@ -1,0 +1,11 @@
+<div
+  class="window"
+  [style.width]="model.width + 'px'"
+  [style.height]="model.height + 'px'"
+  [style.top]="model.top + 'px'"
+  [style.left]="model.left + 'px'"
+>
+  <div class="window-content">
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+  </div>
+</div>

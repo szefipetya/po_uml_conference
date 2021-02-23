@@ -1,0 +1,23 @@
+<div
+  class="window-manager-root_frame"
+  (mousedown)="onMouseDown($event)"
+  (mouseup)="onMouseUp($event)"
+  (mousemove)="onMouseMove($event)"
+>
+  <div
+    class="dock-surface window-manager-left_dock"
+    (mouseenter)="onDockMouseEnter($event, 'L')"
+  ></div>
+  <div
+    class="dock-surface window-manager-right_dock"
+    (mouseenter)="onDockMouseEnter($event, 'R')"
+  ></div>
+  <div
+    class="dock-surface window-manager-bottom_dock"
+    (mouseenter)="onDockMouseEnter($event, 'B')"
+  ></div>
+</div>
+<div class="windows">
+  <app-tool-box-window> </app-tool-box-window>
+</div>
+<app-main> </app-main>

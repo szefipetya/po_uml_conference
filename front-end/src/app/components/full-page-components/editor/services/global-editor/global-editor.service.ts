@@ -10,24 +10,34 @@ import { Model } from '../../../../models/Model';
 })
 export class GlobalEditorService {
   model;
+  alignment;
+
   constructor() {
+    this.alignment = {
+      left_dock: {
+        width: 100,
+      },
+      right_dock: {
+        width: 100,
+      },
+      bottom_dock: {
+        height: 100,
+      },
+    };
     this.model = {
       user: { userid: '001' },
-
-      toolbox: {
-        width: 120,
-      },
-      menubar: {
-        height: 40,
-      },
       canvas: {
+        viewModel: null,
         edit_element_id: null,
         edit_classTitle_id: null,
         scale: 1,
         posx: 0,
         posy: 0,
-        width: 1400,
-        height: 1000,
+        width:
+          window.innerWidth -
+          this.alignment.left_dock.width -
+          this.alignment.right_dock.width,
+        height: window.innerHeight - this.alignment.bottom_dock.height,
         gridSize: 10,
         drawMode: 'cursor',
         drawRect: {
@@ -39,8 +49,8 @@ export class GlobalEditorService {
         selectedClassIds: ['c1'],
       },
       clip: {
-        width: 1000,
-        height: 550,
+        width: 0,
+        height: 0,
       },
       class_general: {
         padding_scaled: 3,

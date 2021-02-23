@@ -6,11 +6,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 //Material
-import {MatIconModule} from '@angular/material/icon';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatSidenavModule} from '@angular/material/sidenav';
-
-
+import { MatIconModule } from '@angular/material/icon';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 //custom source
 import { MainComponent } from './components/main/main.component';
@@ -22,6 +20,11 @@ import { AttributeGroupComponent } from './components/full-page-components/edito
 import { SimpleClassComponent } from './components/full-page-components/editor/simple-class/simple-class.component';
 import { AttributeComponent } from './components/full-page-components/editor/simple-class/attribute-group/attribute/attribute.component';
 import { EditorRootComponent } from './components/full-page-components/editor/editor-root/editor-root.component';
+import { WindowComponent } from './components/windows/windowed-components/window/window.component';
+import { DockableWindowComponent } from './components/windows/windowed-components/dockable-window/dockable-window.component';
+import { FixedWindowComponent } from './components/windows/windowed-components/fixed-window/fixed-window.component';
+import { WindowManagerComponent } from './components/windows/window-manager/window-manager.component';
+import { ToolBoxWindowComponent } from './components/windows/windowed-components/_instances/dockable-window/tool-box-window/tool-box-window.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +38,11 @@ import { EditorRootComponent } from './components/full-page-components/editor/ed
     SimpleClassComponent,
     AttributeComponent,
     EditorRootComponent,
+    WindowComponent,
+    DockableWindowComponent,
+    FixedWindowComponent,
+    WindowManagerComponent,
+    ToolBoxWindowComponent,
   ],
   imports: [
     //Angular core
@@ -43,9 +51,10 @@ import { EditorRootComponent } from './components/full-page-components/editor/ed
     BrowserAnimationsModule,
     //Material
     MatToolbarModule,
-    MatIconModule,MatSidenavModule
+    MatIconModule,
+    MatSidenavModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

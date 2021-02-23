@@ -20,9 +20,12 @@ export class EditorRootComponent implements OnInit {
     this.fullWidth = document.querySelector('html').clientWidth;
     this.fullHeight = document.querySelector('html').clientHeight;
     this.editorService.model.clip.width =
-      this.fullWidth - this.editorService.model.toolbox.width;
+      this.fullWidth -
+      this.editorService.alignment.left_dock.width -
+      this.editorService.alignment.right_dock.width;
     this.editorService.model.clip.height =
-      this.fullHeight - this.editorService.model.menubar.height;
+      this.fullHeight - this.editorService.alignment.bottom_dock.height;
+    this.editorService.editor_ref = this;
   }
 
   ngOnInit(): void {}
@@ -94,12 +97,15 @@ export class EditorRootComponent implements OnInit {
     }
     if (e.key.match('Delete') || e.keyCode == 46) {
       console.log('del');
-      e.preventDefault();
-      this.editorService.model.canvas.selectedClassIds.map((id) => {
-        this.editorService.model.classes = this.editorService.model.classes.filter(
-          (clas) => clas.id != id
-        );
-      });
+      let input = document.querySelector('#editor-input');
+      if (!input) {
+        e.preventDefault();
+        this.editorService.model.canvas.selectedClassIds.map((id) => {
+          this.editorService.model.classes = this.editorService.model.classes.filter(
+            (clas) => clas.id != id
+          );
+        });
+      }
       console.log(this.editorService.model.classes);
     }
     //  this.forceUpdate();

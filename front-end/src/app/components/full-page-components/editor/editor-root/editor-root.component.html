@@ -7,12 +7,7 @@
   (keydown)="this.onKeyPress($event)"
 >
   <!--     <MenuBar obj={this.state.model.menubar} /> -->
-  <div
-    id="main"
-    [style.height]="
-      this.fullHeight - this.editorService.model.menubar.height + 'px'
-    "
-  >
+  <div id="main" [style.height]="this.editorService.model.clip.height + 'px'">
     <!--  <ToolBox model={this.state.model} obj={this.state.model.toolbox} /> -->
     <app-canvas-box> </app-canvas-box>
   </div>

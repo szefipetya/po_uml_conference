@@ -1,0 +1,25 @@
+.window-manager-root_frame {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  .dock-surface {
+    width: 100px;
+
+    background-color: #333;
+    opacity: 0.5;
+    position: inherit;
+  }
+  .window-manager-left_dock {
+    height: 100vh;
+    left: 0px;
+  }
+  .window-manager-right_dock {
+    height: 100vh;
+    right: 0px;
+  }
+  .window-manager-bottom_dock {
+    height: 100px;
+    width: 100vw;
+    bottom: 0px;
+  }
+}

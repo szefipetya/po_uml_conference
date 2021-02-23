@@ -316,6 +316,7 @@ export class CanvasBoxComponent implements OnInit {
   editorService: GlobalEditorService;
   constructor(editorService: GlobalEditorService) {
     this.editorService = editorService;
+    this.editorService.model.canvas.viewModel = this;
   }
   onMouseMove = (e) => {
     //console.dir(e);
