@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { GlobalEditorService } from 'src/app/components/full-page-components/editor/services/global-editor/global-editor.service';
 import { DockableWindow } from 'src/app/components/models/windows/DockableWindow';
 import { Window_c } from 'src/app/components/models/windows/Window_c';
 import { WindowComponent } from '../../../window/window.component';
@@ -9,20 +10,16 @@ import { WindowComponent } from '../../../window/window.component';
   styleUrls: ['./tool-box-window.component.scss'],
 })
 export class ToolBoxWindowComponent implements OnInit {
-  constructor() {
-    this.model = {
-      fixed: false,
-      head: {
-        height: 50,
-        title: 'tools',
-      },
-      height: 200,
-      width: 300,
-      id: '1',
-      left: 300,
-      top: 200,
-    };
+  constructor(private editorService: GlobalEditorService) {}
+  @Input() public model: Window_c;
+  ngOnInit(): void {
+    this.model.contentViewModelInstance = this;
   }
-  model: Window_c;
-  ngOnInit(): void {}
+  toolSelected(e) {
+    console.log(e.target);
+    if (e.target.className == 'toolbox-item') {
+      this.editorService.model.canvas.drawMode = e.target.dataset.action;
+    }
+    console.log(this.editorService.model.canvas.drawMode);
+  }
 }
