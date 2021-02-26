@@ -5,8 +5,8 @@ import {
   OnChanges,
   AfterContentInit,
 } from '@angular/core';
-import { AttributeElement } from 'src/app/components/models/AttributeElement';
-import { SimpleClass } from 'src/app/components/models/SimpleClass';
+import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
+import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { GlobalEditorService } from '../services/global-editor/global-editor.service';
 
 @Component({

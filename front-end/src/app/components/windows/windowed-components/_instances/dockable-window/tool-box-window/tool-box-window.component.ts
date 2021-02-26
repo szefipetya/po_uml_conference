@@ -1,8 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { GlobalEditorService } from 'src/app/components/full-page-components/editor/services/global-editor/global-editor.service';
-import { DockableWindow } from 'src/app/components/models/windows/DockableWindow';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Window_c } from 'src/app/components/models/windows/Window_c';
-import { WindowComponent } from '../../../window/window.component';
 
 @Component({
   selector: 'app-tool-box-window',
@@ -10,16 +7,32 @@ import { WindowComponent } from '../../../window/window.component';
   styleUrls: ['./tool-box-window.component.scss'],
 })
 export class ToolBoxWindowComponent implements OnInit {
-  constructor(private editorService: GlobalEditorService) {}
+  constructor() {
+    this.toolSelectedEvent = new EventEmitter();
+  }
+  @Input() public canvasModel;
+  @Input() public lineCanvasModel;
   @Input() public model: Window_c;
+  @Output() public toolSelectedEvent: EventEmitter<{
+    type: string;
+    extra: number;
+  }>;
   ngOnInit(): void {
     this.model.contentViewModelInstance = this;
   }
   toolSelected(e) {
     console.log(e.target);
     if (e.target.className == 'toolbox-item') {
-      this.editorService.model.canvas.drawMode = e.target.dataset.action;
+      /* this.toolSelectedEvent.emit({
+        type: e.target.dataset.action,
+        extra: Number.parseInt(e.target.dataset.line_extra),
+      });*/
+      this.canvasModel.drawMode = e.target.dataset.action;
+      if (e.target.dataset.action == 'line' && e.target.dataset.line_extra) {
+        this.lineCanvasModel.drawLineType = Number.parseInt(
+          e.target.dataset.line_extra
+        );
+      }
     }
-    console.log(this.editorService.model.canvas.drawMode);
   }
 }

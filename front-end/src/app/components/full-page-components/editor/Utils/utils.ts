@@ -1,10 +1,6 @@
-const rkey = () =>
-  Math.random()
-    .toString(36)
-    .substring(8);
-const unFocus = function() {
-  if (document.selection) {
-    document.selection.empty();
+const unFocus = function () {
+  if (document.getSelection()) {
+    document.getSelection().empty();
   } else {
     window.getSelection().removeAllRanges();
   }
@@ -44,7 +40,7 @@ function round(a, mod) {
 /* Number.prototype.clamp = function(min, max) {
   return Math.min(Math.max(this, min), max);
 }; */
-let clamp = function(min, max) {
+let clamp = function (min, max) {
   return Math.min(Math.max(this, min), max);
 };
 function getWindowWidth() {
@@ -67,6 +63,23 @@ function getWindowHeight() {
   );
 }
 
+function clone(obj) {
+  if (null == obj || 'object' != typeof obj) return obj;
+  var copy = obj.constructor();
+  for (var attr in obj) {
+    if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+  }
+  return copy;
+}
+function clone1(obj, param1) {
+  if (null == obj || 'object' != typeof obj) return obj;
+  let copy = new obj.constructor(param1);
+  for (var attr in obj) {
+    if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+  }
+  return copy;
+}
+
 console.log(`Width:  ${getWindowWidth()}`);
 console.log(`Height: ${getWindowHeight()}`);
-export { rkey, round, unFocus,clamp, getRelativeCoordinates };
+export { round, unFocus, clamp, getRelativeCoordinates, clone, clone1 };

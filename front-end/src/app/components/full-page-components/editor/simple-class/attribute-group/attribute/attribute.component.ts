@@ -7,8 +7,8 @@ import {
   OnChanges,
   OnInit,
 } from '@angular/core';
-import { SimpleClassAttributeGroup } from 'src/app/components/models/SimpleClassAttributeGroup';
-import { AttributeElement } from '../../../../../models/AttributeElement';
+import { SimpleClassAttributeGroup } from 'src/app/components/models/DiagramObjects/SimpleClassAttributeGroup';
+import { AttributeElement } from '../../../../../models/DiagramObjects/AttributeElement';
 import { AttributeGroupComponent } from '../attribute-group.component';
 @Component({
   selector: 'app-attribute',

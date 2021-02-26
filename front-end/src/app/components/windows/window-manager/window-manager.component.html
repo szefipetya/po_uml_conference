@@ -1,8 +1,9 @@
 <div
   class="window-manager-root_frame"
-  (mousedown)="onMouseDown($event)"
-  (mouseup)="onMouseUp($event)"
-  (mousemove)="onMouseMove($event)"
+  (mousedown)="this.onMouseDown($event)"
+  (mouseup)="this.onMouseUp($event)"
+  (mousemove)="this.onMouseMove($event)"
+  (click)="this.onClick($event)"
 >
   <div
     class="dock-surface window-manager-left_dock"
@@ -16,8 +17,17 @@
     class="dock-surface window-manager-bottom_dock"
     (mouseenter)="onDockMouseEnter($event, 'B')"
   ></div>
+  <div class="windows">
+    <div *ngFor="let win of this.windows">
+      <app-tool-box-window
+        (toolSelectedEvent)="onToolSelected($event)"
+        [model]="win"
+        *ngIf="win.id == 'tools'"
+        [lineCanvasModel]="this.editorService.model.lineCanvas"
+        [canvasModel]="this.editorService.model.canvas"
+      >
+      </app-tool-box-window>
+    </div>
+  </div>
+  <app-main> </app-main>
 </div>
-<div class="windows">
-  <app-tool-box-window> </app-tool-box-window>
-</div>
-<app-main> </app-main>

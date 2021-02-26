@@ -3,8 +3,11 @@ import {
   ModuleWithComponentFactories,
   NgModuleRef,
 } from '@angular/core';
-import { Element_c } from 'src/app/components/models/Element_c';
+import { Element_c } from 'src/app/components/models/DiagramObjects/Element_c';
+import { LINE_TYPE } from 'src/app/components/models/line/LINE_TYPE';
 import { Model } from '../../../../models/Model';
+import { CanvasBoxComponent } from '../../canvas-box/canvas-box.component';
+import { LineCanvasComponent } from '../../canvas-box/line-canvas/line-canvas.component';
 @Injectable({
   providedIn: 'root',
 })
@@ -26,6 +29,16 @@ export class GlobalEditorService {
     };
     this.model = {
       user: { userid: '001' },
+      lineCanvas: {
+        lines: [],
+        drawLineType: LINE_TYPE,
+        viewModel: null,
+        width:
+          window.innerWidth -
+          this.alignment.left_dock.width -
+          this.alignment.right_dock.width,
+        height: window.innerHeight - this.alignment.bottom_dock.height,
+      },
       canvas: {
         viewModel: null,
         edit_element_id: null,

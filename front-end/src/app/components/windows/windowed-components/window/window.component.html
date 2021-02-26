@@ -1,10 +1,18 @@
 <div
   class="window"
-  [style.width]="model.width + 'px'"
-  [style.height]="model.height + 'px'"
-  [style.top]="model.top + 'px'"
-  [style.left]="model.left + 'px'"
+  data-id="{{ this.model.id }}"
+  [style.width]="this.model.width + 'px'"
+  [style.height]="this.model.height + 'px'"
+  [style.top]="this.model.top + 'px'"
+  [style.left]="this.model.left + 'px'"
 >
+  <div
+    class="window-head"
+    [style.height]="this.model.head.height + 'px'"
+    (onmousedown)="this.onHeadMouseDown($event)"
+  >
+    {{ this.model.head.title }}
+  </div>
   <div class="window-content">
     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
   </div>

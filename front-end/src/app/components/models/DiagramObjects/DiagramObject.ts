@@ -1,19 +1,17 @@
 import { AttributeElement } from './AttributeElement';
+import { DiagramObject_Scaled } from './DiagramObject_Scaled';
+import { SimpleClass } from './SimpleClass';
 import { SimpleClassAttributeGroup } from './SimpleClassAttributeGroup';
-import { SimpleClass_Scaled } from './SimpleClass_Scaled';
 
-export class SimpleClass {
+export class DiagramObject {
   id: string;
   posx: number;
   posy: number;
   width: number;
   height: number;
-  scaledModel: SimpleClass_Scaled;
+  scaledModel: DiagramObject_Scaled;
   min_height: number;
   z: number;
   edit: boolean;
   name: string;
-  class_type: string;
-  groups: SimpleClassAttributeGroup[];
-  titleModel: AttributeElement;
 }

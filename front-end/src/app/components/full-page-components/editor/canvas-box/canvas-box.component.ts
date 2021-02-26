@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { GlobalEditorService } from '../services/global-editor/global-editor.service';
-import { rkey, round, clamp, unFocus } from '../Utils/utils';
+import { round, unFocus } from '../Utils/utils';
+import { LineCanvasComponent } from './line-canvas/line-canvas.component';
 
 @Component({
   selector: 'app-canvas-box',
@@ -58,7 +60,7 @@ export class CanvasBoxComponent implements OnInit {
 
     this.borderString_scale = `${this.editorService.model.class_general.border_scaled}px gold solid`;
     this.onMouseUp(null);
-    //this.forceUpdate();
+    this.updateCanvas();
   }
 
   drawedClassX: number;
@@ -181,7 +183,7 @@ export class CanvasBoxComponent implements OnInit {
   xdiff_rel_to_stored: number;
   ydiff_rel_to_stored: number;
   dclass: any;
-  targetClass_stored: any;
+  targetClass_stored: SimpleClass;
   targetWidth_stored: any;
   targetHeight_stored: any;
   targetRect_stored: any;
@@ -191,7 +193,9 @@ export class CanvasBoxComponent implements OnInit {
   stored_ydiff: number;
 
   ebox: any;
-  forceUpdate() {}
+  updateCanvas() {
+    this.lineCanvasComponent.update();
+  }
   targetDOM: any;
   holdingAny: boolean;
   holding: boolean;
@@ -231,7 +235,7 @@ export class CanvasBoxComponent implements OnInit {
             this.targetDOM.style.transition = 'unset';
           }, this.targetCorrigateTransition);
         }
-        this.forceUpdate();
+        this.updateCanvas();
       }
     }
   };
@@ -308,7 +312,7 @@ export class CanvasBoxComponent implements OnInit {
       setTimeout(() => {
         this.ebox.style.transition = 'unset';
       }, this.targetCorrigateTransition);
-      this.forceUpdate();
+      this.updateCanvas();
       /*  this.setState({ canvas }) */
     }
   };
@@ -333,8 +337,11 @@ export class CanvasBoxComponent implements OnInit {
     if (!this.dclass || e.target.className == 'edit-box') {
       if (this.repositionCanvas(e)) return;
     }
-    // CLASS//
-    this.resizeExistingClass(e);
+
+    if (this.editorService.model.canvas.drawMode == 'line')
+      this.lineCanvasComponent.drawMove(e);
+    // class újraméretezés//
+    else this.resizeExistingClass(e);
   };
   resizeExistingClass = (e) => {
     let nohover = 0;
@@ -359,7 +366,7 @@ export class CanvasBoxComponent implements OnInit {
         this.targetClass.scaledModel.posy_scaled,
         this.editorService.model.canvas.gridSize
       );
-      this.forceUpdate();
+      this.updateCanvas();
       return;
     }
     // resize xr
@@ -380,7 +387,7 @@ export class CanvasBoxComponent implements OnInit {
         this.xdiff_rel_to_stored +
         (this.targetWidth_stored - this.stored_xdiff);
       this.targetDOM.style.borderRight = this.borderString_scale;
-      this.forceUpdate();
+      this.updateCanvas();
       // return;
     }
     // resize xl
@@ -490,7 +497,7 @@ export class CanvasBoxComponent implements OnInit {
     }
     //   this.corrigateCanvasPosition();
     //  this.corrigateTargetClassPosition();
-    this.forceUpdate();
+    this.updateCanvas();
   };
 
   repositionCanvas = (e) => {
@@ -500,7 +507,7 @@ export class CanvasBoxComponent implements OnInit {
           e.clientX - this.clipDOM.getBoundingClientRect().left - this.xdiff;
         this.editorService.model.canvas.posy =
           e.clientY - this.clipDOM.getBoundingClientRect().top - this.ydiff;
-        this.forceUpdate();
+        this.updateCanvas();
         /* this.setState({ canvas }) */
         return true;
       }
@@ -519,7 +526,7 @@ export class CanvasBoxComponent implements OnInit {
       this.findClassById(this.drawedClassId)[0].scaledModel.height_scaled =
         y - this.drawedClassY;
       unFocus();
-      this.forceUpdate();
+      this.updateCanvas();
     }
   };
   findClassDOMbyId(id): any {
@@ -534,18 +541,21 @@ export class CanvasBoxComponent implements OnInit {
     }
   }
   onMouseUp(e) {
-    if (this.editorService.model.canvas.drawMode == 'class') {
+    if (this.editorService.model.canvas.drawMode == 'line')
+      this.lineCanvasComponent.drawEnd(e);
+    if (this.editorService.model.canvas.drawMode != 'cursor') {
       this.editorService.model.canvas.drawMode = 'cursor';
       const drawedclass = this.findClassDOMbyId(this.drawedClassId);
-      // if (drawedclass) drawedclass.querySelector('.class-title').click();
       this.drawedClassPositionSpecified = false;
       this.drawedClassId = undefined;
-      this.forceUpdate();
     }
-    //  findReact(document.querySelector('.toolbox')).updateSelected();
 
     if (this.targetDOM != undefined)
       this.targetDOM.style.border = `${this.editorService.model.class_general.border_scaled}px solid rgba(255, 255, 255, 0.19)`;
+    this.resetMouseState();
+  }
+
+  resetMouseState() {
     this.holdingAny = false;
     this.holding = false;
     this.corrigateTargetClassPosition();
@@ -560,117 +570,146 @@ export class CanvasBoxComponent implements OnInit {
     this.corrigateCanvasPosition();
   }
   onMouseDown(e) {
-    if (this.editorService.model.canvas.drawMode == 'class') {
-      const rect = e.target.closest('.edit-box').getBoundingClientRect();
-      const x = e.clientX - rect.left; // x position within the element.
-      const y = e.clientY - rect.top;
-      this.drawedClassX = x;
-      this.drawedClassY = y;
-      this.drawedClassId = `c${this.getNewClassId()}`;
-      const newclass = {
-        id: this.drawedClassId,
-        width: 1,
-        height: 1,
-        posx: this.drawedClassX,
-        posy: this.drawedClassY,
-        min_height: 75,
-        scaledModel: {
-          posx_scaled: x,
-          posy_scaled: y,
-          width_scaled: 1,
-          height_scaled: 1,
-          min_height_scaled: 75,
-        },
-        z: this.getHighestClassZIndex(),
-        edit: false,
-        name: '',
-        class_type: 'classDG',
-        groups: [
-          {
-            group_name: 'attributes',
-            group_syntax: 'attribute',
-            attributes: [],
-          },
-          {
-            group_name: 'functions',
-            group_syntax: 'function',
-            attributes: [],
-          },
-        ],
-      };
-      this.editorService.model.classes.push(newclass);
-      this.targetClass = newclass;
-      this.drawedClassPositionSpecified = true;
-    } else if (this.editorService.model.canvas.drawMode == 'cursor') {
-      // EDIT BOX//
-      if (e.target.className == 'edit-box') {
-        let rect;
-        let inner;
-        rect = e.target.parentNode.getBoundingClientRect();
-        inner = e.target.getBoundingClientRect();
-        this.xdiff = e.clientX - inner.left;
-        this.ydiff = e.clientY - inner.top;
-        console.log(this.xdiff);
-        console.log(this.ydiff);
-        this.holding = true;
-        this.clipDOM = e.target.closest('.edit-box-clip');
-        // selection off
-        this.editorService.model.canvas.selectedClassIds = [];
-        this.updateClassSelection();
-      }
-      // CLASS//
+    switch (this.editorService.model.canvas.drawMode) {
+      case 'class':
+        this.drawClassMode(e);
+        break;
+      case 'cursor':
+        this.cursorMode(e);
+        break;
+      case 'line':
+        this.drawLineMode(e);
+        break;
+    }
+  }
+  @ViewChild('linecanvas') lineCanvasComponent: LineCanvasComponent;
+  drawLineMode(e) {
+    this.lineCanvasComponent.drawBegin(
+      e,
+      this.editorService.model.lineCanvas.drawLineType
+    );
+  }
+  cursorMode(e) {
+    // EDIT BOX//
+    if (e.target.className == 'edit-box') {
+      let rect;
+      let inner;
+      rect = e.target.parentNode.getBoundingClientRect();
+      inner = e.target.getBoundingClientRect();
+      this.xdiff = e.clientX - inner.left;
+      this.ydiff = e.clientY - inner.top;
+      console.log(this.xdiff);
+      console.log(this.ydiff);
+      this.holding = true;
+      this.clipDOM = e.target.closest('.edit-box-clip');
+      // selection off
+      this.editorService.model.canvas.selectedClassIds = [];
+      this.updateClassSelection();
+    }
+    // CLASS//
+    if (
+      e.target.className != 'edit-box' &&
+      e.target.nodeName != 'INPUT' &&
+      this.targetClass
+    ) {
+      console.log('selected a class');
+      this.setTargets(e);
+      this.setStoredTargets(e);
+      // selection
+      this.selectClickedClassOnly();
+      this.updateClassSelection();
+      // zindex problem
+      const max = this.getHighestClassZIndex();
+      if (this.targetClass) this.targetClass.z = max;
+      // grabxr
+      let n = 0;
       if (
-        e.target.className != 'edit-box' &&
-        e.target.nodeName != 'INPUT' &&
-        this.targetClass
+        this.xdiff >=
+        this.targetClass.scaledModel.width_scaled - this.resizePadding
       ) {
-        console.log('selected a class');
-        this.setTargets(e);
-        this.setStoredTargets(e);
-        // selection
-        this.selectClickedClassOnly();
-        this.updateClassSelection();
-        // zindex problem
-        const max = this.getHighestClassZIndex();
-        if (this.targetClass) this.targetClass.z = max;
-        // grabxr
-        let n = 0;
-        if (
-          this.xdiff >=
-          this.targetClass.scaledModel.width_scaled - this.resizePadding
-        ) {
-          n++;
-          this.targetResizeGrabXR = true;
-          this.targetCurrentId = this.targetClass.id;
-          console.log('xl');
-        }
-        // grabxl
+        n++;
+        this.targetResizeGrabXR = true;
+        this.targetCurrentId = this.targetClass.id;
+        console.log('xl');
+      }
+      // grabxl
 
-        if (this.xdiff < this.resizePadding) {
-          n++;
-          this.targetResizeGrabXL = true;
-          this.targetCurrentId = this.targetClass.id;
-        }
-        // grabyr
+      if (this.xdiff < this.resizePadding) {
+        n++;
+        this.targetResizeGrabXL = true;
+        this.targetCurrentId = this.targetClass.id;
+      }
+      // grabyr
 
-        if (
-          this.ydiff >=
-          this.targetClass.scaledModel.height_scaled - this.resizePadding
-        ) {
-          n++;
-          this.targetResizeGrabYR = true;
-          this.targetCurrentId = this.targetClass.id;
-        }
-        // grabyl
-        if (this.ydiff <= this.resizePadding) {
-          n++;
-          this.targetResizeGrabYL = true;
-          this.targetCurrentId = this.targetClass.id;
-        }
-        if (n == 0) {
-          this.holdingAny = true;
-        }
+      if (
+        this.ydiff >=
+        this.targetClass.scaledModel.height_scaled - this.resizePadding
+      ) {
+        n++;
+        this.targetResizeGrabYR = true;
+        this.targetCurrentId = this.targetClass.id;
+      }
+      // grabyl
+      if (this.ydiff <= this.resizePadding) {
+        n++;
+        this.targetResizeGrabYL = true;
+        this.targetCurrentId = this.targetClass.id;
+      }
+      if (n == 0) {
+        this.holdingAny = true;
       }
     }
+  }
+  drawClassMode(e) {
+    const rect = e.target.closest('.edit-box')?.getBoundingClientRect();
+    if (!rect) return;
+    const x = e.clientX - rect.left; // x position within the element.
+    const y = e.clientY - rect.top;
+    this.drawedClassX = x;
+    this.drawedClassY = y;
+    this.drawedClassId = `c${this.getNewClassId()}`;
+    let newclass: SimpleClass;
+    newclass = {
+      id: this.drawedClassId,
+      width: 1,
+      height: 1,
+      posx: this.drawedClassX,
+      posy: this.drawedClassY,
+      min_height: 75,
+      scaledModel: {
+        posx_scaled: x,
+        posy_scaled: y,
+        width_scaled: 1,
+        height_scaled: 1,
+        min_height_scaled: 75,
+      },
+      z: this.getHighestClassZIndex(),
+      edit: false,
+      name: '',
+      class_type: 'classDG',
+      groups: [
+        {
+          group_name: 'attributes',
+          group_syntax: 'attribute',
+          attributes: [],
+        },
+        {
+          group_name: 'functions',
+          group_syntax: 'function',
+          attributes: [],
+        },
+      ],
+      titleModel: {
+        edit: true,
+        id: this.drawedClassId + '-t',
+        name: 'Class',
+        type: null,
+        viewModel: null,
+        visibility: null,
+      },
+    };
+    this.editorService.model.classes.push(newclass);
+    this.targetClass = newclass;
+    this.drawedClassPositionSpecified = true;
   }
 }

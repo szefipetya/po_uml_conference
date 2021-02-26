@@ -1,4 +1,7 @@
+import { WindowComponent } from '../../windows/windowed-components/window/window.component';
+
 export class Window_c {
+  selector: string;
   id: string;
   width: number;
   height: number;
@@ -9,4 +12,6 @@ export class Window_c {
     height: number;
     title: string;
   };
+  viewModelInstance: WindowComponent;
+  contentViewModelInstance: any;
 }

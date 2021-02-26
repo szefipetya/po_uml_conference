@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
-import { SimpleClass } from 'src/app/components/models/SimpleClass';
-import { SimpleClassAttributeGroup } from 'src/app/components/models/SimpleClassAttributeGroup';
+import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
+import { SimpleClassAttributeGroup } from 'src/app/components/models/DiagramObjects/SimpleClassAttributeGroup';
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
 import { SimpleClassComponent } from '../simple-class.component';
 
