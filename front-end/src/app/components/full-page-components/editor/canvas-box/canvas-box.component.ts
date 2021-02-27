@@ -495,9 +495,6 @@ export class CanvasBoxComponent implements OnInit {
       );
       this.corrigateTargetClassDimensions();
     }
-    //   this.corrigateCanvasPosition();
-    //  this.corrigateTargetClassPosition();
-    this.updateCanvas();
   };
 
   repositionCanvas = (e) => {
@@ -507,7 +504,7 @@ export class CanvasBoxComponent implements OnInit {
           e.clientX - this.clipDOM.getBoundingClientRect().left - this.xdiff;
         this.editorService.model.canvas.posy =
           e.clientY - this.clipDOM.getBoundingClientRect().top - this.ydiff;
-        this.updateCanvas();
+        //  this.updateCanvas();
         /* this.setState({ canvas }) */
         return true;
       }

@@ -24,7 +24,7 @@ import { WindowComponent } from './components/windows/windowed-components/window
 import { DockableWindowComponent } from './components/windows/windowed-components/dockable-window/dockable-window.component';
 import { FixedWindowComponent } from './components/windows/windowed-components/fixed-window/fixed-window.component';
 import { WindowManagerComponent } from './components/windows/window-manager/window-manager.component';
-import { ToolBoxWindowComponent } from './components/windows/windowed-components/_instances/dockable-window/tool-box-window/tool-box-window.component';
+import { ToolBoxWindowComponent } from './components/windows/windowed-components/_instances/editor/tool-box-window/tool-box-window.component';
 import { LineCanvasComponent } from './components/full-page-components/editor/canvas-box/line-canvas/line-canvas.component';
 
 @NgModule({
