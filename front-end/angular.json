@@ -31,7 +31,10 @@
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": ["src/app/js/webjars/jquery.min.js",
+              "src/app/js/webjars/sockjs.min.js",
+              "src/app/js/webjars/stomp.min.js",
+              "src/app/js/webjars/stomp.js"]
           },
           "configurations": {
             "production": {
@@ -96,7 +99,10 @@
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": ["src/app/js/webjars/jquery.min.js",
+              "src/app/js/webjars/sockjs.min.js",
+              "src/app/js/webjars/stomp.min.js",
+              "src/app/js/webjars/stomp.js"]
           }
         },
         "lint": {

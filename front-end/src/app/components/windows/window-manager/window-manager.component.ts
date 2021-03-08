@@ -29,8 +29,23 @@ export class WindowManagerComponent implements OnInit {
         height: null,
         width: 300,
         id: 'tools',
-        left: 300,
+        left: 600,
         top: 200,
+        viewModelInstance: null,
+        contentViewModelInstance: null,
+      },
+      {
+        selector: 'app-socket-communication-window',
+        fixed: false,
+        head: {
+          height: 25,
+          title: 'Socket Communication',
+        },
+        height: null,
+        width: 300,
+        id: 'socket',
+        left: 600,
+        top: 550,
         viewModelInstance: null,
         contentViewModelInstance: null,
       },
@@ -41,16 +56,20 @@ export class WindowManagerComponent implements OnInit {
   }
   draggedWindowModel: Window_c;
   onMouseDown(e) {
+    console.log(e);
     if (e.target.className == 'window-head') {
       this.draggedWindowDOM = e.target.closest('.window');
       this.draggedWindowModel = this.findWindowModelById(
         this.draggedWindowDOM.id
       );
       this.draggedWindowModel.viewModelInstance.onHeadMouseDown(e);
-    } //else this.editorService.model.canvas.viewModel.onMouseDown(e);
+    } else this.editorService.model.canvas.viewModel.onMouseDown(e);
   }
   onMouseMove(e) {
+    //console.log('move1');
     if (this.draggedWindowDOM && this.draggedWindowModel) {
+      //  this.draggedWindowModel.viewModelInstance.onHeadMouseDown(e);
+      // console.log('move');
       this.draggedWindowModel.viewModelInstance.moveWindow(e);
     } else this.editorService.model.canvas.viewModel.onMouseMove(e);
   }

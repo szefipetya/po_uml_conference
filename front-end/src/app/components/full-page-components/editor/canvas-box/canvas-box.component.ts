@@ -538,10 +538,10 @@ export class CanvasBoxComponent implements OnInit {
     }
   }
   onMouseUp(e) {
-    if (this.editorService.model.canvas.drawMode == 'line')
+    if (this.editorService.model.canvas.drawMode == 'line') {
       this.lineCanvasComponent.drawEnd(e);
+    }
     if (this.editorService.model.canvas.drawMode != 'cursor') {
-      this.editorService.model.canvas.drawMode = 'cursor';
       const drawedclass = this.findClassDOMbyId(this.drawedClassId);
       this.drawedClassPositionSpecified = false;
       this.drawedClassId = undefined;
@@ -553,6 +553,7 @@ export class CanvasBoxComponent implements OnInit {
   }
 
   resetMouseState() {
+    this.editorService.model.canvas.drawMode = 'cursor';
     this.holdingAny = false;
     this.holding = false;
     this.corrigateTargetClassPosition();

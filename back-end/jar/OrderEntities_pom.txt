@@ -1,0 +1,15 @@
+@EntityScan({"com.clarmont.orderentities.model.entity"})
+
+   <repositories>
+                <repository>
+                    <id>local-maven-repo</id>
+                    <url>file:///${project.basedir}/jar</url>
+                </repository>
+            </repositories>
+
+           <dependency>
+                   <groupId>com.clarmont</groupId>
+                   <artifactId>OrderEntities</artifactId>
+                   <version>1.0-SNAPSHOT</version>
+                   
+           </dependency>

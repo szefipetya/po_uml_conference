@@ -1,25 +1,24 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Window_c } from 'src/app/components/models/windows/Window_c';
+import { WindowComponent } from '../../../window/window.component';
 
 @Component({
   selector: 'app-tool-box-window',
   templateUrl: './tool-box-window.component.html',
   styleUrls: ['./tool-box-window.component.scss'],
 })
-export class ToolBoxWindowComponent implements OnInit {
+export class ToolBoxWindowComponent extends WindowComponent {
   constructor() {
+    super();
     this.toolSelectedEvent = new EventEmitter();
   }
   @Input() public canvasModel;
   @Input() public lineCanvasModel;
-  @Input() public model: Window_c;
   @Output() public toolSelectedEvent: EventEmitter<{
     type: string;
     extra: number;
   }>;
-  ngOnInit(): void {
-    this.model.contentViewModelInstance = this;
-  }
+
   toolSelected(e) {
     console.log(e.target);
     if (e.target.className == 'toolbox-item') {

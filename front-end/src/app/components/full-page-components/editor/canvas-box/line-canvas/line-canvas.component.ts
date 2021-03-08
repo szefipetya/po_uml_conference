@@ -13,11 +13,13 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
+import { ResourceLoaderService } from '../../services/resource-loader/resource-loader.service';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { Canvas } from 'src/app/components/models/canvas';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
+import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
+import { LINE_HEAD } from 'src/app/components/models/line/LINE_HEAD';
 
 @Component({
   selector: 'app-line-canvas',
@@ -25,12 +27,13 @@ import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/D
   styleUrls: ['./line-canvas.component.scss'],
 })
 export class LineCanvasComponent implements OnInit, AfterContentInit {
-  constructor() {}
+  constructor(private resourceLoader: ResourceLoaderService) {}
   @ViewChild('canvas')
   public canvasDOM: ElementRef<HTMLCanvasElement>;
   private ctx: CanvasRenderingContext2D;
   @Input() lineCanvasModel: LineCanvas;
   @Input() canvasModel: Canvas;
+  @Input() class_general: SimpleClass_General;
   @Input() classes: SimpleClass[];
   lineInstance: Line;
   ngAfterContentInit(): void {
@@ -38,6 +41,7 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
       this.init();
     }, 1);
   }
+  lineHeads;
   init() {
     this.ctx = this.canvasDOM.nativeElement.getContext('2d');
     console.dir(this.canvasDOM);
@@ -45,8 +49,39 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
     let ctx = this.ctx;
     this.ctx.fillStyle = 'red';
     this.ctx.fillRect(0, 0, 5, 5);
+    this.ctx.lineWidth = 4;
     console.log('drawed');
+
     this.drawStoredLines();
+    this.lineHeads = [
+      {
+        head: LINE_HEAD.RHOMBUS_FILLED,
+        img: this.resourceLoader.getSvgHead(LINE_HEAD.RHOMBUS_FILLED),
+      },
+      {
+        head: LINE_HEAD.RHOMBUS_EMPTY,
+        img: this.resourceLoader.getSvgHead(LINE_HEAD.RHOMBUS_EMPTY),
+      },
+      {
+        head: LINE_HEAD.TRI_ARROW_EMPTY,
+        img: this.resourceLoader.getSvgHead(LINE_HEAD.TRI_ARROW_EMPTY),
+      },
+      {
+        head: LINE_HEAD.TRI_ARROW_FILLED,
+        img: this.resourceLoader.getSvgHead(LINE_HEAD.TRI_ARROW_FILLED),
+      },
+      {
+        head: LINE_HEAD.ARROW,
+        img: this.resourceLoader.getSvgHead(LINE_HEAD.ARROW),
+      },
+      {
+        head: LINE_HEAD.NONE,
+        img: null,
+      },
+    ];
+  }
+  getLineHead(h: LINE_HEAD): any {
+    return this.lineHeads.filter((l) => l.head == h)[0].img;
   }
   getCenter(obj: DiagramObject): { x: number; y: number } {
     let x = obj.scaledModel.posx_scaled + obj.scaledModel.width_scaled / 2;
@@ -56,11 +91,13 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
   drawBegin(e, type) {
     console.log('DRAWING');
     this.lineInstance = new Line(type);
-    let target = e.target;
+    let target;
     if (e.target.className != 'd-class') {
       target = e.target.closest('.d-class');
+    } else {
+      target = e.target;
     }
-    if (target.className == 'd-class') {
+    if (target) {
       this.lineInstance.object_start = this.classes.filter(
         (c) => target.id == c.id
       )[0];
@@ -81,12 +118,14 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
   }
   drawEnd(e) {
     if (!e.target) return;
-    let target = e.target;
+    let target;
     if (e.target.className != 'd-class') {
       target = e.target.closest('.d-class');
+    } else {
+      target = e.target;
     }
     console.log('target:', target);
-    if (target.className == 'd-class') {
+    if (target) {
       this.lineInstance.object_end = this.classes.filter(
         (c) => target.id == c.id
       )[0];
@@ -100,29 +139,83 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
       console.log('err: thats not a valid endpoint');
     }
     this.lineInstance = null;
+    this.update();
+  }
+
+  getClassGeneralDimension() {
+    //width
+    return (
+      this.class_general.border_scaled * 2 +
+      this.class_general.padding_scaled * 2
+    );
   }
   drawLine(l: Line) {
     if (l?.object_start && l?.object_end) {
       let p = this.getLineIntersectionWithBox(l, l.object_end.scaledModel);
+      let vec: Vector = new Vector();
 
       let ctx = this.ctx;
-      if (p) ctx.fillRect(p.x - 20, p.y - 20, 40, 40);
+      // if (p) ctx.fillRect(p.x - 10, p.y - 10, 20, 20);
       ctx.beginPath();
       let spt = this.getCenter(l.object_start);
+
       ctx.moveTo(spt.x, spt.y);
       let spt2 = this.getCenter(l.object_end);
       ctx.lineTo(spt2.x, spt2.y);
-      ctx.fillRect(
-        l.object_start.scaledModel.posx_scaled - 10,
-        l.object_start.scaledModel.posy_scaled - 10,
-        l.object_start.scaledModel.width_scaled + 30,
-        l.object_start.scaledModel.min_height_scaled + 30
-      );
-      console.log(l.object_start);
       ctx.stroke();
+      vec.sx = spt.x;
+      vec.sy = spt.y;
+      vec.ex = spt2.x;
+      vec.ey = spt2.y;
+
+      let angle = (vec.ey - vec.sy) / (vec.ex - vec.sx);
+      console.log(angle);
+      let angleRad = Math.atan(angle);
+      let angleDeg = (angleRad * 180) / Math.PI + 90;
+      if (spt2.x < spt.x) angleDeg += 180;
+      console.log(Math.atan(angle));
+      console.log(angleRad);
+      console.log(angleDeg);
+
+      var src = this.resourceLoader.getSvgHead(LINE_HEAD.TRI_ARROW_FILLED);
+      let img = this.getLineHead(l.lineType.endHead);
+      let i2 = new Image();
+      //  ctx.drawImage(img, p.x - img.width / 2, p.y - img.height / 2);
+      this.drawRotatedImage(img, p.x, p.y, angleDeg);
+      console.log(l.object_start);
+
       let p2 = this.getCenter(l.object_start);
     }
   }
+  TO_RADIANS = Math.PI / 180;
+  drawRotatedImage(image, x, y, angle) {
+    // save the current co-ordinate system
+    // before we screw with it
+    let ctx = this.ctx;
+    ctx.save();
+
+    // move to the middle of where we want to draw our image
+    ctx.translate(x, y);
+
+    // rotate around that point, converting our
+    // angle from degrees to radians
+    ctx.rotate(angle * this.TO_RADIANS);
+
+    // draw it up and to the left by half the width
+    // and height of the image
+    ctx.drawImage(image, -(image.width / 2), -(image.height / 2));
+
+    // and restore the co-ords to how they were when we began
+    ctx.restore();
+  }
+  drawWithRotation(angle, fn) {
+    let ctx = this.ctx;
+    ctx.save(); // save current state
+    ctx.rotate(angle); // rotate
+    fn();
+    ctx.restore(); // restore original states (no rotation etc)
+  }
+
   update() {
     this.clear();
     this.lineCanvasModel.lines.map((l: Line) => {
@@ -160,7 +253,8 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
     t_vec.sy = box.posy_scaled;
 
     t_vec.ey = t_vec.sy;
-    t_vec.ex = box.posx_scaled + box.width_scaled;
+    t_vec.ex =
+      box.posx_scaled + box.width_scaled + this.getClassGeneralDimension();
 
     let l_vec: Vector;
     l_vec = new Vector();
@@ -168,23 +262,26 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
     l_vec.sy = box.posy_scaled;
 
     l_vec.ex = l_vec.sx;
-    l_vec.ey = box.posy_scaled + box.height_scaled;
+    l_vec.ey =
+      box.posy_scaled + box.height_scaled + this.getClassGeneralDimension();
 
     let b_vec: Vector;
     b_vec = new Vector();
     b_vec.sx = box.posx_scaled;
-    b_vec.sy = box.posy_scaled + box.height_scaled;
+    b_vec.sy =
+      box.posy_scaled + box.height_scaled + this.getClassGeneralDimension();
 
-    b_vec.ex = b_vec.sx + box.width_scaled;
+    b_vec.ex = b_vec.sx + box.width_scaled + this.getClassGeneralDimension();
     b_vec.ey = b_vec.sy;
 
     let r_vec: Vector;
     r_vec = new Vector();
-    r_vec.sx = box.posx_scaled + box.width_scaled;
+    r_vec.sx =
+      box.posx_scaled + box.width_scaled + this.getClassGeneralDimension();
     r_vec.sy = box.posy_scaled;
 
     r_vec.ex = r_vec.sx;
-    r_vec.ey = r_vec.sy + box.height_scaled;
+    r_vec.ey = r_vec.sy + box.height_scaled + this.getClassGeneralDimension();
 
     // if the lines intersect, the result contains the x and y of the intersection (treating the lines as infinite) and booleans for whether line segment 1 or line segment 2 contain the point
 

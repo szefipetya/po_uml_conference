@@ -1,0 +1,9 @@
+<ng-template #content>
+  <div className="toolbox-wrapper">
+    <div class="toolbox">
+      <div class="toolbox-item" (click)="this.connect(true)">Connect</div>
+      <div class="toolbox-item" (click)="this.connect(false)">Disconnect</div>
+    </div>
+  </div>
+</ng-template>
+<app-window [contentTemplate]="content" [model]="this.model"> </app-window>

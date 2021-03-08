@@ -26,6 +26,7 @@ import { FixedWindowComponent } from './components/windows/windowed-components/f
 import { WindowManagerComponent } from './components/windows/window-manager/window-manager.component';
 import { ToolBoxWindowComponent } from './components/windows/windowed-components/_instances/editor/tool-box-window/tool-box-window.component';
 import { LineCanvasComponent } from './components/full-page-components/editor/canvas-box/line-canvas/line-canvas.component';
+import { SocketCommunicationWindowComponent } from './components/windows/windowed-components/_instances/editor/socket-communication-window/socket-communication-window.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { LineCanvasComponent } from './components/full-page-components/editor/ca
     WindowManagerComponent,
     ToolBoxWindowComponent,
     LineCanvasComponent,
+    SocketCommunicationWindowComponent,
   ],
   imports: [
     //Angular core

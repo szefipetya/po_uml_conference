@@ -1,32 +1,41 @@
-<div
-  class="window-manager-root_frame"
-  (mousedown)="this.onMouseDown($event)"
-  (mouseup)="this.onMouseUp($event)"
-  (mousemove)="this.onMouseMove($event)"
-  (click)="this.onClick($event)"
->
+<div class="window-manager-bg">
   <div
-    class="dock-surface window-manager-left_dock"
-    (mouseenter)="onDockMouseEnter($event, 'L')"
-  ></div>
-  <div
-    class="dock-surface window-manager-right_dock"
-    (mouseenter)="onDockMouseEnter($event, 'R')"
-  ></div>
-  <div
-    class="dock-surface window-manager-bottom_dock"
-    (mouseenter)="onDockMouseEnter($event, 'B')"
-  ></div>
-  <div class="windows">
-    <div *ngFor="let win of this.windows">
-      <app-tool-box-window
-        (toolSelectedEvent)="onToolSelected($event)"
-        [model]="win"
-        *ngIf="win.id == 'tools'"
-        [lineCanvasModel]="this.editorService.model.lineCanvas"
-        [canvasModel]="this.editorService.model.canvas"
-      >
-      </app-tool-box-window>
+    class="window-manager-root_frame"
+    (mousedown)="this.onMouseDown($event)"
+    (mouseup)="this.onMouseUp($event)"
+    (mousemove)="this.onMouseMove($event)"
+    (click)="this.onClick($event)"
+  >
+    <div
+      class="dock-surface window-manager-left_dock"
+      (mouseenter)="onDockMouseEnter($event, 'L')"
+    ></div>
+    <div
+      class="dock-surface window-manager-right_dock"
+      (mouseenter)="onDockMouseEnter($event, 'R')"
+    ></div>
+    <div
+      class="dock-surface window-manager-bottom_dock"
+      (mouseenter)="onDockMouseEnter($event, 'B')"
+    ></div>
+    <div class="windows">
+      <div *ngFor="let win of this.windows">
+        <app-tool-box-window
+          (toolSelectedEvent)="onToolSelected($event)"
+          [model]="win"
+          *ngIf="win.id == 'tools'"
+          [lineCanvasModel]="this.editorService.model.lineCanvas"
+          [canvasModel]="this.editorService.model.canvas"
+        >
+        </app-tool-box-window>
+        <app-socket-communication-window
+          (toolSelectedEvent)="onToolSelected($event)"
+          [model]="win"
+          *ngIf="win.id == 'socket'"
+        >
+        </app-socket-communication-window>
+      </div>
     </div>
   </div>
+  <router-outlet> </router-outlet>
 </div>

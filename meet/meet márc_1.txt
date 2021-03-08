@@ -1,0 +1,10 @@
+Próbáljam meg végiggondolni. a socketes részt
+selenium - frontend tesztek
+
+mit tennél?
+inkább az adatbázisban turkáljak egyfolytában, vagy
+nálam az alkalmazás típusa
+ megindokolja a vastagabb frontend-et
+
++ kutatás:
+adatbázisból lekérdezve és állandóan módosítva a gyorsabb vagy a memóriába mentve jobb
