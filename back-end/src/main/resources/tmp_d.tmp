@@ -1,0 +1,132 @@
+{
+    "owner": {
+        "id": "001",
+        "username": "test",
+        "email": "example@hu.hu",
+        "name": "test"
+    },
+    "lines": [],
+    "classes": [{
+            "id": "c1",
+            "posx": 110,
+            "posy": 220,
+            "width": 110,
+            "height": 250,
+            "min_height": 75,
+            "scaledModel": {
+                "posx_scaled": 110,
+                "posy_scaled": 220,
+                "width_scaled": 110,
+                "height_scaled": 250,
+                "min_height_scaled": 75
+            },
+            "z": 2,
+            "edit": false,
+            "name": "Class1",
+            "class_type": "classDG",
+            "titleModel": {
+                "id": "-1",
+                "edit": false,
+                "name": "attr2",
+                "viewModel": null
+            },
+            "groups": [{
+                    "group_name": "attributes",
+                    "group_syntax": 1,
+                    "attributes": [{
+                            "id": "1",
+                            "visibility": "+",
+                            "edit": false,
+                            "name": "attr1",
+                            "type": "int",
+                            "viewModel": null
+                        }, {
+                            "id": "2",
+                            "visibility": "+",
+                            "edit": false,
+                            "name": "attr2",
+                            "type": "int",
+                            "viewModel": null
+                        }]
+                }, {
+                    "group_name": "functions",
+                    "group_syntax": 0,
+                    "attributes": [{
+                            "id": "3",
+                            "visibility": "-",
+                            "edit": false,
+                            "name": "func1",
+                            "type": "int",
+                            "viewModel": null
+                        }, {
+                            "id": "4",
+                            "visibility": "#",
+                            "edit": false,
+                            "name": "func2",
+                            "type": "int",
+                            "viewModel": null
+                        }]
+                }]
+        }, {
+            "id": "c2",
+            "posx": 310,
+            "posy": 420,
+            "width": 110,
+            "height": 250,
+            "min_height": 75,
+            "scaledModel": {
+                "posx_scaled": 310,
+                "posy_scaled": 420,
+                "width_scaled": 110,
+                "height_scaled": 250,
+                "min_height_scaled": 75
+            },
+            "z": 1,
+            "edit": false,
+            "name": "Person",
+            "class_type": "classDG",
+            "titleModel": {
+                "id": "-2",
+                "edit": false,
+                "name": "attr2",
+                "viewModel": null
+            },
+            "groups": [{
+                    "group_name": "attributes",
+                    "group_syntax": 1,
+                    "attributes": [{
+                            "id": "5",
+                            "visibility": "+",
+                            "edit": false,
+                            "name": "name",
+                            "type": "string",
+                            "viewModel": null
+                        }, {
+                            "id": "6",
+                            "visibility": "#",
+                            "edit": false,
+                            "name": "age",
+                            "type": "intssssssssssssssssssssssssssssssssssssssssssssssss",
+                            "viewModel": null
+                        }]
+                }, {
+                    "group_name": "functions",
+                    "group_syntax": 0,
+                    "attributes": [{
+                            "id": "7",
+                            "visibility": "-",
+                            "edit": false,
+                            "name": "apply()",
+                            "type": "void",
+                            "viewModel": null
+                        }, {
+                            "id": "8",
+                            "visibility": "#",
+                            "edit": false,
+                            "name": "promote()",
+                            "type": "void",
+                            "viewModel": null
+                        }]
+                }]
+        }]
+}

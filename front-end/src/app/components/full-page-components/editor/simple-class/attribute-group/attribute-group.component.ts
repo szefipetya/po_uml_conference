@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
-import { SimpleClassAttributeGroup } from 'src/app/components/models/DiagramObjects/SimpleClassAttributeGroup';
+import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
 import { SimpleClassComponent } from '../simple-class.component';
 
@@ -10,7 +10,7 @@ import { SimpleClassComponent } from '../simple-class.component';
   styleUrls: ['./attribute-group.component.scss'],
 })
 export class AttributeGroupComponent implements OnInit, AfterViewInit {
-  @Input() model: SimpleClassAttributeGroup;
+  @Input() model: SimpleClassElementGroup;
   inputDOM: any;
   @Input() parent: SimpleClassComponent;
   editorService;
@@ -59,7 +59,7 @@ export class AttributeGroupComponent implements OnInit, AfterViewInit {
 
   pushNewElement = async (visibility, name, type) => {
     const id = this.getNewId();
-    this.editorService.model.canvas.edit_element_id = id;
+    this.editorService.clientModel.canvas.edit_element_id = id;
     let newAttr = {
       edit: true,
       id: id,

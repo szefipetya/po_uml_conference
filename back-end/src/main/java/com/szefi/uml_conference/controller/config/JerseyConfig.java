@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  *
  * @author peti
  */
-/*@Component*/
+@Component
 public class JerseyConfig extends ResourceConfig 
 {
     public JerseyConfig() 

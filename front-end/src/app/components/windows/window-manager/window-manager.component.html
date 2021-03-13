@@ -24,8 +24,8 @@
           (toolSelectedEvent)="onToolSelected($event)"
           [model]="win"
           *ngIf="win.id == 'tools'"
-          [lineCanvasModel]="this.editorService.model.lineCanvas"
-          [canvasModel]="this.editorService.model.canvas"
+          [lineCanvasModel]="this.editorService.clientModel.lineCanvas"
+          [canvasModel]="this.editorService.clientModel.canvas"
         >
         </app-tool-box-window>
         <app-socket-communication-window

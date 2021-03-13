@@ -2,26 +2,28 @@
   <div class="edit-box-container">
     <div
       class="edit-box-clip"
-      [style.width]="this.editorService.model.clip.width + 'px'"
-      [style.height]="this.editorService.model.clip.height + 'px'"
+      [style.width]="this.editorService.clientModel.canvas.clip.width + 'px'"
+      [style.height]="this.editorService.clientModel.canvas.clip.height + 'px'"
       [style.left]="this.editorService.alignment.left_dock.width + 'px'"
     >
       <div
         id="dgbox"
         class="edit-box"
-        [style.top]="editorService.model.canvas.posy.toString() + 'px'"
-        [style.left]="editorService.model.canvas.posx.toString() + 'px'"
-        [style.width]="this.editorService.model.canvas.width.toString() + 'px'"
+        [style.top]="editorService.clientModel.canvas.posy.toString() + 'px'"
+        [style.left]="editorService.clientModel.canvas.posx.toString() + 'px'"
+        [style.width]="
+          this.editorService.clientModel.canvas.width.toString() + 'px'
+        "
         [style.height]="
-          this.editorService.model.canvas.height.toString() + 'px'
+          this.editorService.clientModel.canvas.height.toString() + 'px'
         "
         [style.backgroundImage]="
           'linear-gradient(to right, rgba(255, 255, 255, 0.11) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.11) 1px, transparent 1px)'
         "
         [style.background-size]="
-          editorService.model.canvas.gridSize.toString() +
+          editorService.clientModel.canvas.gridSize.toString() +
           'px ' +
-          editorService.model.canvas.gridSize.toString() +
+          editorService.clientModel.canvas.gridSize.toString() +
           'px'
         "
         (mousemove)="onMouseMove($event)"
@@ -31,10 +33,11 @@
       >
         <app-line-canvas
           [classes]="editorService.model.classes"
-          [canvasModel]="editorService.model.canvas"
+          [canvasModel]="editorService.clientModel.canvas"
           #linecanvas
-          [class_general]="editorService.model.class_general"
-          [lineCanvasModel]="editorService.model.lineCanvas"
+          [class_general]="editorService.clientModel.class_general"
+          [lineCanvasModel]="editorService.clientModel.lineCanvas"
+          [lines]="editorService.model.lines"
         >
         </app-line-canvas>
         <div *ngFor="let item of this.editorService.model.classes">

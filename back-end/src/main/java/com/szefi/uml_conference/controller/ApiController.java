@@ -4,6 +4,8 @@ import com.clarmont.orderentities.model.dto.CartItemDto;
 import com.clarmont.orderentities.model.dto.ShopOrderDto;
 import com.clarmont.orderentities.model.entity.CartItemEntity;
 import com.clarmont.orderentities.model.entity.ShopOrderEntity;
+import com.szefi.uml_conference.model.dto.diagram.Diagram;
+import com.szefi.uml_conference.service.EditorSocketService;
 import com.szefi.uml_conference.service.OrderService;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +23,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,18 +36,20 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author peti and tomi
  */
-/*@Path("/api/order")*/
-
+@Path("/")
+@Controller
 public class ApiController {
 
     @Autowired
     OrderService service;
-
-    @Path("get/{id}")
+    @Autowired
+    EditorSocketService eService;
+    
+    @Path("get/dg/{id}")
     @GET
     @Produces({"application/json", "application/xml"})
-    public Optional<ShopOrderEntity> getOne(@PathParam("id") UUID id) {
-        return service.getById(id);
+    public Diagram getOne(@PathParam("id") String id) {
+        return eService.getDummyDiagram();
     }
 
     @DELETE
@@ -61,13 +66,7 @@ public class ApiController {
         }
     }
 
-    @Path("get")
-    @GET
-    @Produces({"application/json", "application/xml"})
-    public List<ShopOrderDto> getOrders() {
-        return service.getOrders();
-    }
-    
+  
     @Path("test")
     @GET
     @Produces({"application/json", "application/xml"})

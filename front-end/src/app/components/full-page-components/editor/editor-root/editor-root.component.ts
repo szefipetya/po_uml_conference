@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Model } from 'src/app/components/models/Model';
+import { Diagram } from 'src/app/components/models/Diagram/Diagram';
 import { GlobalEditorService } from '../services/global-editor/global-editor.service';
 
 @Component({
@@ -17,18 +17,29 @@ export class EditorRootComponent implements OnInit {
 
   constructor(editorService: GlobalEditorService) {
     this.editorService = editorService;
-    this.fullWidth = document.querySelector('html').clientWidth;
-    this.fullHeight = document.querySelector('html').clientHeight;
-    this.editorService.model.clip.width =
-      this.fullWidth -
-      this.editorService.alignment.left_dock.width -
-      this.editorService.alignment.right_dock.width;
-    this.editorService.model.clip.height =
-      this.fullHeight - this.editorService.alignment.bottom_dock.height;
-    this.editorService.editor_ref = this;
+    console.log('setup is running');
+    this.setup();
   }
 
   ngOnInit(): void {}
+  setup() {
+    const p = new Promise(async (resolve, reject) => {
+      await this.editorService.initFromServer();
+      await resolve('success');
+    });
+    p.then((o) => {
+      console.log(o);
+      this.fullWidth = document.querySelector('html').clientWidth;
+      this.fullHeight = document.querySelector('html').clientHeight;
+      this.editorService.clientModel.canvas.clip.width =
+        this.fullWidth -
+        this.editorService.alignment.left_dock.width -
+        this.editorService.alignment.right_dock.width;
+      this.editorService.clientModel.canvas.clip.height =
+        this.fullHeight - this.editorService.alignment.bottom_dock.height;
+      this.editorService.editor_ref = this;
+    });
+  }
   newButton;
   newButtonTransition;
   newButtonFontSize;
@@ -55,11 +66,11 @@ export class EditorRootComponent implements OnInit {
         if (clas.edit)
           if (clas.name.trim() != '') {
             clas.edit = false;
-            this.editorService.model.canvas.edit_classTitle_id = null;
+            this.editorService.clientModel.canvas.edit_classTitle_id = null;
           } else {
             clas.name = 'Class';
             clas.edit = false;
-            this.editorService.model.canvas.edit_classTitle_id = null;
+            this.editorService.clientModel.canvas.edit_classTitle_id = null;
           }
         clas.titleModel.edit = false;
         clas.titleModel.viewModel.save();
@@ -67,7 +78,7 @@ export class EditorRootComponent implements OnInit {
         clas.groups.map((egroup) => {
           egroup.attributes.map((e) => {
             if (e && e.edit) {
-              this.editorService.model.canvas.edit_element_id = null;
+              this.editorService.clientModel.canvas.edit_element_id = null;
               console.log('EDITED FOUND ');
               e.edit = false;
               e.viewModel.save();
@@ -100,7 +111,7 @@ export class EditorRootComponent implements OnInit {
       let input = document.querySelector('#editor-input');
       if (!input) {
         e.preventDefault();
-        this.editorService.model.canvas.selectedClassIds.map((id) => {
+        this.editorService.clientModel.canvas.selectedClassIds.map((id) => {
           this.editorService.model.classes = this.editorService.model.classes.filter(
             (clas) => clas.id != id
           );

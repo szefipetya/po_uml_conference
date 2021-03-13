@@ -7,7 +7,7 @@ import {
   OnChanges,
   OnInit,
 } from '@angular/core';
-import { SimpleClassAttributeGroup } from 'src/app/components/models/DiagramObjects/SimpleClassAttributeGroup';
+import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
 import { AttributeElement } from '../../../../../models/DiagramObjects/AttributeElement';
 import { AttributeGroupComponent } from '../attribute-group.component';
 @Component({
@@ -73,7 +73,7 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
     this.model.edit = true;
     this.targetDOM = e.target;
     console.log(this.parent.editorService);
-    this.parent.editorService.model.canvas.edit_element = this;
+    this.parent.editorService.clientModel.canvas.edit_element = this;
     if (!this.isTitle) this.renderMode = 'ATTRIBUTE_EDIT';
 
     this.render();
@@ -145,31 +145,37 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
         if (this.model.edit) {
           //TITLE_EDIT
           let val1 =
-            (this.parent.editorService.model.class_general.fontsize_scaled /
+            (this.parent.editorService.clientModel.class_general
+              .fontsize_scaled /
               this.elementScale) *
             1.418 *
             strfull.length;
           let val2 =
             this.parent.model.scaledModel.width_scaled -
-            (this.parent.editorService.model.class_general.padding_scaled +
-              this.parent.editorService.model.class_general.border_scaled) *
+            (this.parent.editorService.clientModel.class_general
+              .padding_scaled +
+              this.parent.editorService.clientModel.class_general
+                .border_scaled) *
               2;
           this.inputWidth = Math.max(val1, val2);
-          //old width: `${(strfull.length + 1) * (this.state.parent.parent.model.class_general.fontsize_scaled / this.titleScale)}px`
+          //old width: `${(strfull.length + 1) * (this.state.parent.parent.clientModel.class_general.fontsize_scaled / this.titleScale)}px`
         } else {
           //TITLE
           let rescale = this.titleScale;
           let charwidth =
-            this.parent.editorService.model.class_general.fontsize_scaled /
-            rescale;
+            this.parent.editorService.clientModel.class_general
+              .fontsize_scaled / rescale;
           let textwidth =
-            (this.parent.editorService.model.class_general.fontsize_scaled /
+            (this.parent.editorService.clientModel.class_general
+              .fontsize_scaled /
               rescale) *
             strfull.length;
           let width =
             this.parent.model.scaledModel.width_scaled -
-            (this.parent.editorService.model.class_general.padding_scaled +
-              this.parent.editorService.model.class_general.border_scaled) *
+            (this.parent.editorService.clientModel.class_general
+              .padding_scaled +
+              this.parent.editorService.clientModel.class_general
+                .border_scaled) *
               2;
           let l = false;
 
@@ -195,14 +201,17 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
           this.renderMode = 'ATTRIBUTE_EDIT';
 
           let val1 =
-            (this.parent.editorService.model.class_general.fontsize_scaled /
+            (this.parent.editorService.clientModel.class_general
+              .fontsize_scaled /
               this.elementScale) *
             0.92 *
             strfull.length;
           let val2 =
             this.parent.parent.model.scaledModel.width_scaled -
-            (this.parent.editorService.model.class_general.padding_scaled +
-              this.parent.editorService.model.class_general.border_scaled) *
+            (this.parent.editorService.clientModel.class_general
+              .padding_scaled +
+              this.parent.editorService.clientModel.class_general
+                .border_scaled) *
               2;
           this.inputWidth = Math.max(val1, val2);
         } else {
@@ -211,16 +220,19 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
 
           let rescale = this.elementScale;
           let charwidth =
-            this.parent.editorService.model.class_general.fontsize_scaled /
-            rescale;
+            this.parent.editorService.clientModel.class_general
+              .fontsize_scaled / rescale;
           let textwidth =
-            (this.parent.editorService.model.class_general.fontsize_scaled /
+            (this.parent.editorService.clientModel.class_general
+              .fontsize_scaled /
               rescale) *
             (strfull.length + 1);
           let width =
             this.parent.parent.model.scaledModel.width_scaled -
-            (this.parent.editorService.model.class_general.padding_scaled +
-              this.parent.editorService.model.class_general.border_scaled) *
+            (this.parent.editorService.clientModel.class_general
+              .padding_scaled +
+              this.parent.editorService.clientModel.class_general
+                .border_scaled) *
               2;
           if (textwidth > width) {
             this.showedText = strfull.substr(

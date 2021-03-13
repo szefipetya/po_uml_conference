@@ -63,7 +63,7 @@ export class WindowManagerComponent implements OnInit {
         this.draggedWindowDOM.id
       );
       this.draggedWindowModel.viewModelInstance.onHeadMouseDown(e);
-    } else this.editorService.model.canvas.viewModel.onMouseDown(e);
+    } // else this.editorService.clientModel.canvas.viewModel.onMouseDown(e);
   }
   onMouseMove(e) {
     //console.log('move1');
@@ -71,12 +71,12 @@ export class WindowManagerComponent implements OnInit {
       //  this.draggedWindowModel.viewModelInstance.onHeadMouseDown(e);
       // console.log('move');
       this.draggedWindowModel.viewModelInstance.moveWindow(e);
-    } else this.editorService.model.canvas.viewModel.onMouseMove(e);
+    } //else this.editorService.clientModel.canvas.viewModel.onMouseMove(e);
   }
   onMouseUp(e) {
     this.draggedWindowDOM = null;
     this.draggedWindowModel = null;
-    this.editorService.model.canvas.viewModel.onMouseUp(e);
+    //this.editorService.clientModel.canvas.viewModel.onMouseUp(e);
   }
   onDockMouseEnter(e, side) {
     console.log(e, side);

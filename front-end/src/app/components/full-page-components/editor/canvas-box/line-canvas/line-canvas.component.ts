@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { ResourceLoaderService } from '../../services/resource-loader/resource-loader.service';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
-import { Canvas } from 'src/app/components/models/canvas';
+import { Canvas } from 'src/app/components/models/Diagram/Canvas';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
 import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
@@ -35,6 +35,7 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
   @Input() canvasModel: Canvas;
   @Input() class_general: SimpleClass_General;
   @Input() classes: SimpleClass[];
+  @Input() lines: Line[];
   lineInstance: Line;
   ngAfterContentInit(): void {
     setTimeout(() => {
@@ -79,14 +80,18 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
         img: null,
       },
     ];
+    console.log(this.lineHeads);
   }
-  getLineHead(h: LINE_HEAD): any {
+  getLineHeadImg(h: LINE_HEAD): any {
     return this.lineHeads.filter((l) => l.head == h)[0].img;
   }
   getCenter(obj: DiagramObject): { x: number; y: number } {
     let x = obj.scaledModel.posx_scaled + obj.scaledModel.width_scaled / 2;
     let y = obj.scaledModel.posy_scaled + obj.scaledModel.height_scaled / 2;
     return { x, y };
+  }
+  getClassById(id: string): SimpleClass {
+    return this.classes.find((e) => e.id == id);
   }
   drawBegin(e, type) {
     console.log('DRAWING');
@@ -133,7 +138,7 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
         console.log(this.lineInstance.object_start);
         console.log(this.lineInstance.object_end);
 
-        this.lineCanvasModel.lines.push(this.lineInstance.clone());
+        this.lines.push(this.lineInstance.clone());
       }
     } else {
       console.log('err: thats not a valid endpoint');
@@ -173,18 +178,11 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
       let angleRad = Math.atan(angle);
       let angleDeg = (angleRad * 180) / Math.PI + 90;
       if (spt2.x < spt.x) angleDeg += 180;
-      console.log(Math.atan(angle));
-      console.log(angleRad);
-      console.log(angleDeg);
+      let img = this.getLineHeadImg(l.lineType.endHead);
 
-      var src = this.resourceLoader.getSvgHead(LINE_HEAD.TRI_ARROW_FILLED);
-      let img = this.getLineHead(l.lineType.endHead);
-      let i2 = new Image();
-      //  ctx.drawImage(img, p.x - img.width / 2, p.y - img.height / 2);
-      this.drawRotatedImage(img, p.x, p.y, angleDeg);
-      console.log(l.object_start);
-
-      let p2 = this.getCenter(l.object_start);
+      if (img)
+        //  ctx.drawImage(img, p.x - img.width / 2, p.y - img.height / 2);
+        this.drawRotatedImage(img, p.x, p.y, angleDeg);
     }
   }
   TO_RADIANS = Math.PI / 180;
@@ -218,7 +216,7 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
 
   update() {
     this.clear();
-    this.lineCanvasModel.lines.map((l: Line) => {
+    this.lines.map((l: Line) => {
       this.drawLine(l);
     });
   }

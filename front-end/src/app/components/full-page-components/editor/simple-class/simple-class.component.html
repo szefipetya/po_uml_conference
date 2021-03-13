@@ -1,16 +1,18 @@
 <div
   id="{{ this.model.id }}"
   [style.fontSize]="
-    this.editorService.model.class_general.fontsize_scaled + 'px'
+    this.editorService.clientModel.class_general.fontsize_scaled + 'px'
   "
   [style.top]="this.model.scaledModel.posy_scaled + 'px'"
   [style.left]="this.model.scaledModel.posx_scaled + 'px'"
   [style.width]="this.model.scaledModel.width_scaled + 'px'"
   [style.height]="this.model.scaledModel.height_scaled + 'px'"
   [style.zIndex]="this.model.z"
-  [style.padding]="this.editorService.model.class_general.padding_scaled + 'px'"
+  [style.padding]="
+    this.editorService.clientModel.class_general.padding_scaled + 'px'
+  "
   [style.border]="
-    this.editorService.model.class_general.border_scaled +
+    this.editorService.clientModel.class_general.border_scaled +
     'px' +
     'solid rgba(255, 255, 255, 0.19)'
   "

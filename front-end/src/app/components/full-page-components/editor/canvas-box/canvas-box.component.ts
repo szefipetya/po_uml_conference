@@ -3,7 +3,7 @@ import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClas
 import { GlobalEditorService } from '../services/global-editor/global-editor.service';
 import { round, unFocus } from '../Utils/utils';
 import { LineCanvasComponent } from './line-canvas/line-canvas.component';
-
+import { GROUP_SYNTAX } from 'src/app/components/models/DiagramObjects/GROUP_SYNTAX';
 @Component({
   selector: 'app-canvas-box',
   templateUrl: './canvas-box.component.html',
@@ -40,25 +40,25 @@ export class CanvasBoxComponent implements OnInit {
       e.groups.map((group) => {
         group.attributes.map((e2) => {
           if (e2.edit) {
-            e2.inputWidth *= scale;
+            e2.viewModel.inputWidth *= scale;
             e2.viewModel.render();
           }
         });
       });
     });
-    this.editorService.model.class_general.fontsize_scaled *= scale;
-    this.editorService.model.class_general.padding_scaled *= scale;
-    this.editorService.model.class_general.border_scaled *= scale;
-    this.editorService.model.class_general.min_height_scaled *= scale;
-    this.editorService.model.class_general.min_width_scaled *= scale;
-    this.editorService.model.canvas.scale *= scale;
-    this.editorService.model.canvas.posx *= scale;
-    this.editorService.model.canvas.posy *= scale;
-    this.editorService.model.canvas.width *= scale;
-    this.editorService.model.canvas.height *= scale;
-    this.editorService.model.canvas.gridSize *= scale;
+    this.editorService.clientModel.class_general.fontsize_scaled *= scale;
+    this.editorService.clientModel.class_general.padding_scaled *= scale;
+    this.editorService.clientModel.class_general.border_scaled *= scale;
+    this.editorService.clientModel.class_general.min_height_scaled *= scale;
+    this.editorService.clientModel.class_general.min_width_scaled *= scale;
+    this.editorService.clientModel.canvas.scale *= scale;
+    this.editorService.clientModel.canvas.posx *= scale;
+    this.editorService.clientModel.canvas.posy *= scale;
+    this.editorService.clientModel.canvas.width *= scale;
+    this.editorService.clientModel.canvas.height *= scale;
+    this.editorService.clientModel.canvas.gridSize *= scale;
 
-    this.borderString_scale = `${this.editorService.model.class_general.border_scaled}px gold solid`;
+    this.borderString_scale = `${this.editorService.clientModel.class_general.border_scaled}px gold solid`;
     this.onMouseUp(null);
     this.updateCanvas();
   }
@@ -112,7 +112,7 @@ export class CanvasBoxComponent implements OnInit {
     this.editorService.model.classes.map((clas) => {
       this.findClassDOMbyId(clas.id).classList.remove('d-class-selected');
     });
-    this.editorService.model.canvas.selectedClassIds.map((id) => {
+    this.editorService.clientModel.canvas.selectedClassIds.map((id) => {
       this.findClassDOMbyId(id).classList.add('d-class-selected');
     });
   };
@@ -167,9 +167,9 @@ export class CanvasBoxComponent implements OnInit {
     }
   };
   selectClickedClassOnly = () => {
-    this.editorService.model.canvas.selectedClassIds = [];
+    this.editorService.clientModel.canvas.selectedClassIds = [];
     if (this.targetClass_stored)
-      this.editorService.model.canvas.selectedClassIds.push(
+      this.editorService.clientModel.canvas.selectedClassIds.push(
         this.targetClass_stored.id
       );
   };
@@ -202,7 +202,7 @@ export class CanvasBoxComponent implements OnInit {
 
   corrigateTargetClassPosition = () => {
     if (this.targetClass_stored != undefined) {
-      const canvas = { ...this.editorService.model.canvas };
+      const canvas = { ...this.editorService.clientModel.canvas };
       let c = 0;
       const {
         posx_scaled,
@@ -244,19 +244,19 @@ export class CanvasBoxComponent implements OnInit {
     if (this.targetClass != undefined) {
       if (
         this.targetClass.scaledModel.width_scaled <
-        this.editorService.model.class_general.min_width_scaled
+        this.editorService.clientModel.class_general.min_width_scaled
       )
         this.targetClass.scaledModel.width_scaled = round(
-          this.editorService.model.class_general.min_width_scaled,
-          this.editorService.model.canvas.gridSize
+          this.editorService.clientModel.class_general.min_width_scaled,
+          this.editorService.clientModel.canvas.gridSize
         );
       if (
         this.targetClass.scaledModel.height_scaled <
-        this.editorService.model.class_general.min_height_scaled
+        this.editorService.clientModel.class_general.min_height_scaled
       )
         this.targetClass.scaledModel.height_scaled = round(
-          this.editorService.model.class_general.min_height_scaled,
-          this.editorService.model.canvas.gridSize
+          this.editorService.clientModel.class_general.min_height_scaled,
+          this.editorService.clientModel.canvas.gridSize
         );
 
       this.targetClass.groups.map((group) => {
@@ -277,33 +277,33 @@ export class CanvasBoxComponent implements OnInit {
   drawedClassId: string;
 
   corrigateCanvasPosition = () => {
-    const canvas = { ...this.editorService.model.canvas };
-    const clip = { ...this.editorService.model.clip };
+    const canvas = { ...this.editorService.clientModel.canvas };
+    const clip = { ...this.editorService.clientModel.canvas.clip };
     let c = 0;
-    if (this.editorService.model.canvas.posx > 0) {
-      this.editorService.model.canvas.posx = 0;
+    if (this.editorService.clientModel.canvas.posx > 0) {
+      this.editorService.clientModel.canvas.posx = 0;
       c++;
     }
-    if (this.editorService.model.canvas.posy > 0) {
-      this.editorService.model.canvas.posy = 0;
+    if (this.editorService.clientModel.canvas.posy > 0) {
+      this.editorService.clientModel.canvas.posy = 0;
       c++;
     }
     if (
-      this.editorService.model.canvas.posx +
-        this.editorService.model.canvas.width <
+      this.editorService.clientModel.canvas.posx +
+        this.editorService.clientModel.canvas.width <
       clip.width
     ) {
-      this.editorService.model.canvas.posx =
-        clip.width - this.editorService.model.canvas.width;
+      this.editorService.clientModel.canvas.posx =
+        clip.width - this.editorService.clientModel.canvas.width;
       c++;
     }
     if (
-      this.editorService.model.canvas.posy +
-        this.editorService.model.canvas.height <
+      this.editorService.clientModel.canvas.posy +
+        this.editorService.clientModel.canvas.height <
       clip.height
     ) {
-      this.editorService.model.canvas.posy =
-        clip.height - this.editorService.model.canvas.height;
+      this.editorService.clientModel.canvas.posy =
+        clip.height - this.editorService.clientModel.canvas.height;
       c++;
     }
     if (c > 0) {
@@ -320,7 +320,7 @@ export class CanvasBoxComponent implements OnInit {
   editorService: GlobalEditorService;
   constructor(editorService: GlobalEditorService) {
     this.editorService = editorService;
-    this.editorService.model.canvas.viewModel = this;
+    // this.editorService.clientModel.canvas.viewModel = this;
   }
   onMouseMove = (e) => {
     //console.dir(e);
@@ -328,7 +328,7 @@ export class CanvasBoxComponent implements OnInit {
     // ha, éppen class-t rajzol az illető
     if (
       this.drawedClassPositionSpecified &&
-      this.editorService.model.canvas.drawMode == 'class'
+      this.editorService.clientModel.canvas.drawMode == 'class'
     ) {
       this.resizeDrawedClass(e);
       return;
@@ -338,7 +338,7 @@ export class CanvasBoxComponent implements OnInit {
       if (this.repositionCanvas(e)) return;
     }
 
-    if (this.editorService.model.canvas.drawMode == 'line')
+    if (this.editorService.clientModel.canvas.drawMode == 'line')
       this.lineCanvasComponent.drawMove(e);
     // class újraméretezés//
     else this.resizeExistingClass(e);
@@ -360,11 +360,11 @@ export class CanvasBoxComponent implements OnInit {
         e.clientY - this.targetRect.top - this.ydiff;
       this.targetClass.scaledModel.posx_scaled = round(
         this.targetClass.scaledModel.posx_scaled,
-        this.editorService.model.canvas.gridSize
+        this.editorService.clientModel.canvas.gridSize
       );
       this.targetClass.scaledModel.posy_scaled = round(
         this.targetClass.scaledModel.posy_scaled,
-        this.editorService.model.canvas.gridSize
+        this.editorService.clientModel.canvas.gridSize
       );
       this.updateCanvas();
       return;
@@ -412,7 +412,7 @@ export class CanvasBoxComponent implements OnInit {
       this.targetDOM.style.borderLeft = this.borderString_scale;
       this.targetClass_stored.scaledModel.posx_scaled = round(
         this.targetClass_stored.scaledModel.posx_scaled,
-        this.editorService.model.canvas.gridSize
+        this.editorService.clientModel.canvas.gridSize
       );
     }
     //  }
@@ -459,7 +459,7 @@ export class CanvasBoxComponent implements OnInit {
       this.targetDOM.style.borderTop = this.borderString_scale;
       this.targetClass_stored.scaledModel.posy_scaled = round(
         this.targetClass_stored.scaledModel.posy_scaled,
-        this.editorService.model.canvas.gridSize
+        this.editorService.clientModel.canvas.gridSize
       );
       // return;
     }
@@ -487,11 +487,11 @@ export class CanvasBoxComponent implements OnInit {
     if (this.targetClass != undefined) {
       this.targetClass.scaledModel.width_scaled = round(
         this.targetClass.scaledModel.width_scaled,
-        this.editorService.model.canvas.gridSize
+        this.editorService.clientModel.canvas.gridSize
       );
       this.targetClass.scaledModel.height_scaled = round(
         this.targetClass.scaledModel.height_scaled,
-        this.editorService.model.canvas.gridSize
+        this.editorService.clientModel.canvas.gridSize
       );
       this.corrigateTargetClassDimensions();
     }
@@ -500,9 +500,9 @@ export class CanvasBoxComponent implements OnInit {
   repositionCanvas = (e) => {
     if (this.holding) {
       if (this.clipDOM) {
-        this.editorService.model.canvas.posx =
+        this.editorService.clientModel.canvas.posx =
           e.clientX - this.clipDOM.getBoundingClientRect().left - this.xdiff;
-        this.editorService.model.canvas.posy =
+        this.editorService.clientModel.canvas.posy =
           e.clientY - this.clipDOM.getBoundingClientRect().top - this.ydiff;
         //  this.updateCanvas();
         /* this.setState({ canvas }) */
@@ -538,22 +538,22 @@ export class CanvasBoxComponent implements OnInit {
     }
   }
   onMouseUp(e) {
-    if (this.editorService.model.canvas.drawMode == 'line') {
+    if (this.editorService.clientModel.canvas.drawMode == 'line') {
       this.lineCanvasComponent.drawEnd(e);
     }
-    if (this.editorService.model.canvas.drawMode != 'cursor') {
+    if (this.editorService.clientModel.canvas.drawMode != 'cursor') {
       const drawedclass = this.findClassDOMbyId(this.drawedClassId);
       this.drawedClassPositionSpecified = false;
       this.drawedClassId = undefined;
     }
 
     if (this.targetDOM != undefined)
-      this.targetDOM.style.border = `${this.editorService.model.class_general.border_scaled}px solid rgba(255, 255, 255, 0.19)`;
+      this.targetDOM.style.border = `${this.editorService.clientModel.class_general.border_scaled}px solid rgba(255, 255, 255, 0.19)`;
     this.resetMouseState();
   }
 
   resetMouseState() {
-    this.editorService.model.canvas.drawMode = 'cursor';
+    this.editorService.clientModel.canvas.drawMode = 'cursor';
     this.holdingAny = false;
     this.holding = false;
     this.corrigateTargetClassPosition();
@@ -568,7 +568,7 @@ export class CanvasBoxComponent implements OnInit {
     this.corrigateCanvasPosition();
   }
   onMouseDown(e) {
-    switch (this.editorService.model.canvas.drawMode) {
+    switch (this.editorService.clientModel.canvas.drawMode) {
       case 'class':
         this.drawClassMode(e);
         break;
@@ -584,7 +584,7 @@ export class CanvasBoxComponent implements OnInit {
   drawLineMode(e) {
     this.lineCanvasComponent.drawBegin(
       e,
-      this.editorService.model.lineCanvas.drawLineType
+      this.editorService.clientModel.lineCanvas.drawLineType
     );
   }
   cursorMode(e) {
@@ -601,7 +601,7 @@ export class CanvasBoxComponent implements OnInit {
       this.holding = true;
       this.clipDOM = e.target.closest('.edit-box-clip');
       // selection off
-      this.editorService.model.canvas.selectedClassIds = [];
+      this.editorService.clientModel.canvas.selectedClassIds = [];
       this.updateClassSelection();
     }
     // CLASS//
@@ -688,12 +688,12 @@ export class CanvasBoxComponent implements OnInit {
       groups: [
         {
           group_name: 'attributes',
-          group_syntax: 'attribute',
+          group_syntax: GROUP_SYNTAX.ATTRIBUTE,
           attributes: [],
         },
         {
           group_name: 'functions',
-          group_syntax: 'function',
+          group_syntax: GROUP_SYNTAX.FUNCTION,
           attributes: [],
         },
       ],
@@ -701,9 +701,7 @@ export class CanvasBoxComponent implements OnInit {
         edit: true,
         id: this.drawedClassId + '-t',
         name: 'Class',
-        type: null,
         viewModel: null,
-        visibility: null,
       },
     };
     this.editorService.model.classes.push(newclass);

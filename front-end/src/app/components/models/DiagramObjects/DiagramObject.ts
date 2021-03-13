@@ -1,7 +1,7 @@
 import { AttributeElement } from './AttributeElement';
 import { DiagramObject_Scaled } from './DiagramObject_Scaled';
 import { SimpleClass } from './SimpleClass';
-import { SimpleClassAttributeGroup } from './SimpleClassAttributeGroup';
+import { SimpleClassElementGroup } from './SimpleClassElementGroup';
 
 export class DiagramObject {
   id: string;
