@@ -1,7 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+$grey_light:#555;
+$grey_light_input:#bbb;
+$grey_dark:#232323;
+$selected:rgb(111, 173, 236);
+$hover:rgb(42, 115, 187);
 body {
-  background-color: #333;
+  background-color: $grey_light;
 }
+
 
 body {
   padding: 0;
@@ -13,11 +19,31 @@ body {
   width: 0px;
   height: 0px;
 }
-
+textarea{
+  background: $grey_light_input;
+  color: black;
+  resize: none;
+  font-weight: bold;
+}
+.note-box-content{
+  white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+  white-space: -webkit-pre-wrap;          /* Chrome & Safari */
+  white-space: -pre-wrap;                 /* Opera 4-6 */
+  white-space: -o-pre-wrap;               /* Opera 7 */
+  white-space: pre-wrap;                  /* CSS3 */
+  word-wrap: break-word;                  /* Internet Explorer 5.5+ */
+  word-break:normal;
+  white-space: normal;
+}
 /* Optional: show position indicator in red */
 input {
   font-size: inherit;
   font-family: "Roboto Mono", monospace;
+  background: $grey_light_input;
+  color: black!important;
+}
+input:hover{
+  box-shadow: none!important;
 }
 body {
   background: rgb(139, 77, 15);
@@ -90,11 +116,12 @@ body {
 }
 
 .d-class-selected {
-  border: #299ce8 0.095em solid !important;
+  border:$selected 0.095em solid !important;
 }
 
 .d-class-selected .class-title {
-  color: #299ce8;
+  color:$selected;
+  font-weight: bold;
 }
 
 .class-element-group-name {
@@ -118,7 +145,7 @@ body {
 }
 
 .class-element:hover {
-  box-shadow: inset 0px 0px 5px 2px black;
+  box-shadow: inset 0px 0px 3px 1px black;
 }
 
 .class-element {

@@ -5,23 +5,36 @@
  */
 package com.szefi.uml_conference.model.dto.do_related;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
 
 /**
  *
  * @author h9pbcl
  */
+
+@JsonTypeName(value = "SimpleClass")
 public class SimpleClass extends DiagramObject{
-   private String class_type;
    private List<SimpleClassElementGroup> groups;
   private AttributeElement titleModel;
 
-    public String getClass_type() {
-        return class_type;
+
+private String _type;
+private String  name;
+
+    public String getName() {
+        return name;
     }
 
-    public void setClass_type(String class_type) {
-        this.class_type = class_type;
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getType() {
+        return _type;
+    }
+
+    public void setType(String _type) {
+        this._type = _type;
     }
 
     public List<SimpleClassElementGroup> getGroups() {

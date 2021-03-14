@@ -32,7 +32,7 @@
         (wheel)="zoom($event)"
       >
         <app-line-canvas
-          [classes]="editorService.model.classes"
+          [dgObjects]="editorService.model.dgObjects"
           [canvasModel]="editorService.clientModel.canvas"
           #linecanvas
           [class_general]="editorService.clientModel.class_general"
@@ -40,8 +40,21 @@
           [lines]="editorService.model.lines"
         >
         </app-line-canvas>
-        <div *ngFor="let item of this.editorService.model.classes">
-          <app-simple-class [id]="item.id" [model]="item"> </app-simple-class>
+        <div *ngIf="this.editorService.model">
+          <div *ngFor="let item of this.editorService.model.dgObjects">
+            <app-simple-class
+              *ngIf="item._type == 'SimpleClass'"
+              [model]="item"
+              [general]="this.editorService.clientModel.class_general"
+            >
+            </app-simple-class>
+            <app-note-box
+              *ngIf="item._type == 'NoteBox'"
+              [model]="item"
+              [general]="this.editorService.clientModel.class_general"
+            >
+            </app-note-box>
+          </div>
         </div>
       </div>
     </div>

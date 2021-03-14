@@ -1,0 +1,18 @@
+<div
+  id="{{ this.model.id }}"
+  [style.fontSize]="this.general.fontsize_scaled + 'px'"
+  [style.top]="this.model.scaledModel.posy_scaled + 'px'"
+  [style.left]="this.model.scaledModel.posx_scaled + 'px'"
+  [style.width]="this.model.scaledModel.width_scaled + 'px'"
+  [style.height]="this.model.scaledModel.height_scaled + 'px'"
+  [style.zIndex]="this.model.z"
+  [style.padding]="this.general.padding_scaled + 'px'"
+  [style.border]="
+    this.general.border_scaled + 'px' + 'solid rgba(255, 255, 255, 0.19)'
+  "
+  class="d-class"
+>
+  <div class="window-content">
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+  </div>
+</div>

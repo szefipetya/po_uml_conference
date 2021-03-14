@@ -1,3 +1,4 @@
+import { DiagramObjectComponent } from '../../full-page-components/editor/diagram-objects/diagram-object/diagram-object.component';
 import { AttributeElement } from './AttributeElement';
 import { DiagramObject_Scaled } from './DiagramObject_Scaled';
 import { SimpleClass } from './SimpleClass';
@@ -14,4 +15,6 @@ export class DiagramObject {
   z: number;
   edit: boolean;
   name: string;
+  viewModel: DiagramObjectComponent; //ignored in rest
+  _type: string;
 }

@@ -4,7 +4,6 @@ import { DiagramObject } from './DiagramObject';
 import { Element_c } from './Element_c';
 
 export class SimpleClass extends DiagramObject {
-  class_type: string;
   groups: SimpleClassElementGroup[];
   titleModel: Element_c;
 }

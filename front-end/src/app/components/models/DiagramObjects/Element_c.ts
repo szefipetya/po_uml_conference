@@ -1,4 +1,4 @@
-import { AttributeComponent } from '../../full-page-components/editor/simple-class/attribute-group/attribute/attribute.component';
+import { AttributeComponent } from '../../full-page-components/editor/diagram-objects/simple-class/attribute-group/attribute/attribute.component';
 
 export class Element_c {
   id: string;

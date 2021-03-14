@@ -1,16 +1,18 @@
 import { LineType } from './LineType';
 import { SimpleClass } from '../DiagramObjects/SimpleClass';
 import { LINE_TYPE } from './LINE_TYPE';
+import { DiagramObject } from '../DiagramObjects/DiagramObject';
 export class Line {
   id: string;
   lineType: LineType;
   object_start_id: string;
   object_end_id: string;
-  object_end: SimpleClass; //ignore in REST
-  object_start: SimpleClass; //ignore in REST
+  object_end: DiagramObject; //ignore in REST
+  object_start: DiagramObject; //ignore in REST
   public constructor(lt: LINE_TYPE) {
     this.id = new Date().getTime().toString();
-    this.lineType = new LineType(lt);
+
+    this.lineType = new LineType(lt, this.object_start, this.object_end);
   }
   public clone() {
     let l2 = new Line(this.lineType.type);

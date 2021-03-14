@@ -1,0 +1,28 @@
+<ng-template #contentc>
+  <div
+    class="note-box-content"
+    (dblclick)="this.onContentClick($event)"
+    [style.height]="getInnerHeight() + 'px'"
+  >
+    <textarea
+      #texta
+      name="text"
+      *ngIf="model.edit"
+      class="INPUT"
+      [style.width]="this.getInnerWidth() + 'px'"
+      (input)="textInput($event)"
+      (click)="inputClick($event)"
+      >{{ model.content }}</textarea
+    >
+
+    <div *ngIf="!model.edit">
+      {{ model.content }}
+    </div>
+  </div>
+</ng-template>
+<app-diagram-object
+  [contentTemplate]="contentc"
+  [model]="this.model"
+  [general]="this.general"
+>
+</app-diagram-object>

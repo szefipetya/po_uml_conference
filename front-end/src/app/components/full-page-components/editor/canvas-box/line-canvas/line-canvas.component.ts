@@ -34,7 +34,7 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
   @Input() lineCanvasModel: LineCanvas;
   @Input() canvasModel: Canvas;
   @Input() class_general: SimpleClass_General;
-  @Input() classes: SimpleClass[];
+  @Input() dgObjects: DiagramObject[];
   @Input() lines: Line[];
   lineInstance: Line;
   ngAfterContentInit(): void {
@@ -90,8 +90,8 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
     let y = obj.scaledModel.posy_scaled + obj.scaledModel.height_scaled / 2;
     return { x, y };
   }
-  getClassById(id: string): SimpleClass {
-    return this.classes.find((e) => e.id == id);
+  getClassById(id: string): DiagramObject {
+    return this.dgObjects.find((e) => e.id == id);
   }
   drawBegin(e, type) {
     console.log('DRAWING');
@@ -103,7 +103,7 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
       target = e.target;
     }
     if (target) {
-      this.lineInstance.object_start = this.classes.filter(
+      this.lineInstance.object_start = this.dgObjects.filter(
         (c) => target.id == c.id
       )[0];
       console.log(this.lineInstance.object_start);
@@ -131,7 +131,7 @@ export class LineCanvasComponent implements OnInit, AfterContentInit {
     }
     console.log('target:', target);
     if (target) {
-      this.lineInstance.object_end = this.classes.filter(
+      this.lineInstance.object_end = this.dgObjects.filter(
         (c) => target.id == c.id
       )[0];
       if (this.lineInstance.object_end != this.lineInstance.object_start) {

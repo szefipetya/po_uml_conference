@@ -29,7 +29,7 @@
 <div *ngIf="!this.model.edit && this.isTitle">
   <div
     id="{{ model.id }}"
-    (click)="this.onClick($event)"
+    (dblclick)="this.onClick($event)"
     class="{{ this.clname }}"
   >
     <span class="class-title">{{ this.showedText }}</span>
@@ -39,7 +39,7 @@
 <div *ngIf="!this.model.edit && !this.isTitle">
   <div
     id="{{ model.id }}"
-    (click)="this.onClick($event)"
+    (dblclick)="this.onClick($event)"
     class="{{ this.clname }}"
   >
     <span class="class-element-visibility">

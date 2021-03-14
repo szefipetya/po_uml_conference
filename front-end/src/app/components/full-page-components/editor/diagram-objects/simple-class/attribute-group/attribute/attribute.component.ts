@@ -8,7 +8,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
-import { AttributeElement } from '../../../../../models/DiagramObjects/AttributeElement';
+import { AttributeElement } from '../../../../../../models/DiagramObjects/AttributeElement';
 import { AttributeGroupComponent } from '../attribute-group.component';
 @Component({
   selector: 'app-attribute',
@@ -28,7 +28,6 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
 
   constructor() {}
   ngAfterContentInit(): void {
-    this.model.viewModel = this;
     this.render();
   }
   @Input() parent: any;
@@ -36,7 +35,7 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
   @Input() isTitle: boolean;
   @Input() model: AttributeElement;
   ngOnInit(): void {
-    // this.render();
+    this.model.viewModel = this;
   }
   ngOnChanges() {
     //  this.render();
@@ -54,9 +53,7 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
   saveEvent() {
     if (this.isTitle) {
       if (this.model.name == '') {
-        this.deleteSelfFromParent();
-        console.log('deleted', this.model);
-        this.model.name = 'Class';
+        this.model.name = '';
         this.model.edit = true;
       }
     } else {
@@ -72,8 +69,8 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
     console.log('editing');
     this.model.edit = true;
     this.targetDOM = e.target;
-    console.log(this.parent.editorService);
-    this.parent.editorService.clientModel.canvas.edit_element = this;
+
+    // this.parent.editorService.clientModel.canvas.edit_element = this;
     if (!this.isTitle) this.renderMode = 'ATTRIBUTE_EDIT';
 
     this.render();
@@ -112,7 +109,6 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
   };
   onInput = (e) => {
     let isVisibilitySymbolWritten = this.setVisibility(e);
-    console.log(this.model);
     this.setNameAndType(e, isVisibilitySymbolWritten);
     this.render();
   };
@@ -143,39 +139,28 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
         this.clname = 'class-title class-element';
 
         if (this.model.edit) {
-          //TITLE_EDIT
+          //TITLE_EDIT parent.parent helyett parent simán
           let val1 =
-            (this.parent.editorService.clientModel.class_general
-              .fontsize_scaled /
-              this.elementScale) *
+            (this.parent.general.fontsize_scaled / this.elementScale) *
             1.418 *
             strfull.length;
           let val2 =
             this.parent.model.scaledModel.width_scaled -
-            (this.parent.editorService.clientModel.class_general
-              .padding_scaled +
-              this.parent.editorService.clientModel.class_general
-                .border_scaled) *
+            (this.parent.general.padding_scaled +
+              this.parent.general.border_scaled) *
               2;
           this.inputWidth = Math.max(val1, val2);
           //old width: `${(strfull.length + 1) * (this.state.parent.parent.clientModel.class_general.fontsize_scaled / this.titleScale)}px`
         } else {
           //TITLE
           let rescale = this.titleScale;
-          let charwidth =
-            this.parent.editorService.clientModel.class_general
-              .fontsize_scaled / rescale;
+          let charwidth = this.parent.general.fontsize_scaled / rescale;
           let textwidth =
-            (this.parent.editorService.clientModel.class_general
-              .fontsize_scaled /
-              rescale) *
-            strfull.length;
+            (this.parent.general.fontsize_scaled / rescale) * strfull.length;
           let width =
             this.parent.model.scaledModel.width_scaled -
-            (this.parent.editorService.clientModel.class_general
-              .padding_scaled +
-              this.parent.editorService.clientModel.class_general
-                .border_scaled) *
+            (this.parent.general.padding_scaled +
+              this.parent.general.border_scaled) *
               2;
           let l = false;
 
@@ -201,17 +186,13 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
           this.renderMode = 'ATTRIBUTE_EDIT';
 
           let val1 =
-            (this.parent.editorService.clientModel.class_general
-              .fontsize_scaled /
-              this.elementScale) *
+            (this.parent.parent.general.fontsize_scaled / this.elementScale) *
             0.92 *
             strfull.length;
           let val2 =
             this.parent.parent.model.scaledModel.width_scaled -
-            (this.parent.editorService.clientModel.class_general
-              .padding_scaled +
-              this.parent.editorService.clientModel.class_general
-                .border_scaled) *
+            (this.parent.parent.general.padding_scaled +
+              this.parent.parent.general.border_scaled) *
               2;
           this.inputWidth = Math.max(val1, val2);
         } else {
@@ -219,20 +200,14 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
           let l = false;
 
           let rescale = this.elementScale;
-          let charwidth =
-            this.parent.editorService.clientModel.class_general
-              .fontsize_scaled / rescale;
+          let charwidth = this.parent.parent.general.fontsize_scaled / rescale;
           let textwidth =
-            (this.parent.editorService.clientModel.class_general
-              .fontsize_scaled /
-              rescale) *
+            (this.parent.parent.general.fontsize_scaled / rescale) *
             (strfull.length + 1);
           let width =
             this.parent.parent.model.scaledModel.width_scaled -
-            (this.parent.editorService.clientModel.class_general
-              .padding_scaled +
-              this.parent.editorService.clientModel.class_general
-                .border_scaled) *
+            (this.parent.parent.general.padding_scaled +
+              this.parent.parent.general.border_scaled) *
               2;
           if (textwidth > width) {
             this.showedText = strfull.substr(

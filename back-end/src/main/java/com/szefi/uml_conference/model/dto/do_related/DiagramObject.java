@@ -5,10 +5,21 @@
  */
 package com.szefi.uml_conference.model.dto.do_related;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  *
  * @author h9pbcl
  */
+@JsonTypeInfo(use=JsonTypeInfo.Id.NAME,
+        include=JsonTypeInfo.As.PROPERTY,
+        property="_type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value=SimpleClass.class, name="SimpleClass"),
+        @JsonSubTypes.Type(value=NoteBox.class, name="NoteBox"),
+      
+})
 public class DiagramObject {
      private String id;
  private float posx;
@@ -19,7 +30,15 @@ public class DiagramObject {
 private float  min_height;
 private int  z;
  private boolean edit;
-private String  name;
+private String _type;
+
+    public String getType() {
+        return _type;
+    }
+
+    public void setType(String _type) {
+        this._type = _type;
+    }
 
     public String getId() {
         return id;
@@ -93,11 +112,5 @@ private String  name;
         this.edit = edit;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+  
 }

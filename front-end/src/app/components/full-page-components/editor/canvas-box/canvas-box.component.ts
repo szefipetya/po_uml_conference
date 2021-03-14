@@ -4,6 +4,8 @@ import { GlobalEditorService } from '../services/global-editor/global-editor.ser
 import { round, unFocus } from '../Utils/utils';
 import { LineCanvasComponent } from './line-canvas/line-canvas.component';
 import { GROUP_SYNTAX } from 'src/app/components/models/DiagramObjects/GROUP_SYNTAX';
+import { DiagramObjectComponent } from '../diagram-objects/diagram-object/diagram-object.component';
+import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 @Component({
   selector: 'app-canvas-box',
   templateUrl: './canvas-box.component.html',
@@ -16,7 +18,7 @@ export class CanvasBoxComponent implements OnInit {
   targetResizeHoverYR: boolean;
   targetResizeHoverYL: boolean;
   findClassById = (id) => {
-    const cls = this.editorService.model.classes.filter((e) => e.id == id);
+    const cls = this.editorService.model.dgObjects.filter((e) => e.id == id);
     return cls;
   };
 
@@ -28,23 +30,12 @@ export class CanvasBoxComponent implements OnInit {
     scale += event.deltaY * -0.0006;
     // Restrict scale
     //scale = clamp(scale, 0.96, 1.04);
-    this.editorService.model.classes.map((e) => {
+    this.editorService.model.dgObjects.map((e) => {
       e.scaledModel.posx_scaled *= scale;
       e.scaledModel.posy_scaled *= scale;
       e.scaledModel.width_scaled *= scale;
       e.scaledModel.height_scaled *= scale;
-
-      if (e.titleModel.edit) {
-        e.titleModel.viewModel.render();
-      }
-      e.groups.map((group) => {
-        group.attributes.map((e2) => {
-          if (e2.edit) {
-            e2.viewModel.inputWidth *= scale;
-            e2.viewModel.render();
-          }
-        });
-      });
+      e.viewModel.updateScales(scale);
     });
     this.editorService.clientModel.class_general.fontsize_scaled *= scale;
     this.editorService.clientModel.class_general.padding_scaled *= scale;
@@ -69,36 +60,36 @@ export class CanvasBoxComponent implements OnInit {
     const found = false;
     const match = 0;
     let id;
-    for (let i = 0; i < this.editorService.model.classes.length - 1; i++) {
+    for (let i = 0; i < this.editorService.model.dgObjects.length - 1; i++) {
       if (
         Math.abs(
-          Number.parseInt(this.editorService.model.classes[i].id) -
-            Number.parseInt(this.editorService.model.classes[i + 1].id)
+          Number.parseInt(this.editorService.model.dgObjects[i].id) -
+            Number.parseInt(this.editorService.model.dgObjects[i + 1].id)
         ) >= 2
       ) {
         id =
           Math.min(
-            Number.parseInt(this.editorService.model.classes[i].id),
-            Number.parseInt(this.editorService.model.classes[i + 1].id)
+            Number.parseInt(this.editorService.model.dgObjects[i].id),
+            Number.parseInt(this.editorService.model.dgObjects[i + 1].id)
           ) + 1;
       }
     }
     if (!id) {
       id =
-        this.editorService.model.classes[
-          this.editorService.model.classes.length - 1
+        this.editorService.model.dgObjects[
+          this.editorService.model.dgObjects.length - 1
         ].id + 1;
     }
     return id;
   };
   getHighestClassZIndex = () => {
     let max = 0;
-    this.editorService.model.classes.map((e) => {
+    this.editorService.model.dgObjects.map((e) => {
       if (e.z > max) max = e.z;
     });
 
     if (max > 1000) {
-      this.editorService.model.classes.map((e) => {
+      this.editorService.model.dgObjects.map((e) => {
         e.z--;
       });
     }
@@ -109,7 +100,7 @@ export class CanvasBoxComponent implements OnInit {
   ydiff: number;
   clipDOM: any;
   updateClassSelection = () => {
-    this.editorService.model.classes.map((clas) => {
+    this.editorService.model.dgObjects.map((clas) => {
       this.findClassDOMbyId(clas.id).classList.remove('d-class-selected');
     });
     this.editorService.clientModel.canvas.selectedClassIds.map((id) => {
@@ -149,9 +140,9 @@ export class CanvasBoxComponent implements OnInit {
       const dclass = e.target.closest('.d-class');
       if (dclass) {
         this.dclass = dclass;
-        this.targetClass_stored = this.findClassById(dclass.id)[0];
-        this.targetWidth_stored = this.targetClass_stored.scaledModel.width_scaled;
-        this.targetHeight_stored = this.targetClass_stored.scaledModel.height_scaled;
+        this.targetObject_stored = this.findClassById(dclass.id)[0];
+        this.targetWidth_stored = this.targetObject_stored.scaledModel.width_scaled;
+        this.targetHeight_stored = this.targetObject_stored.scaledModel.height_scaled;
         this.targetRect_stored = dclass.parentNode.getBoundingClientRect();
         this.targetInner_stored = dclass.getBoundingClientRect();
 
@@ -168,13 +159,13 @@ export class CanvasBoxComponent implements OnInit {
   };
   selectClickedClassOnly = () => {
     this.editorService.clientModel.canvas.selectedClassIds = [];
-    if (this.targetClass_stored)
+    if (this.targetObject_stored)
       this.editorService.clientModel.canvas.selectedClassIds.push(
-        this.targetClass_stored.id
+        this.targetObject_stored.id
       );
   };
   resizePadding = 14;
-  targetCurrentId = 1;
+  targetCurrentId = '1';
   targetCorrigateTransition = 300;
   gridSize = 10;
 
@@ -183,7 +174,7 @@ export class CanvasBoxComponent implements OnInit {
   xdiff_rel_to_stored: number;
   ydiff_rel_to_stored: number;
   dclass: any;
-  targetClass_stored: SimpleClass;
+  targetObject_stored: DiagramObject;
   targetWidth_stored: any;
   targetHeight_stored: any;
   targetRect_stored: any;
@@ -201,7 +192,7 @@ export class CanvasBoxComponent implements OnInit {
   holding: boolean;
 
   corrigateTargetClassPosition = () => {
-    if (this.targetClass_stored != undefined) {
+    if (this.targetObject_stored != undefined) {
       const canvas = { ...this.editorService.clientModel.canvas };
       let c = 0;
       const {
@@ -209,22 +200,22 @@ export class CanvasBoxComponent implements OnInit {
         posy_scaled,
         width_scaled,
         height_scaled,
-      } = this.targetClass_stored.scaledModel;
+      } = this.targetObject_stored.scaledModel;
       if (posx_scaled < 0) {
-        this.targetClass_stored.scaledModel.posx_scaled = 0;
+        this.targetObject_stored.scaledModel.posx_scaled = 0;
         c++;
       }
       if (posy_scaled < 0) {
-        this.targetClass_stored.scaledModel.posy_scaled = 0;
+        this.targetObject_stored.scaledModel.posy_scaled = 0;
         c++;
       }
       if (posx_scaled + width_scaled > canvas.width) {
-        this.targetClass_stored.scaledModel.posx_scaled =
+        this.targetObject_stored.scaledModel.posx_scaled =
           canvas.width - width_scaled;
         c++;
       }
       if (posy_scaled + height_scaled > canvas.height) {
-        this.targetClass_stored.scaledModel.posy_scaled =
+        this.targetObject_stored.scaledModel.posy_scaled =
           canvas.height - height_scaled;
         c++;
       }
@@ -258,13 +249,7 @@ export class CanvasBoxComponent implements OnInit {
           this.editorService.clientModel.class_general.min_height_scaled,
           this.editorService.clientModel.canvas.gridSize
         );
-
-      this.targetClass.groups.map((group) => {
-        group.attributes.map((a) => {
-          a.viewModel.render();
-        });
-      });
-      this.targetClass.titleModel.viewModel.render();
+      this.targetClass.viewModel.update();
     }
   };
   targetResizeGrabXR: boolean;
@@ -273,7 +258,7 @@ export class CanvasBoxComponent implements OnInit {
   targetResizeGrabYL: boolean;
   targetInner: any;
   targetRect: any;
-  targetClass: any;
+  targetClass: DiagramObject;
   drawedClassId: string;
 
   corrigateCanvasPosition = () => {
@@ -320,7 +305,6 @@ export class CanvasBoxComponent implements OnInit {
   editorService: GlobalEditorService;
   constructor(editorService: GlobalEditorService) {
     this.editorService = editorService;
-    // this.editorService.clientModel.canvas.viewModel = this;
   }
   onMouseMove = (e) => {
     //console.dir(e);
@@ -341,9 +325,9 @@ export class CanvasBoxComponent implements OnInit {
     if (this.editorService.clientModel.canvas.drawMode == 'line')
       this.lineCanvasComponent.drawMove(e);
     // class újraméretezés//
-    else this.resizeExistingClass(e);
+    else this.resizeExistingClassOrMove(e);
   };
-  resizeExistingClass = (e) => {
+  resizeExistingClassOrMove = (e) => {
     let nohover = 0;
     if (
       this.holdingAny &&
@@ -351,7 +335,8 @@ export class CanvasBoxComponent implements OnInit {
       !this.targetResizeGrabYR &&
       !this.targetResizeGrabXL &&
       !this.targetResizeGrabYL &&
-      this.targetClass != undefined
+      this.targetClass != undefined &&
+      e.target.className != 'INPUT'
     ) {
       unFocus();
       this.targetClass.scaledModel.posx_scaled =
@@ -381,9 +366,9 @@ export class CanvasBoxComponent implements OnInit {
     } else {
       nohover++;
     }
-    if (this.targetResizeGrabXR && this.targetClass_stored) {
+    if (this.targetResizeGrabXR && this.targetObject_stored) {
       unFocus();
-      this.targetClass_stored.scaledModel.width_scaled =
+      this.targetObject_stored.scaledModel.width_scaled =
         this.xdiff_rel_to_stored +
         (this.targetWidth_stored - this.stored_xdiff);
       this.targetDOM.style.borderRight = this.borderString_scale;
@@ -401,17 +386,17 @@ export class CanvasBoxComponent implements OnInit {
     } else {
       nohover++;
     }
-    if (this.targetResizeGrabXL && this.targetClass_stored) {
+    if (this.targetResizeGrabXL && this.targetObject_stored) {
       unFocus();
 
-      this.targetClass_stored.scaledModel.posx_scaled =
+      this.targetObject_stored.scaledModel.posx_scaled =
         e.clientX - this.targetRect.left - this.stored_xdiff;
       const mx = e.clientX - this.targetRect.left;
-      this.targetClass_stored.scaledModel.width_scaled =
+      this.targetObject_stored.scaledModel.width_scaled =
         this.targetWidth_stored - (mx - this.stored_mx);
       this.targetDOM.style.borderLeft = this.borderString_scale;
-      this.targetClass_stored.scaledModel.posx_scaled = round(
-        this.targetClass_stored.scaledModel.posx_scaled,
+      this.targetObject_stored.scaledModel.posx_scaled = round(
+        this.targetObject_stored.scaledModel.posx_scaled,
         this.editorService.clientModel.canvas.gridSize
       );
     }
@@ -428,9 +413,9 @@ export class CanvasBoxComponent implements OnInit {
     } else {
       nohover++;
     }
-    if (this.targetResizeGrabYR && this.targetClass_stored) {
+    if (this.targetResizeGrabYR && this.targetObject_stored) {
       unFocus();
-      this.targetClass_stored.scaledModel.height_scaled =
+      this.targetObject_stored.scaledModel.height_scaled =
         this.ydiff_rel_to_stored +
         (this.targetHeight_stored - this.stored_ydiff);
       this.targetDOM.style.borderBottom = this.borderString_scale;
@@ -449,16 +434,17 @@ export class CanvasBoxComponent implements OnInit {
     } else {
       nohover++;
     }
-    if (this.targetResizeGrabYL && this.targetClass_stored) {
+    //just grab normally
+    if (this.targetResizeGrabYL && this.targetObject_stored) {
       unFocus();
-      this.targetClass_stored.scaledModel.posy_scaled =
+      this.targetObject_stored.scaledModel.posy_scaled =
         e.clientY - this.targetRect.top - this.stored_ydiff;
       const my = e.clientY - this.targetRect.top;
-      this.targetClass_stored.scaledModel.height_scaled =
+      this.targetObject_stored.scaledModel.height_scaled =
         this.targetHeight_stored - (my - this.stored_my);
       this.targetDOM.style.borderTop = this.borderString_scale;
-      this.targetClass_stored.scaledModel.posy_scaled = round(
-        this.targetClass_stored.scaledModel.posy_scaled,
+      this.targetObject_stored.scaledModel.posy_scaled = round(
+        this.targetObject_stored.scaledModel.posy_scaled,
         this.editorService.clientModel.canvas.gridSize
       );
       // return;
@@ -668,12 +654,14 @@ export class CanvasBoxComponent implements OnInit {
     this.drawedClassId = `c${this.getNewClassId()}`;
     let newclass: SimpleClass;
     newclass = {
+      _type: 'SimpleClass',
       id: this.drawedClassId,
       width: 1,
       height: 1,
       posx: this.drawedClassX,
       posy: this.drawedClassY,
       min_height: 75,
+      viewModel: null,
       scaledModel: {
         posx_scaled: x,
         posy_scaled: y,
@@ -684,7 +672,6 @@ export class CanvasBoxComponent implements OnInit {
       z: this.getHighestClassZIndex(),
       edit: false,
       name: '',
-      class_type: 'classDG',
       groups: [
         {
           group_name: 'attributes',
@@ -704,7 +691,7 @@ export class CanvasBoxComponent implements OnInit {
         viewModel: null,
       },
     };
-    this.editorService.model.classes.push(newclass);
+    this.editorService.model.dgObjects.push(newclass);
     this.targetClass = newclass;
     this.drawedClassPositionSpecified = true;
   }

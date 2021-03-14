@@ -1,0 +1,20 @@
+<ng-template #contentc>
+  <app-attribute
+    [parent]="this"
+    [isTitle]="true"
+    [model]="this.model.titleModel"
+  >
+  </app-attribute>
+  <div class="class-elements">
+    <div *ngFor="let item of this.model.groups">
+      <app-attribute-group [parent]="this" [model]="item">
+      </app-attribute-group>
+    </div>
+  </div>
+</ng-template>
+<app-diagram-object
+  [contentTemplate]="contentc"
+  [model]="this.model"
+  [general]="this.general"
+>
+</app-diagram-object>

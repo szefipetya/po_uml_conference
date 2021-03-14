@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Diagram } from 'src/app/components/models/Diagram/Diagram';
+import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { GlobalEditorService } from '../services/global-editor/global-editor.service';
 
 @Component({
@@ -60,32 +61,17 @@ export class EditorRootComponent implements OnInit {
       this.newButton.style.height = '1.0em';
     }
     const isElem = Array.from(e.target.classList).includes('class-element');
-    if (bool || e.target.nodeName != 'INPUT') {
+    if (
+      bool ||
+      (e.target.nodeName != 'INPUT' && e.target.className != 'INPUT')
+    ) {
       console.log('false on all');
-      this.editorService.model.classes.map((clas) => {
-        if (clas.edit)
-          if (clas.name.trim() != '') {
-            clas.edit = false;
-            this.editorService.clientModel.canvas.edit_classTitle_id = null;
-          } else {
-            clas.name = 'Class';
-            clas.edit = false;
-            this.editorService.clientModel.canvas.edit_classTitle_id = null;
-          }
-        clas.titleModel.edit = false;
-        clas.titleModel.viewModel.save();
+      this.editorService.model.dgObjects.map((clas) => {
+        console.log(clas);
+        console.log(clas instanceof SimpleClass);
 
-        clas.groups.map((egroup) => {
-          egroup.attributes.map((e) => {
-            if (e && e.edit) {
-              this.editorService.clientModel.canvas.edit_element_id = null;
-              console.log('EDITED FOUND ');
-              e.edit = false;
-              e.viewModel.save();
-              //e.forceUpdate();
-            }
-          });
-        });
+        clas.viewModel.disableEdit();
+        console.log('edit is false');
       });
       this.inputDOM = undefined;
     } else if (e.target.id == '#editor-input') this.inputDOM = e.target;
@@ -112,12 +98,12 @@ export class EditorRootComponent implements OnInit {
       if (!input) {
         e.preventDefault();
         this.editorService.clientModel.canvas.selectedClassIds.map((id) => {
-          this.editorService.model.classes = this.editorService.model.classes.filter(
+          this.editorService.model.dgObjects = this.editorService.model.dgObjects.filter(
             (clas) => clas.id != id
           );
         });
       }
-      console.log(this.editorService.model.classes);
+      console.log(this.editorService.model.dgObjects);
     }
     //  this.forceUpdate();
   };

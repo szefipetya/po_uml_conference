@@ -7,10 +7,11 @@ import { LineCanvas } from '../line/LineCanvas';
 import { Clip } from './Clip';
 import { ClientModel } from './ClientModel';
 import { Line } from '../line/Line';
+import { DiagramObject } from '../DiagramObjects/DiagramObject';
 
 export class Diagram {
   owner: User;
-  classes: SimpleClass[];
+  dgObjects: Array<DiagramObject>;
   lines: Line[];
   // clientModel: ClientModel;
 }

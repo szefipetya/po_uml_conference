@@ -6,6 +6,7 @@
 package com.szefi.uml_conference.model.dto.diagram;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.szefi.uml_conference.model.dto.do_related.DiagramObject;
 import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
 import com.szefi.uml_conference.model.dto.do_related.line.Line;
 import com.szefi.uml_conference.model.dto.management.User;
@@ -20,7 +21,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Diagram implements Serializable{
 private User owner;
-private List<SimpleClass> classes;
+
+private List<DiagramObject> dgObjects;
 private List<Line> lines;
 
     public User getOwner() {
@@ -31,12 +33,12 @@ private List<Line> lines;
         this.owner = owner;
     }
 
-    public List<SimpleClass> getClasses() {
-        return classes;
+    public List<DiagramObject> getDgObjects() {
+        return dgObjects;
     }
 
-    public void setClasses(List<SimpleClass> classes) {
-        this.classes = classes;
+    public void setDgObects(List<DiagramObject> dgObjects) {
+        this.dgObjects = dgObjects;
     }
 
     public List<Line> getLines() {

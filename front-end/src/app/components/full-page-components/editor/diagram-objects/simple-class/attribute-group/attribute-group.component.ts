@@ -1,7 +1,13 @@
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import {
+  AfterContentInit,
+  AfterViewInit,
+  Component,
+  Input,
+  OnInit,
+} from '@angular/core';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
-import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
+import { GlobalEditorService } from '../../../services/global-editor/global-editor.service';
 import { SimpleClassComponent } from '../simple-class.component';
 
 @Component({
@@ -9,15 +15,13 @@ import { SimpleClassComponent } from '../simple-class.component';
   templateUrl: './attribute-group.component.html',
   styleUrls: ['./attribute-group.component.scss'],
 })
-export class AttributeGroupComponent implements OnInit, AfterViewInit {
+export class AttributeGroupComponent implements OnInit, AfterContentInit {
   @Input() model: SimpleClassElementGroup;
   inputDOM: any;
   @Input() parent: SimpleClassComponent;
-  editorService;
-  constructor(editorService: GlobalEditorService) {
-    this.editorService = editorService;
-  }
-  ngAfterViewInit(): void {
+
+  constructor() {}
+  ngAfterContentInit(): void {
     if (this.inputDOM) this.inputDOM.focus();
   }
 
@@ -59,7 +63,7 @@ export class AttributeGroupComponent implements OnInit, AfterViewInit {
 
   pushNewElement = async (visibility, name, type) => {
     const id = this.getNewId();
-    this.editorService.clientModel.canvas.edit_element_id = id;
+    // this..clientModel.canvas.edit_element_id = id;
     let newAttr = {
       edit: true,
       id: id,
