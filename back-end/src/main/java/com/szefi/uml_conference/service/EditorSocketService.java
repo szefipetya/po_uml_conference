@@ -37,8 +37,7 @@ public class EditorSocketService {
         try {
            
             dg=new Diagram();
-            objectMapper=new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+           
 
             Resource res = new ClassPathResource("d.json");
             byte[] buffer = new byte[res.getInputStream().available()];
@@ -47,7 +46,8 @@ public class EditorSocketService {
             OutputStream outStream = new FileOutputStream(targetFile);
             outStream.write(buffer);
             try {
-                
+                 objectMapper=new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 dg=  objectMapper.readValue(targetFile, Diagram.class);
             } catch (IOException ex) {
               

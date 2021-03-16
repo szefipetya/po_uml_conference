@@ -127,6 +127,7 @@ export class GlobalEditorService {
     };
     let c1: SimpleClass = new SimpleClass();
     c1 = {
+      sessionState: null,
       _type: 'SimpleClass',
       id: 'c1',
       posx: 110,
@@ -200,6 +201,7 @@ export class GlobalEditorService {
     };
     let c2: SimpleClass = new SimpleClass();
     c2 = {
+      sessionState: null,
       _type: 'SimpleClass',
       id: 'c2',
       posx: 310,

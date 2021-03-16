@@ -30,28 +30,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
  * @author peti and tomi
  */
-@Path("/")
-@Controller
+@RequestMapping("/")
+@RestController
 public class ApiController {
 
-    @Autowired
-    OrderService service;
+   
     @Autowired
     EditorSocketService eService;
     
-    @Path("get/dg/{id}")
-    @GET
-    @Produces({"application/json", "application/xml"})
+    @GetMapping("get/dg/{id}")
     public Diagram getOne(@PathParam("id") String id) {
         return eService.getDummyDiagram();
     }
-
+/*
     @DELETE
     @Path("delete/{id}")
     public Response delete(@PathParam("id") UUID id) {
@@ -112,7 +110,7 @@ public class ApiController {
         return Response
                 .ok("order updated ")
                 .build();
-    }
+    }*/
 
     @Path("ok")
     @GET

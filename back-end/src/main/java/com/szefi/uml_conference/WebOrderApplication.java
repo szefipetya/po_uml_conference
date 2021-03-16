@@ -13,6 +13,8 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EntityScan({"com.clarmont.orderentities.model.entity"})
+//@ComponentScan({"com.szefi.uml_conference.socket"})
+
 public class WebOrderApplication {
     @Autowired
      static ApplicatoinStartupRunner runner;

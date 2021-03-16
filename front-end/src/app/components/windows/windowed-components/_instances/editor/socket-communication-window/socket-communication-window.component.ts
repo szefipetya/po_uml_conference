@@ -19,6 +19,9 @@ export class SocketCommunicationWindowComponent
       this.socketService.disconnect();
     }
   }
+  test() {
+    this.socketService.send_test();
+  }
 
   ngOnInit(): void {}
 }

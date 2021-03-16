@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderService {
     
-    @Autowired
+  /*  @Autowired
    OrderRepository repo;
     
     @Autowired
@@ -61,6 +61,6 @@ public class OrderService {
     public void updateFromClient(ShopOrderDto dto) {
         repo.save(transformer.shopOrderDtoToEntity(dto));
     }
-    
+    */
     
 }

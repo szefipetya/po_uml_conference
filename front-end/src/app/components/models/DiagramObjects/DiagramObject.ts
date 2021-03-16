@@ -3,7 +3,7 @@ import { AttributeElement } from './AttributeElement';
 import { DiagramObject_Scaled } from './DiagramObject_Scaled';
 import { SimpleClass } from './SimpleClass';
 import { SimpleClassElementGroup } from './SimpleClassElementGroup';
-
+import { SessionState } from '../socket/SessionState';
 export class DiagramObject {
   id: string;
   posx: number;
@@ -17,4 +17,5 @@ export class DiagramObject {
   name: string;
   viewModel: DiagramObjectComponent; //ignored in rest
   _type: string;
+  sessionState: SessionState;
 }

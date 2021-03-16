@@ -3,7 +3,9 @@
     <div class="toolbox">
       <div class="toolbox-item" (click)="this.connect(true)">Connect</div>
       <div class="toolbox-item" (click)="this.connect(false)">Disconnect</div>
+      <div class="toolbox-item" (click)="this.test()">test</div>
     </div>
   </div>
 </ng-template>
+
 <app-window [contentTemplate]="content" [model]="this.model"> </app-window>

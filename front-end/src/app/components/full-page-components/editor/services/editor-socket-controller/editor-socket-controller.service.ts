@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
+import { Action } from 'rxjs/internal/scheduler/Action';
+import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
 /* import Stomp from '../../../../../js/webjars/stomp.js';
 import SockJS from '../../../../../js/webjars/sockjs.min.js'; */
-
+import { ACTION_TYPE } from '../../../../models/socket/ACTION_TYPE';
+import { EditorAction } from '../../../../models/socket/EditorAction';
 declare var SockJS: any;
 declare var Stomp: any;
 @Injectable({
@@ -19,15 +22,21 @@ export class EditorSocketControllerService {
     }
     $('#userinfo').html(''); */
   }
-
+  socket;
   public connect() {
-    var socket = new WebSocket('ws://localhost:8080/test');
+    this.socket = new WebSocket('ws://localhost:8080/test');
+    var socket = this.socket;
     socket.onopen = (e) => {
       this.setConnected(true);
       console.log('Connected: ' + e);
     };
-    socket.onmessage = (e) => {
+    socket.onmessage = (e: MessageEvent) => {
       console.log('message', e);
+      let action: EditorAction;
+      action = JSON.parse(e.data);
+      console.log(action);
+      let attr: AttributeElement = JSON.parse(action.json);
+      console.log(attr);
     };
     socket.onclose = (e) => {
       console.log('closed', e);
@@ -41,6 +50,24 @@ export class EditorSocketControllerService {
         this.showGreeting(JSON.parse(greeting.body).content);
       });
     });*/
+  }
+  public send(action: ACTION_TYPE, body) {}
+  send_test() {
+    let action: EditorAction = new EditorAction();
+    action.id = 'nemtom';
+    action.user_id = 'nemtom';
+
+    action.action = ACTION_TYPE.CREATE;
+    let newAttr: AttributeElement = {
+      edit: true,
+      id: 'id',
+      visibility: 'visibility',
+      name: 'name',
+      type: 'type',
+      viewModel: null,
+    };
+    action.json = JSON.stringify(newAttr);
+    this.socket.send(JSON.stringify(action));
   }
   disconnect() {
     if (this.stompClient !== null) {

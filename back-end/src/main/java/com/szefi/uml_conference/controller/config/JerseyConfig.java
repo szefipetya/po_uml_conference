@@ -15,15 +15,15 @@ import org.springframework.stereotype.Component;
  *
  * @author peti
  */
-@Component
+/*@Component*/
 public class JerseyConfig extends ResourceConfig 
 {
     public JerseyConfig() 
     {
         LOG.info("JerseyConfig - configuring REST classes");
-      register(ApiController.class);     
-       register(ApplicatoinStartupRunner.class);  
-       register(CorsFilter.class);  
+     /* register(ApiController.class);  */   
+      // register(ApplicatoinStartupRunner.class);  
+     /*  register(CorsFilter.class);*/  
     
     }
     private static final Logger LOG = Logger.getLogger(JerseyConfig.class.getName());

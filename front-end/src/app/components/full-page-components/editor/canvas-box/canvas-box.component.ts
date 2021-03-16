@@ -654,6 +654,7 @@ export class CanvasBoxComponent implements OnInit {
     this.drawedClassId = `c${this.getNewClassId()}`;
     let newclass: SimpleClass;
     newclass = {
+      sessionState: null,
       _type: 'SimpleClass',
       id: this.drawedClassId,
       width: 1,
