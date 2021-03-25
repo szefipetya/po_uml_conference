@@ -6,6 +6,10 @@ import { LineCanvasComponent } from './line-canvas/line-canvas.component';
 import { GROUP_SYNTAX } from 'src/app/components/models/DiagramObjects/GROUP_SYNTAX';
 import { DiagramObjectComponent } from '../diagram-objects/diagram-object/diagram-object.component';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
+import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
+import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
+import { uniqId } from 'src/app/components/utils/utils';
+
 @Component({
   selector: 'app-canvas-box',
   templateUrl: './canvas-box.component.html',
@@ -19,6 +23,7 @@ export class CanvasBoxComponent implements OnInit {
   targetResizeHoverYL: boolean;
   findClassById = (id) => {
     const cls = this.editorService.model.dgObjects.filter((e) => e.id == id);
+
     return cls;
   };
 
@@ -57,30 +62,7 @@ export class CanvasBoxComponent implements OnInit {
   drawedClassX: number;
   drawedClassY: number;
   getNewClassId = () => {
-    const found = false;
-    const match = 0;
-    let id;
-    for (let i = 0; i < this.editorService.model.dgObjects.length - 1; i++) {
-      if (
-        Math.abs(
-          Number.parseInt(this.editorService.model.dgObjects[i].id) -
-            Number.parseInt(this.editorService.model.dgObjects[i + 1].id)
-        ) >= 2
-      ) {
-        id =
-          Math.min(
-            Number.parseInt(this.editorService.model.dgObjects[i].id),
-            Number.parseInt(this.editorService.model.dgObjects[i + 1].id)
-          ) + 1;
-      }
-    }
-    if (!id) {
-      id =
-        this.editorService.model.dgObjects[
-          this.editorService.model.dgObjects.length - 1
-        ].id + 1;
-    }
-    return id;
+    return uniqId('c');
   };
   getHighestClassZIndex = () => {
     let max = 0;
@@ -654,7 +636,6 @@ export class CanvasBoxComponent implements OnInit {
     this.drawedClassId = `c${this.getNewClassId()}`;
     let newclass: SimpleClass;
     newclass = {
-      sessionState: null,
       _type: 'SimpleClass',
       id: this.drawedClassId,
       width: 1,
@@ -675,17 +656,23 @@ export class CanvasBoxComponent implements OnInit {
       name: '',
       groups: [
         {
+          id: 'g' + uniqId + '1',
           group_name: 'attributes',
           group_syntax: GROUP_SYNTAX.ATTRIBUTE,
           attributes: [],
+          _type: 'SimpleClassElementGroup',
         },
         {
+          id: 'g' + uniqId,
           group_name: 'functions',
           group_syntax: GROUP_SYNTAX.FUNCTION,
           attributes: [],
+          _type: 'SimpleClassElementGroup',
         },
       ],
       titleModel: {
+        extra: null,
+        _type: 'AttributeElement',
         edit: true,
         id: this.drawedClassId + '-t',
         name: 'Class',

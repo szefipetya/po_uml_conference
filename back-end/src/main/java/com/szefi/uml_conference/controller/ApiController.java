@@ -5,8 +5,8 @@ import com.clarmont.orderentities.model.dto.ShopOrderDto;
 import com.clarmont.orderentities.model.entity.CartItemEntity;
 import com.clarmont.orderentities.model.entity.ShopOrderEntity;
 import com.szefi.uml_conference.model.dto.diagram.Diagram;
-import com.szefi.uml_conference.service.EditorSocketService;
 import com.szefi.uml_conference.service.OrderService;
+import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +43,7 @@ public class ApiController {
 
    
     @Autowired
-    EditorSocketService eService;
+    SocketSessionService eService;
     
     @GetMapping("get/dg/{id}")
     public Diagram getOne(@PathParam("id") String id) {

@@ -7,15 +7,27 @@ import {
   OnChanges,
   OnInit,
 } from '@angular/core';
+import { throwToolbarMixedModesError } from '@angular/material/toolbar';
 import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
+import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
+import { EditorAction } from 'src/app/components/models/socket/EditorAction';
+import { LOCK_TYPE } from 'src/app/components/models/socket/LOCK_TYPE';
+import { SessionInteractiveItem } from 'src/app/components/models/socket/interface/SessionInteractiveItem';
+import { SessionState } from 'src/app/components/models/socket/SessionState';
 import { AttributeElement } from '../../../../../../models/DiagramObjects/AttributeElement';
+import { EditorSocketControllerService } from '../../../../services/editor-socket-controller/editor-socket-controller.service';
 import { AttributeGroupComponent } from '../attribute-group.component';
+import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
+import { SimpleClassComponent } from '../../simple-class.component';
+import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
+
 @Component({
   selector: 'app-attribute',
   templateUrl: './attribute.component.html',
   styleUrls: ['./attribute.component.scss'],
 })
-export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
+export class AttributeComponent
+  implements OnInit, OnChanges, AfterContentInit, SessionInteractiveItem {
   targetDOM: any;
   inputDOM: Element;
   clname: string;
@@ -25,48 +37,163 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
 
   name: string;
   type: string;
-
-  constructor() {}
-  ngAfterContentInit(): void {
-    this.render();
-  }
+  responseMsg: string = '';
   @Input() parent: any;
 
   @Input() isTitle: boolean;
   @Input() model: AttributeElement;
+
+  loading: boolean = false;
+  extra_overlay: string = '';
+  constructor(private socket: EditorSocketControllerService) {
+    //this.sessionState = new SessionState();
+  }
+  callback_queue: CallbackItem[] = [];
+  getParentClass(): SimpleClassComponent {
+    if (this.isTitle) {
+      return this.parent;
+    } else return this.parent.parent;
+  }
+
+  restoreModel(model: any, action_id: string, msg: string) {
+    this.updateModel(model, action_id, msg);
+    this.model.edit = false;
+    console.log('RESTORED');
+    this.callback_queue = this.callback_queue.filter(
+      (q) => q.action_id != action_id
+    );
+    if (msg) this.msgPopup(msg);
+    this.render();
+  }
+  msgPopup(msg: string) {
+    this.responseMsg = msg;
+    setTimeout(() => {
+      this.responseMsg = '';
+    }, 2000);
+  }
+
+  sessionState: SessionState;
+  updateState(state: SessionState, callback_action_id = ''): void {
+    this.callback_queue = this.callback_queue.filter(
+      (q) => q.action_id != callback_action_id
+    );
+    this.sessionState = state;
+    if (state.lockerUser_id != this.socket.user.id) {
+      this.model.edit = false;
+    } else {
+      //we are the owner
+      if (this.sessionState?.extra?.placeholder) {
+        this.sessionState.extra.placeholder = null;
+      }
+    }
+    console.log('STATE UPDATED', this.sessionState);
+    this.loading = false;
+    this.render();
+  }
+  sendAction(action: EditorAction) {
+    this.callback_queue.push(new CallbackItem(action.id));
+    this.socket.send(action);
+  }
+  editBegin() {
+    let action = new EditorAction(this.model.id, this.model.attr_type, '');
+
+    action.action = ACTION_TYPE.SELECT;
+    action.json = '{}';
+    action.target.target_id = this.model.id;
+    if (this.isTitle) action.target.parent_id = this.parent.model.id;
+    else action.target.parent_id = this.parent.parent.model.id;
+
+    this.sendAction(action);
+  }
+  editEnd() {
+    let action = new EditorAction(this.model.id, this.model._type, '');
+    action.action = ACTION_TYPE.UPDATE;
+
+    this.model.viewModel = null;
+    action.json = JSON.stringify(this.model);
+    this.model.viewModel = this;
+
+    if (this.isTitle) action.target.parent_id = this.parent.model.id;
+    else action.target.parent_id = this.parent.parent.model.id;
+    console.log('edit ended', action.json);
+    this.sendAction(action);
+  }
+  updateModel(model: any, action_id: string, msg: string, extra?: string) {
+    this.model.id = model.id;
+    this.model.name = model.name;
+    this.model.attr_type = model.attr_type;
+    this.model.visibility = model.visibility;
+    this.model.edit = model.edit;
+    if (this.sessionState?.extra) this.sessionState.extra.placeholder = null;
+    // this.model = model;
+    //this.model.edit = false;
+
+    //this.model.viewModel = this;
+    // this.model._type = 'AttributeElement';
+    console.log('view updated: ', this.model.id);
+    this.render();
+  }
+
+  ngAfterContentInit(): void {
+    this.render();
+  }
+  isLoading(): string {
+    if (this.callback_queue.length > 0)
+      return 'loading ' + this.callback_queue.length;
+    else return '';
+  }
+  isLocked(): string {
+    if (this.sessionState == null) return 'null';
+    if (this.sessionState.lockerUser_id == this.socket.user.id)
+      return 'editing';
+    if (this.sessionState.locks.length > 0) return 'locked';
+    else return '';
+  }
+
   ngOnInit(): void {
     this.model.viewModel = this;
+    console.log('attr registered with id', this.model);
+    //this.model._type = 'AttributeElement';
+    this.socket.register(this.model.id, this);
+    this.socket.popInjectionQueue(this.model.id);
+    this.render();
   }
   ngOnChanges() {
     //  this.render();
   }
 
-  save() {
-    console.log('save');
-    this.saveEvent();
+  save(wastrue) {
+    this.saveEvent(wastrue);
     this.render();
   }
   parentClass;
   deleteSelfFromParent = () => {
     this.parent.delete(this.model.id);
   };
-  saveEvent() {
+  saveEvent(wastrue) {
     if (this.isTitle) {
       if (this.model.name == '') {
         this.model.name = '';
         this.model.edit = true;
+      } else {
+        if (wastrue) this.editEnd();
       }
     } else {
       //NOT TITLE
       if (this.model.name == '') {
         this.deleteSelfFromParent();
         console.log('deleted', this.model);
+      } else {
+        if (wastrue) this.editEnd();
       }
     }
   }
 
   onClick(e) {
-    console.log('editing');
+    if (this.sessionState == null) return;
+    if (this.sessionState.locks.length > 0) return;
+
+    this.editBegin();
     this.model.edit = true;
     this.targetDOM = e.target;
 
@@ -102,12 +229,13 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
     if (l) {
       this.model.name = this.model.name.substr(1);
     }
-    if (splitted[1]) this.model.type = splitted[1].trim();
+    if (splitted[1]) this.model.attr_type = splitted[1].trim();
     else {
-      this.model.type = '';
+      this.model.attr_type = '';
     }
   };
   onInput = (e) => {
+    console.log(this.model);
     let isVisibilitySymbolWritten = this.setVisibility(e);
     this.setNameAndType(e, isVisibilitySymbolWritten);
     this.render();
@@ -121,15 +249,15 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
   str;
   render() {
     if (this.model) {
-      let { name, type, id } = this.model;
+      let { name, attr_type, id } = this.model;
 
-      if (type == '') {
+      if (attr_type == '') {
         this.str = '';
       } else {
         this.str = ':';
       }
       let strfull;
-      if (type) strfull = name + this.str + type;
+      if (attr_type) strfull = name + this.str + attr_type;
       else {
         strfull = name;
       }
@@ -224,7 +352,7 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
           if (this.str) {
             this.str_displayed = ':';
           } else this.str_displayed = '';
-          if (type) {
+          if (attr_type) {
             this.type_dispayed = this.type;
           } else this.type_dispayed = '';
           this.dots = '';
@@ -233,6 +361,11 @@ export class AttributeComponent implements OnInit, OnChanges, AfterContentInit {
           }
         }
       }
+    }
+    if (this.sessionState?.extra?.placeholder) {
+      this.extra_overlay = this.sessionState.extra.placeholder;
+    } else {
+      this.extra_overlay = '';
     }
   }
 }

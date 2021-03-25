@@ -25,45 +25,50 @@
             "edit": false,
             "name": "Class1",
             "titleModel": {
+                "_type": "Element_c",
                 "id": "-1",
                 "edit": false,
                 "name": "attr2",
                 "viewModel": null
             },
             "groups": [{
+                    "id":"g1",
+                    "_type": "SimpleClassElementGroup",
                     "group_name": "attributes",
                     "group_syntax": 1,
                     "attributes": [{
-                            "id": "1",
+                            "id": "1", "_type": "AttributeElement",
                             "visibility": "+",
                             "edit": false,
                             "name": "attr1",
-                            "type": "int",
+                            "attr_type": "int",
                             "viewModel": null
                         }, {
-                            "id": "2",
+                            "id": "2","_type": "AttributeElement",
                             "visibility": "+",
                             "edit": false,
                             "name": "attr2",
-                            "type": "int",
+                            "attr_type": "int",
                             "viewModel": null
                         }]
                 }, {
-                    "group_name": "functions",
+                     "id":"g2",
+                    "_type": "SimpleClassElementGroup",
+                    "group_name": "functions","_type": "SimpleClassElementGroup",
                     "group_syntax": 0,
                     "attributes": [{
-                            "id": "3",
+                            "id": "3","_type": "AttributeElement",
                             "visibility": "-",
                             "edit": false,
                             "name": "func1",
-                            "type": "int",
+                            "attr_type": "int",
                             "viewModel": null
                         }, {
-                            "id": "4",
+                            "id": "4","_type": "AttributeElement",
                             "visibility": "#",
                             "edit": false,
                             "name": "func2",
-                            "type": "int",
+                            "attr_type": "int",
                             "viewModel": null
                         }]
                 }]
@@ -86,45 +91,49 @@
             "edit": false,
             "name": "Person",
             "titleModel": {
-                "id": "-2",
+                "id": "-2","_type": "Element_c",
                 "edit": false,
                 "name": "attr2",
                 "viewModel": null
             },
             "groups": [{
-                    "group_name": "attributes",
+                     "id":"g3",
+                    "_type": "SimpleClassElementGroup",
+                    "group_name": "attributes","_type": "SimpleClassElementGroup",
                     "group_syntax": 1,
                     "attributes": [{
-                            "id": "5",
+                            "id": "5","_type": "AttributeElement",
                             "visibility": "+",
                             "edit": false,
                             "name": "name",
-                            "type": "string",
+                            "attr_type": "string",
                             "viewModel": null
                         }, {
-                            "id": "6",
+                            "id": "6","_type": "AttributeElement",
                             "visibility": "#",
                             "edit": false,
                             "name": "age",
-                            "type": "intssssssssssssssssssssssssssssssssssssssssssssssss",
+                            "attr_type": "intssssssssssssssssssssssssssssssssssssssssssssssss",
                             "viewModel": null
                         }]
                 }, {
-                    "group_name": "functions",
+                     "id":"g4",
+                    "_type": "SimpleClassElementGroup",
+                    "group_name": "functions","_type": "SimpleClassElementGroup",
                     "group_syntax": 0,
                     "attributes": [{
-                            "id": "7",
+                            "id": "7","_type": "AttributeElement",
                             "visibility": "-",
                             "edit": false,
                             "name": "apply()",
-                            "type": "void",
+                            "attr_type": "void",
                             "viewModel": null
                         }, {
-                            "id": "8",
+                            "id": "8","_type": "AttributeElement",
                             "visibility": "#",
                             "edit": false,
-                            "name": "promote()",
-                            "type": "void",
+                            "name": "proamote()",
+                            "attr_type": "void",
                             "viewModel": null
                         }]
                 }]
@@ -146,7 +155,7 @@
             "z": 2,
             "edit": false,
             "name": "Note1",
-            "content": "This is the content of Node1"
+            "content": "This is the content of Notebox"
         }
     ]
 }

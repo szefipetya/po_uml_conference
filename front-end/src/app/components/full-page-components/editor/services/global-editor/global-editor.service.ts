@@ -15,18 +15,28 @@ import { LineCanvasComponent } from '../../canvas-box/line-canvas/line-canvas.co
 import { catchError, map, tap } from 'rxjs/operators';
 import { ClientModel } from 'src/app/components/models/Diagram/ClientModel';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
+import { User } from 'src/app/components/models/User';
 @Injectable({
   providedIn: 'root',
 })
 export class GlobalEditorService {
   model: Diagram;
   alignment;
-  url_pre = 'http://localhost:8080/';
+  url_pre = 'http://86.59.220.241:8101/';
   url_pre_test = 'https://jsonplaceholder.typicode.com/posts';
   url_get_diagram = 'get/dg';
   clientModel: ClientModel;
+
+  user: User = {
+    id: new Date().getUTCMilliseconds().toString(),
+    email: 'email',
+    username: 'username',
+    name: 'name',
+  };
   constructor(private http: HttpClient) {
     this.model = new Diagram();
+
+    console.log('id ', this.user.id);
     this.alignment = {
       left_dock: {
         width: 100,
@@ -92,12 +102,13 @@ export class GlobalEditorService {
 
     console.log({ ...response });
     this.model = { ...response };
+
     console.log(JSON.stringify(this.model));
   }
   getDiagramFromServer(id: string): Promise<Diagram> {
     return this.http
       .get<Diagram>(this.url_pre + this.url_get_diagram + '/' + id)
-      .pipe(catchError(this.handleError<Diagram>('getDiagram', this.init())))
+      .pipe(catchError(this.handleError<Diagram>('getDiagram', new Diagram())))
       .toPromise();
   }
   private handleError<T>(operation = 'operation', result?: T) {
@@ -113,7 +124,8 @@ export class GlobalEditorService {
     };
   }
   init(): Diagram {
-    let model = {
+    return null;
+    /*let model = {
       owner: {
         id: '001',
         username: 'test',
@@ -127,7 +139,7 @@ export class GlobalEditorService {
     };
     let c1: SimpleClass = new SimpleClass();
     c1 = {
-      sessionState: null,
+
       _type: 'SimpleClass',
       id: 'c1',
       posx: 110,
@@ -201,7 +213,7 @@ export class GlobalEditorService {
     };
     let c2: SimpleClass = new SimpleClass();
     c2 = {
-      sessionState: null,
+
       _type: 'SimpleClass',
       id: 'c2',
       posx: 310,
@@ -274,6 +286,6 @@ export class GlobalEditorService {
       ],
     };
     model.dgObjects.push(c1, c2);
-    return model;
+    return model;*/
   }
 }

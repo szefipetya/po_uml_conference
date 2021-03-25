@@ -6,8 +6,12 @@
 package com.szefi.uml_conference.socket.threads;
 
 import com.szefi.uml_conference.model.dto.socket.EditorAction;
-import com.szefi.uml_conference.socket.handler.EditorActionProcessor;
-import com.szefi.uml_conference.socket.handler.ResponseProcessor;
+import com.szefi.uml_conference.model.dto.socket.Response.SessionStateResponse;
+import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.socket.threads.service.QueueManager;
+import com.szefi.uml_conference.socket.threads.service.SOCKET;
+import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -17,8 +21,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -27,23 +40,79 @@ import org.springframework.web.socket.WebSocketSession;
  * @author h9pbcl
  */
 
+@Component
+@Configuration
+@Import(QueueManager.class)
 public class SocketThreadManager {
-    private  List<WebSocketSession> sessions;
-    // @Autowired
-    private final  BlockingQueue<EditorAction> responseQueue;
-   //  @Autowired
-    private final   BlockingQueue<EditorAction> actionQueue;
+   
+    SocketSessionService socketService;
+ /*@Autowired
+    public void setSocketService(SocketSessionService socketService) {
+        this.socketService = socketService;
+        actionSockets=this.socketService.getSockets(SOCKET.ACTION);
+        stateSockets=this.socketService.getSockets(SOCKET.STATE);
+    }*/
     
-    public SocketThreadManager( List<WebSocketSession> sessions){
-        System.out.print("hello im started");
-        actionQueue=new LinkedBlockingQueue<>(200);
-        responseQueue=new LinkedBlockingQueue<>(200);
-        this.sessions=sessions;
+   // private  List<UserWebSocket> actionSockets;
+  //  private  List<UserWebSocket> stateSockets;
+    // @Autowired
+  //  private final  BlockingQueue<EditorAction> responseQueue;
+      @Autowired
+     @Qualifier("sessionStateResponseQueue")
+    private  BlockingQueue<SessionStateResponse> sessionStateResponseQueue;
+     @Autowired
+     @Qualifier("actionQueue")
+    private  BlockingQueue<EditorAction> actionQueue;
+    
+       @Bean("actionSockets")
+                @Scope("singleton")
+      public  List<UserWebSocket> getActionSockets(){
+             return new  LinkedList<>();
+         }
+           
+          @Bean("stateSockets")
+                  @Scope("singleton")
+        public List<UserWebSocket> getStateSockets(){
+             return new  LinkedList<>();
+         }
+     
+     
+    @Autowired
+    private ApplicationContext ctx;
+    @Autowired
+    private TaskExecutor taskExecutor;  
+    
+     @Autowired
+    private TaskExecutor taskExecutor2;  
+       @Autowired
+    private TaskExecutor taskExecutor3;  
+    
+    
+    
+    
+  
+        
+    
+    
+    @Autowired
+    public SocketThreadManager( SocketSessionService socketService){
+        this.socketService=socketService;
+       // System.out.print("hello im started2222"+socketService==null);
+        //actionSockets=socketService.getSockets(SOCKET.ACTION);
+       // stateSockets=socketService.getSockets(SOCKET.STATE);
+                
+                
+        //actionQueue=new LinkedBlockingQueue<>(200);
+       // responseQueue=new LinkedBlockingQueue<>(200);
+      //  sessionStateResponseQueue=new LinkedBlockingQueue<>(200);
+   
+       // start1();
     }
     
     Thread actionProcessorThread;
-    Thread responseProcessorThread;
-    public void post(EditorAction a){
+    Thread actionResponseProcessorThread;
+    Thread sessionStateResponseProcessorThread;
+    public void postAction(EditorAction a){
         try {
             actionQueue.put(a);
             System.out.println("putted on list");
@@ -51,10 +120,21 @@ public class SocketThreadManager {
             Logger.getLogger(SocketThreadManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public void start(){
-        actionProcessorThread=new Thread(new EditorActionProcessor(actionQueue,responseQueue));
+    
+    @EventListener(ApplicationReadyEvent.class)
+    private void executeProcessors(){
+        taskExecutor.execute(ctx.getBean(EditorActionProcessor.class));
+    //    taskExecutor.execute(ctx.getBean(ActionResponseProcessor.class));
+        taskExecutor2.execute(ctx.getBean(SessionStateResponseProcessor.class));
+        taskExecutor3.execute(ctx.getBean(ActionResponseProcessor.class));
+        
+        
+      /*  actionProcessorThread=new Thread(new EditorActionProcessor(socketService,actionQueue,responseQueue,sessionStateResponseQueue));
         actionProcessorThread.start();
-        responseProcessorThread=new Thread(new ResponseProcessor(sessions,responseQueue));
-        responseProcessorThread.start();  
+        sessionStateResponseProcessorThread=new Thread(new SessionStateResponseProcessor(stateSockets,sessionStateResponseQueue));
+        sessionStateResponseProcessorThread.start(); 
+        
+        actionResponseProcessorThread=new Thread(new ActionResponseProcessor(actionSockets,responseQueue));
+        actionResponseProcessorThread.start(); */ 
     }
 }

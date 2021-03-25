@@ -9,7 +9,7 @@ package com.szefi.uml_conference.model.dto.do_related;
  *
  * @author h9pbcl
  */
-class DiagramObject_Scaled {
+public class DiagramObject_Scaled {
    private float  posy_scaled;
 private float posx_scaled;
  private float width_scaled;

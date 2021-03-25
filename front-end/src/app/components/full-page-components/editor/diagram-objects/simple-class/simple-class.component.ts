@@ -9,6 +9,7 @@ import {
 import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
+import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
 import { DiagramObjectComponent } from '../diagram-object/diagram-object.component';
 
@@ -53,16 +54,18 @@ export class SimpleClassComponent
         this.model.edit = false;
         // this.editorService.clientModel.canvas.edit_classTitle_id = null;
       }
+    let prev = this.model.titleModel.edit;
     this.model.titleModel.edit = false;
-    this.model.titleModel.viewModel.save();
+    this.model.titleModel.viewModel.save(prev);
 
     this.model.groups.map((egroup) => {
       egroup.attributes.map((e) => {
         if (e && e.edit) {
           // this.editorService.clientModel.canvas.edit_element_id = null;
           console.log('EDITED FOUND ');
+          let prev = e.edit;
           e.edit = false;
-          e.viewModel.save();
+          e.viewModel.save(prev);
         }
       });
     });
@@ -70,8 +73,8 @@ export class SimpleClassComponent
   // editorService;
   @Input() public model: SimpleClass;
   @Input() public general: SimpleClass_General;
-  constructor() {
-    super();
+  constructor(socket: EditorSocketControllerService) {
+    super(socket);
   }
   ngAfterContentInit(): void {
     this.model.viewModel = this;

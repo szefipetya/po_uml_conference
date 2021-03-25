@@ -5,24 +5,25 @@
  */
 package com.szefi.uml_conference.model.dto.do_related;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
+import java.util.Map;
+
 /**
  *
  * @author h9pbcl
  */
-public class Element_c {
-   private String id;
-private String name;
- private boolean edit;
+@JsonTypeName(value = "Element_c")
+public class Element_c extends DynamicSerialObject{
+
+protected String name;
+ protected boolean edit;
+
+
  //viewModel: AttributeElement
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
+ 
+  
     public String getName() {
         return name;
     }
@@ -38,4 +39,8 @@ private String name;
     public void setEdit(boolean edit) {
         this.edit = edit;
     }
+
+
+
+  
 }

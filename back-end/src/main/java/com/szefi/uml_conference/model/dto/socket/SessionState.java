@@ -5,21 +5,35 @@
  */
 package com.szefi.uml_conference.model.dto.socket;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author h9pbcl
  */
 public class SessionState {
-    private List<LOCK_TYPE> locks;
+    private LOCK_TYPE[] locks;
     private String lockerUser_id;
+    private  Map<String,String> extra;
 
-    public List<LOCK_TYPE> getLocks() {
+    public Map<String, String> getExtra() {
+        return extra;
+    }
+
+    public void setExtra(Map<String, String> extra) {
+        this.extra = extra;
+    }
+    public SessionState() {
+       locks=new LOCK_TYPE[0];
+    }
+
+    public LOCK_TYPE[] getLocks() {
         return locks;
     }
 
-    public void setLocks(List<LOCK_TYPE> locks) {
+    public void setLocks(LOCK_TYPE[] locks) {
         this.locks = locks;
     }
 

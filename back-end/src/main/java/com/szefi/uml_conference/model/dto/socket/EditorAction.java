@@ -6,6 +6,8 @@
 package com.szefi.uml_conference.model.dto.socket;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -16,8 +18,24 @@ public class EditorAction implements Serializable,Comparable<EditorAction>{
 private String id;
 private String json;
 private ACTION_TYPE action;
+private ActionTarget target;
+
+    public Map<String, String> getExtra() {
+        return extra;
+    }
+
+    public void setExtra(Map<String, String> extra) {
+        this.extra = extra;
+    }
+Map<String,String> extra;
+
+    public EditorAction() {
+        this.extra=new HashMap<>();
+    }
 
   
+
+   
     public String getUser_id() {
         return user_id;
     }
@@ -55,6 +73,14 @@ private ACTION_TYPE action;
         if(o!=null)
          return o.getId().compareTo(this.id);
         else return 1;
+    }
+
+    public ActionTarget getTarget() {
+        return target;
+    }
+
+    public void setTarget(ActionTarget target) {
+        this.target = target;
     }
 
 }

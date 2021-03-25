@@ -1,6 +1,7 @@
 export enum ACTION_TYPE {
-  CREATE,
-  UPDATE,
-  SELECT,
-  DELETE,
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  SELECT = 'SELECT',
+  DELETE = 'DELETE',
+  RESTORE = 'RESTORE',
 }

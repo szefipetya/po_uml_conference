@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
 import { NoteBox } from '../../../../models/DiagramObjects/NoteBox';
+import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { DiagramObjectComponent } from '../diagram-object/diagram-object.component';
 @Component({
   selector: 'app-note-box',
@@ -21,8 +22,8 @@ export class NoteBoxComponent
   model: NoteBox;
   @Input() public general: SimpleClass_General;
   @ViewChild('texta') textarea: ElementRef<HTMLTextAreaElement>;
-  constructor() {
-    super();
+  constructor(socket: EditorSocketControllerService) {
+    super(socket);
   }
   updateScales(scale): void {
     this.updateFont();

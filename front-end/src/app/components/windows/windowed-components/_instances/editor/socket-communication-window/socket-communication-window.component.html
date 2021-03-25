@@ -3,7 +3,9 @@
     <div class="toolbox">
       <div class="toolbox-item" (click)="this.connect(true)">Connect</div>
       <div class="toolbox-item" (click)="this.connect(false)">Disconnect</div>
-      <div class="toolbox-item" (click)="this.test()">test</div>
+      <div class="toolbox-item" (input)="this.changePing($event)">
+        <input type="text" value="{{ this.socketService.test.ping }}" />
+      </div>
     </div>
   </div>
 </ng-template>

@@ -1,8 +1,8 @@
 import { AttributeComponent } from '../../full-page-components/editor/diagram-objects/simple-class/attribute-group/attribute/attribute.component';
-
-export class Element_c {
-  id: string;
+import { DynamicSerialObject } from '../common/DynamicSerialObject';
+export class Element_c extends DynamicSerialObject {
   name: string;
   edit: boolean;
   viewModel: AttributeComponent;
+  extra: any;
 }

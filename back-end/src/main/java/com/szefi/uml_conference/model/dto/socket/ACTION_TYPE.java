@@ -10,5 +10,5 @@ package com.szefi.uml_conference.model.dto.socket;
  * @author h9pbcl
  */
 public enum ACTION_TYPE {
-    CREATE,UPDATE,SELECT,DELETE    
+    CREATE,UPDATE,SELECT,DELETE,RESTORE
 }

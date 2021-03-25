@@ -1,53 +1,67 @@
-<div *ngIf="this.model.edit && this.isTitle">
-  <input
-    class="{{ this.clname }}"
-    id="editor-input"
-    type="text"
-    (input)="this.onInput($event)"
-    [style.width]="this.inputWidth + 'px'"
-    defaultValue="{{ this.model.name }}"
-  />
-</div>
-<div *ngIf="this.model.edit && !this.isTitle">
-  <div
-    id="{{ model.id }}"
-    (click)="this.onClick($event)"
-    class="{{ this.clname }}"
+<div style="position: relative">
+  <span
+    style="position: absolute"
+    [style.left]="this.getParentClass().model.scaledModel.width_scaled + 'px'"
   >
+    {{ this.isLocked() }}{{ this.isLoading() }}{{ this.responseMsg }}
+  </span>
+  <span style="position: absolute" [style.backgroundColor]="'#333333'">
+    {{ this.extra_overlay }}
+  </span>
+  <div *ngIf="this.model.edit && this.isTitle">
     <input
+      class="{{ this.clname }}"
       id="editor-input"
       type="text"
       (input)="this.onInput($event)"
       [style.width]="this.inputWidth + 'px'"
-      defaultValue="{{
-        this.model.visibility + this.model.name + this.str + this.model.type
-      }}"
+      defaultValue="{{ this.model.name }}"
     />
   </div>
-</div>
-<!-- simán a title -->
-<div *ngIf="!this.model.edit && this.isTitle">
-  <div
-    id="{{ model.id }}"
-    (dblclick)="this.onClick($event)"
-    class="{{ this.clname }}"
-  >
-    <span class="class-title">{{ this.showedText }}</span>
-    <span class="class-title-dots">{{ this.dots }}</span>
+  <div *ngIf="this.model.edit && !this.isTitle">
+    <div
+      id="{{ model.id }}"
+      (click)="this.onClick($event)"
+      class="{{ this.clname }}"
+    >
+      <input
+        id="editor-input"
+        type="text"
+        (input)="this.onInput($event)"
+        [style.width]="this.inputWidth + 'px'"
+        defaultValue="{{
+          this.model.visibility +
+            this.model.name +
+            this.str +
+            this.model.attr_type
+        }}"
+      />
+    </div>
   </div>
-</div>
-<div *ngIf="!this.model.edit && !this.isTitle">
-  <div
-    id="{{ model.id }}"
-    (dblclick)="this.onClick($event)"
-    class="{{ this.clname }}"
-  >
-    <span class="class-element-visibility">
-      {{ this.model.visibility }}
-    </span>
-    <span class="class-element-name">{{ this.name }}</span>
-    <span class="class-element-separator">{{ this.str_displayed }}</span>
-    <span class="class-element-type">{{ this.type_dispayed }}</span>
-    <span class="class-element-dots">{{ this.dots }}</span>
+  <!-- simán a title -->
+  <div *ngIf="!this.model.edit && this.isTitle">
+    <div
+      id="{{ model.id }}"
+      (dblclick)="this.onClick($event)"
+      class="{{ this.clname }}"
+    >
+      <span class="class-title">{{ this.showedText }}</span>
+      <span class="class-title-dots">{{ this.dots }}</span>
+    </div>
+  </div>
+  <div *ngIf="!this.model.edit && !this.isTitle">
+    <div
+      id="{{ model.id }}"
+      (dblclick)="this.onClick($event)"
+      class="{{ this.clname }}"
+    >
+      <span class="class-element-visibility">
+        {{ this.model.visibility }}
+      </span>
+      <span class="class-element-name">{{ this.name }}</span>
+      <span class="class-element-separator">{{ this.str_displayed }}</span>
+      <span class="class-element-type">{{ this.type_dispayed }}</span>
+      <span class="class-element-dots">{{ this.dots }}</span>
+    </div>
   </div>
 </div>

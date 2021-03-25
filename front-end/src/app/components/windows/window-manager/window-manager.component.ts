@@ -27,10 +27,10 @@ export class WindowManagerComponent implements OnInit {
           title: 'tools',
         },
         height: null,
-        width: 300,
+        width: 100,
         id: 'tools',
-        left: 600,
-        top: 200,
+        left: 0,
+        top: 100,
         viewModelInstance: null,
         contentViewModelInstance: null,
       },
@@ -42,10 +42,10 @@ export class WindowManagerComponent implements OnInit {
           title: 'Socket Communication',
         },
         height: null,
-        width: 300,
+        width: 100,
         id: 'socket',
-        left: 600,
-        top: 550,
+        left: 0,
+        top: 10,
         viewModelInstance: null,
         contentViewModelInstance: null,
       },
@@ -79,7 +79,7 @@ export class WindowManagerComponent implements OnInit {
     //this.editorService.clientModel.canvas.viewModel.onMouseUp(e);
   }
   onDockMouseEnter(e, side) {
-    console.log(e, side);
+    //  console.log(e, side);
   }
   onClick(e) {}
 

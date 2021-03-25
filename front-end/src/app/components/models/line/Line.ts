@@ -10,7 +10,7 @@ export class Line {
   object_end: DiagramObject; //ignore in REST
   object_start: DiagramObject; //ignore in REST
   public constructor(lt: LINE_TYPE) {
-    this.id = new Date().getTime().toString();
+    this.id = new Date().getMilliseconds().toString();
 
     this.lineType = new LineType(lt, this.object_start, this.object_end);
   }

@@ -9,7 +9,7 @@ import { EditorSocketControllerService } from '../../../../../full-page-componen
 export class SocketCommunicationWindowComponent
   extends WindowComponent
   implements OnInit {
-  constructor(private socketService: EditorSocketControllerService) {
+  constructor(public socketService: EditorSocketControllerService) {
     super();
   }
   connect(l) {
@@ -19,9 +19,9 @@ export class SocketCommunicationWindowComponent
       this.socketService.disconnect();
     }
   }
-  test() {
-    this.socketService.send_test();
+  test() {}
+  changePing(e) {
+    this.socketService.test.changePing(e.target.value);
   }
-
   ngOnInit(): void {}
 }

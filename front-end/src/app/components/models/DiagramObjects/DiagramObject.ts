@@ -1,11 +1,8 @@
 import { DiagramObjectComponent } from '../../full-page-components/editor/diagram-objects/diagram-object/diagram-object.component';
-import { AttributeElement } from './AttributeElement';
+import { DynamicSerialObject } from '../common/DynamicSerialObject';
 import { DiagramObject_Scaled } from './DiagramObject_Scaled';
-import { SimpleClass } from './SimpleClass';
-import { SimpleClassElementGroup } from './SimpleClassElementGroup';
-import { SessionState } from '../socket/SessionState';
-export class DiagramObject {
-  id: string;
+
+export class DiagramObject extends DynamicSerialObject {
   posx: number;
   posy: number;
   width: number;
@@ -16,6 +13,4 @@ export class DiagramObject {
   edit: boolean;
   name: string;
   viewModel: DiagramObjectComponent; //ignored in rest
-  _type: string;
-  sessionState: SessionState;
 }

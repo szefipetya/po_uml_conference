@@ -9,10 +9,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.szefi.uml_conference.model.dto.diagram.Diagram;
 import com.szefi.uml_conference.model.dto.socket.EditorAction;
+import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
 import com.szefi.uml_conference.socket.threads.SocketThreadManager;
+import com.szefi.uml_conference.socket.threads.service.SOCKET;
+import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -31,69 +37,61 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
  *
  * @author h9pbcl
  */
-@Component
-public class WebSocketHandler extends TextWebSocketHandler {
-  
-    private final List<WebSocketSession> sessions = new ArrayList<>();
-   
-    ObjectMapper mapper ;
 
-   
-    public WebSocketHandler() {
+public class EditorActionHandler extends TextWebSocketHandler {
+
+    @Autowired
+    SocketSessionService sessionService;
+    
+    @Autowired SocketThreadManager threadManager;
+    Map<WebSocketSession,Integer> initMap=new HashMap<>();
+    ObjectMapper mapper ;
+    public EditorActionHandler() {
             System.out.print("hello im started");
         mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);                
-       threadManager=new SocketThreadManager(sessions);
-    threadManager.start();
-        
-       
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
-
-   
-    SocketThreadManager threadManager;
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        sessions.remove(session);
+        for(UserWebSocket s:sessionService.getSockets(SOCKET.ACTION)){
+          
+            if(s.getSocket()==null||s.getSocket().equals(session)) { 
+                
+                sessionService.getSockets(SOCKET.ACTION).remove(s);
+            break;
+            }
+        }
     }
-
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-       // System.out.println(message);
-        threadManager.post(mapper.readValue(message.getPayload(), EditorAction.class));
+     //init step to identify the session
+  //  Random r=new Random();
+   //  int num=r.nextInt(2500-1500)+1500;
+    // Thread.sleep(2300);
+        if(initMap.get(session)==0){
+          for(UserWebSocket u:sessionService.getSockets(SOCKET.ACTION)){
+              if(u.getSocket()==session){
+                  u.setUser_id(message.getPayload());
+                   System.out.println(initMap.get(session));
+             System.out.println("action msg"+message.getPayload());
+              }
+          }
+           
+         initMap.replace(session,1);
+    }
+        else{
+      threadManager.postAction(mapper.readValue(message.getPayload(), EditorAction.class));
          System.out.println(message.getPayload());
-       //  System.out.println("posted");
+        }
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        sessions.add(session);
-
+        UserWebSocket s=new UserWebSocket(session);
+        sessionService.getSockets(SOCKET.ACTION).add(s);
+        initMap.put(s.getSocket(), 0);
     }
-    int initCount=0;
- //@Inject
-   /* public void setResponseQueue(BlockingQueue<EditorAction> responseQueue) {
-        this.responseQueue = responseQueue;
-        initCount++;
-        initCheck();
-    }
- //@Inject
-    public void setActionQueue(BlockingQueue<EditorAction> actionQueue) {
-        this.actionQueue = actionQueue;
-            EditorAction t=new EditorAction();
-        t.setJson("json");
-        t.setId("id");
-           actionQueue.add(t);
-           initCount++;
-                   initCheck();
-
-    }
-
-    private void initCheck() {
-if(initCount>=2){
-        threadManager=new SocketThreadManager(sessions,actionQueue,responseQueue);
-    threadManager.start();
-}
-        }*/
+  
 
 }

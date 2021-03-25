@@ -16,11 +16,8 @@ import java.util.List;
 @JsonTypeName(value = "SimpleClass")
 public class SimpleClass extends DiagramObject{
    private List<SimpleClassElementGroup> groups;
-  private AttributeElement titleModel;
-
-
-private String _type;
-private String  name;
+   private Element_c titleModel;
+   private String  name;
 
     public String getName() {
         return name;
@@ -29,13 +26,7 @@ private String  name;
     public void setName(String name) {
         this.name = name;
     }
-    public String getType() {
-        return _type;
-    }
 
-    public void setType(String _type) {
-        this._type = _type;
-    }
 
     public List<SimpleClassElementGroup> getGroups() {
         return groups;
@@ -45,11 +36,13 @@ private String  name;
         this.groups = groups;
     }
 
-    public AttributeElement getTitleModel() {
+    public Element_c getTitleModel() {
         return titleModel;
     }
 
-    public void setTitleModel(AttributeElement titleModel) {
+    public void setTitleModel(Element_c titleModel) {
         this.titleModel = titleModel;
     }
+
+   
 }

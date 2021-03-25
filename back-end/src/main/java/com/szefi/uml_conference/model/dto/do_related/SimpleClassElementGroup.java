@@ -5,13 +5,19 @@
  */
 package com.szefi.uml_conference.model.dto.do_related;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.szefi.uml_conference.model.dto.top.DynamicSerialContainer_I;
+import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
 import java.util.List;
 
 /**
  *
  * @author h9pbcl
  */
-class SimpleClassElementGroup {
+@JsonTypeName(value = "SimpleClassElementGroup")
+public class SimpleClassElementGroup extends DynamicSerialObject 
+        implements DynamicSerialContainer_I<AttributeElement>{
+ 
     private String group_name;
 private GROUP_SYNTAX group_syntax;
  private List<AttributeElement> attributes;
@@ -38,5 +44,10 @@ private GROUP_SYNTAX group_syntax;
 
     public void setAttributes(List<AttributeElement> attributes) {
         this.attributes = attributes;
+    }
+
+    @Override
+    public List<AttributeElement> getContainer() {
+        return this.getAttributes();
     }
 }

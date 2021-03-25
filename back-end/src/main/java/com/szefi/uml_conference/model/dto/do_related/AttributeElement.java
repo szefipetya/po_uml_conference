@@ -5,13 +5,16 @@
  */
 package com.szefi.uml_conference.model.dto.do_related;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 /**
  *
  * @author h9pbcl
  */
-class AttributeElement extends Element_c  {
+@JsonTypeName(value = "AttributeElement")
+public class AttributeElement extends Element_c  {
     private String visibility;
-    private String type;
+    private String attr_type;
 
     public String getVisibility() {
         return visibility;
@@ -21,11 +24,11 @@ class AttributeElement extends Element_c  {
         this.visibility = visibility;
     }
 
-    public String getType() {
-        return type;
+    public String getAttr_type() {
+        return attr_type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setAttr_type(String attr_type) {
+        this.attr_type = attr_type;
     }
 }
