@@ -56,7 +56,7 @@ ObjectMapper mapper;
             if(response==null) continue;
             System.out.println("response taken");
             System.out.println(response.getAction_id());
-            System.out.println(response.getSessionState().getLockerUser_id());
+          //  System.out.println(response.getSessionState().getLockerUser_id());
             System.out.println("----");
            
             for(UserWebSocket s:sessions){

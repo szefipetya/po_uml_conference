@@ -35,6 +35,7 @@ public class SessionState {
     }
     public SessionState() {
        locks=new LOCK_TYPE[0];
+       lockerUser_id="-";
     }
 
     public LOCK_TYPE[] getLocks() {

@@ -93,9 +93,9 @@ export class ActionSocket implements SocketWrapper {
             this.parent.service.itemViewModelMap.map((i) => {
               if (i.key == resp.action.extra['old_id']) {
                 i.key = load.id;
+                i.value.updateModel(load, resp.action.id);
                 i.value.updateState(JSON.parse(resp.action.extra.sessionState));
                 console.log('id kicserélve', resp.action.extra);
-                i.value.updateModel(load, resp.action.id);
               }
             });
 

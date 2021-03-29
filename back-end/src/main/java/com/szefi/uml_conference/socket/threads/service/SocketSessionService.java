@@ -243,16 +243,18 @@ public class SocketSessionService {
         return false;
     }
 
-    public Pair<SessionState,DynamicSerialObject> updateObject(DynamicSerialObject obj,String user_id) {
+    public Pair<SessionState,DynamicSerialObject> updateObject(DynamicSerialObject obj,String user_id) throws NullPointerException {
        
        
           SessionState s=this.getSessionStateById(obj.getId());
-          s.setDraft(false);
-       if(this.unLockObjectById(obj.getId(), user_id)){
-           this.getItemById(obj.getId()).update(obj); 
-           return this.sessionItemMap.get(obj.getId());
-       }
-        else return null;      
+          if(s!=null){
+                s.setDraft(false);
+               if(this.unLockObjectById(obj.getId(), user_id)){
+                   this.getItemById(obj.getId()).update(obj); 
+                   return this.sessionItemMap.get(obj.getId());
+                }
+          }
+         return null;      
     }
 
   

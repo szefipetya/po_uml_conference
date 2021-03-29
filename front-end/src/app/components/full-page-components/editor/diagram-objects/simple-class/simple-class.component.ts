@@ -55,7 +55,7 @@ export class SimpleClassComponent
         // this.editorService.clientModel.canvas.edit_classTitle_id = null;
       }
     let prev = this.model.titleModel.edit;
-    this.model.titleModel.edit = false;
+    //   this.model.titleModel.edit = false;
     this.model.titleModel.viewModel.save(prev);
 
     this.model.groups.map((egroup) => {
@@ -64,7 +64,7 @@ export class SimpleClassComponent
           // this.editorService.clientModel.canvas.edit_element_id = null;
           console.log('EDITED FOUND ');
           let prev = e.edit;
-          e.edit = false;
+
           e.viewModel.save(prev);
         }
       });
