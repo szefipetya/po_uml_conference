@@ -31,7 +31,7 @@ import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
         
       
 })
-public class DynamicSerialObject {
+public abstract class DynamicSerialObject {
     private String _type;
     private String id;
 
@@ -50,4 +50,5 @@ public class DynamicSerialObject {
     public void setId(String id) {
         this.id = id;
     }
+    public abstract void update(DynamicSerialObject obj);
 }

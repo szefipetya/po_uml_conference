@@ -29,7 +29,7 @@ class Test {
     this.ping = v;
   }
 }
-class Pair<K, V> {
+export class Pair<K, V> {
   key: K;
   value: V;
   constructor(key: K, value: V) {
@@ -44,7 +44,8 @@ class Pair<K, V> {
 export class EditorSocketControllerService {
   [x: string]: any;
 
-  url_pre = 'ws://86.59.220.241:8101/';
+  //url_pre = 'ws://84.2.193.197:8101/';
+  url_pre = 'ws://localhost:8101/';
   constructor(private editorService: GlobalEditorService) {
     this.itemViewModelMap = [];
     this.waitingForResponse_queue = [];
@@ -55,20 +56,30 @@ export class EditorSocketControllerService {
   injectionQueue: InjectionToken_c[] = [];
 
   popInjectionQueue(req_target_id: string) {
-    let token: InjectionToken_c = this.injectionQueue.find(
-      (i) => i.target_id == req_target_id
-    );
-    console.log('injqueue', this.injectionQueue);
-    console.log('vm map', this.itemViewModelMap);
-    if (token != null) {
-      // if (token.target_type == TARGET_TYPE.ITEM) {
-      // if (token.type == TOKEN_TYPE.SESSION_STATE) {
-      let l = this.itemViewModelMap.find((i) => i.key == req_target_id).value;
-      l.updateState(token.data);
-      console.log('updatedaf');
-      //   }
-      //  }
-    }
+    let self = this;
+    this.injectionQueue.map((i) => {
+      if (i.target_id == req_target_id) {
+        let item: SessionInteractiveItem = self.itemViewModelMap.find(
+          (i) => i.key == req_target_id
+        )?.value;
+        if (item) {
+          if (i.type == TOKEN_TYPE.COMBINED) {
+            item.restoreModel(i.data.model, '');
+            item.updateState(i.data.sessionState);
+          } else if (i.type == TOKEN_TYPE.SESSION_STATE) {
+            item.updateState(i.data.sessionState);
+          }
+        }
+      }
+    });
+    // console.log('injqueue', this.injectionQueue);
+    // console.log('vm map', this.itemViewModelMap);
+
+    // if (token.target_type == TARGET_TYPE.ITEM) {
+    // if (token.type == TOKEN_TYPE.SESSION_STATE) {
+
+    //   }
+    //  }
   }
 
   addToInjectionQ(
@@ -87,6 +98,11 @@ export class EditorSocketControllerService {
 
   public register(target_id: string, view: SessionInteractiveItem) {
     this.itemViewModelMap.push(new Pair(target_id, view));
+  }
+  public unregister(view: SessionInteractiveItem) {
+    this.itemViewModelMap = this.itemViewModelMap.filter(
+      (f) => f.value != view
+    );
   }
   public registerContainer(
     target_id: string,
@@ -109,8 +125,6 @@ export class EditorSocketControllerService {
     this.sessionSocket.connect(this.url_pre + 'state');
 
     this.actionSocket.connect(this.url_pre + 'action');
-    this.sessionSocket.socket.send(this.user.id);
-    this.actionSocket.socket.send(this.user.id);
   }
   public disconnect() {
     this.sessionSocket.socket.close();

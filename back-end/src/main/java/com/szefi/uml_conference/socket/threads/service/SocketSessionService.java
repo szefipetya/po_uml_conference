@@ -67,13 +67,17 @@ public class SocketSessionService {
         //  socketThreadManager.start(); 
     }
 
-    public void deleteLocksRelatedToUser(String user_id){
+    public List<String> deleteLocksRelatedToUser(String user_id){
+        List<String> ret=new ArrayList<>();
      for( Entry<String,Pair<SessionState,DynamicSerialObject>> e : sessionItemMap.entrySet()){
-        if(e.getValue().getFirst().getLockerUser_id().equals(user_id)){
-        this.unLockObjectById(e.getKey(), user_id);
-          
+        if(e.getValue().getFirst().getLockerUser_id()!=null&&
+               e.getValue().getFirst().getLockerUser_id().equals(user_id)){
+        if(this.unLockObjectById(e.getKey(), user_id)){
+            ret.add(e.getKey());
+        }
         }
     }
+        return ret;
     }
     
     public List<UserWebSocket> getSockets(SOCKET s) {
@@ -99,17 +103,18 @@ public class SocketSessionService {
 
     public SessionState getSessionStateById(String id) {
         if(sessionItemMap.get(id)!=null)
-        return sessionItemMap.get(id).getFirst();
+            return sessionItemMap.get(id).getFirst();
         return null;
     }
-        public SessionState getContainerSessionStateById(String id) {
+    public SessionState getContainerSessionStateById(String id) {
         if(sessionContainerMap.get(id)!=null)
-        return sessionContainerMap.get(id).getFirst();
+            return sessionContainerMap.get(id).getFirst();
         return null;
     }
 
     public boolean lockObjectById(String target_id, String user_id, LOCK_TYPE[] locks) {
-        SessionState s = sessionItemMap.get(target_id).getFirst();
+        SessionState s = this.getSessionStateById(target_id);
+        if(s!=null){
         //even if someone locked it, and its me, i can still lock it again for myself
            if(s.getLocks().length==0||
                    (s.getLockerUser_id() == null ? user_id == null 
@@ -120,23 +125,27 @@ public class SocketSessionService {
         s.setLocks(locks);
           return true;
            }
+        }
       return false;
 
     }
 
+  
+    
     public boolean isLockedById(String id) {
-        SessionState s = sessionItemMap.get(id).getFirst();
+        SessionState s = this.getSessionStateById(id);
         if (s == null) 
             return false;
         return s.getLocks().length > 0;
     }
-    public boolean isLockedByMe(String id,String user_id){
-         SessionState s = sessionItemMap.get(id).getFirst();
+    public boolean isItemLockedByMe(String id,String user_id){
+         SessionState s =this.getSessionStateById(id);
           if (s == null) 
             return false;
           return s.getLockerUser_id().equals(user_id);
     }
     //returning new item's id
+  
     public DynamicSerialObject createItemForContainer(String user_id,String cont_id,DynamicSerialObject obj){
         Pair<SessionState,DynamicSerialContainer_I> s= this.sessionContainerMap.get(cont_id);
         if(s!=null){
@@ -153,8 +162,13 @@ public class SocketSessionService {
             this.sessionItemMap.put(rand_id,Pair.of(new SessionState(),obj)); 
             this.lockObjectById(rand_id, user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
             SessionState state=new SessionState();
+            state.setDraft(true);
             state.setLockerUser_id(user_id);
             System.out.println("obj created and locked for"+user_id);
+              getSessionStateById(obj.getId()).setExtra(new HashMap<>());
+              getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+user_id);
+              
+                   
             return obj;
         }
       return null;
@@ -204,29 +218,107 @@ public class SocketSessionService {
         return dg;
     }
 
+    public DynamicSerialObject getItemById(String target_id){
+          Pair<SessionState,DynamicSerialObject> ss = sessionItemMap.get(target_id);
+                 if(ss==null) return null;
+             return ss.getSecond();
+    }
+ 
+     public DynamicSerialContainer_I getContainerById(String cont_id){
+          Pair<SessionState,DynamicSerialContainer_I> ss = sessionContainerMap.get(cont_id);
+                 if(ss==null) return null;
+             return ss.getSecond();
+    }
+    
+    
     public boolean unLockObjectById(String target_id, String user_id) {
-       Pair<SessionState,DynamicSerialObject> ss = sessionItemMap.get(target_id);
-                 if(ss==null) return false;
-              SessionState s=ss.getFirst();
+              SessionState s=getSessionStateById(target_id);
+        if(s!=null)
         if (user_id.equals(s.getLockerUser_id()==null?"":s.getLockerUser_id())) {
             s.setLockerUser_id("-");
             s.setLocks(new LOCK_TYPE[0]);
+           if(s.getExtra()!=null) s.getExtra().clear();
             return true;
         }
         return false;
     }
 
-    public Pair<SessionState,DynamicSerialObject> updateObject(DynamicSerialObject obj) {
-        if(obj instanceof AttributeElement){
-          AttributeElement cast=(AttributeElement)obj;
-          
-         return this.sessionItemMap.replace(cast.getId(),Pair.of(sessionItemMap.get(cast.getId()).getFirst(),cast));
-        }
+    public Pair<SessionState,DynamicSerialObject> updateObject(DynamicSerialObject obj,String user_id) {
+       
+       
+          SessionState s=this.getSessionStateById(obj.getId());
+          s.setDraft(false);
+       if(this.unLockObjectById(obj.getId(), user_id)){
+           this.getItemById(obj.getId()).update(obj); 
+           return this.sessionItemMap.get(obj.getId());
+       }
         else return null;      
     }
 
-    public DynamicSerialObject getRestoredModel(String target_id) {
-        return this.sessionItemMap.get(target_id).getSecond();
+  
+
+    public boolean deleteItemFromContainerById(String user_id,String target_id, String parent_id) {
+        if(this.isItemLockedByMe(target_id, user_id)){
+            DynamicSerialContainer_I cont= getContainerById(parent_id);
+            if(cont!=null){
+               DynamicSerialObject obj=getItemById(target_id);
+               if(obj!=null){
+                   sessionItemMap.remove(target_id);
+                   return cont.getContainer().remove(obj);
+               }
+            }
+        }
+        
+            return false;
+    }
+
+    private String getItemParentId(String target_id){
+        for(Entry<String, Pair<SessionState, DynamicSerialContainer_I>> e:this.sessionContainerMap.entrySet()){
+            for(Object item:e.getValue().getSecond().getContainer()){
+                if(item instanceof DynamicSerialObject){
+                   DynamicSerialObject casted=(DynamicSerialObject)item;
+                   if(casted.getId().equals(target_id)){
+                       return e.getKey();
+                   }
+                }
+            }
+        }
+        return "" ;
+    }
+    
+    //returning the list of deleted object's ids
+    public List<String> deleteDraftsByUser(String user_id) {
+        
+        List<String> ret=new ArrayList<>();
+          List<Map.Entry<String,Pair<SessionState,DynamicSerialObject>>> list=this.getItemsByUser(user_id);
+           for(Map.Entry<String,Pair<SessionState,DynamicSerialObject>> e:list){
+         if(e.getValue().getFirst().isDraft()){
+              if( this.deleteItemFromContainerById(user_id,e.getKey(),getItemParentId(e.getKey())));
+              ret.add(e.getKey());
+                
+            }
+        }
+           //if all the elements were removed, return true else false
+           return ret;
+         
+    }
+    public List<String> unlockObjectsByUserId(String user_id){
+    List<String> ret=new ArrayList<>();
+        List<Entry<String, Pair<SessionState, DynamicSerialObject>>> items= this.getItemsByUser(user_id);
+        for( Entry<String, Pair<SessionState, DynamicSerialObject>> item:items){
+         if(this.unLockObjectById(item.getKey(), user_id))
+             ret.add(item.getKey());
+        }
+        return ret;
+    }
+    private List<Map.Entry<String,Pair<SessionState,DynamicSerialObject>>> getItemsByUser(String user_id){
+        List<Map.Entry<String,Pair<SessionState,DynamicSerialObject>>> list=new ArrayList<>();
+        for(Map.Entry<String,Pair<SessionState,DynamicSerialObject>> e:this.getSessionItemMap().entrySet()){
+          if(e.getValue().getFirst().getLockerUser_id()!=null&&e.getValue().getFirst().getLockerUser_id().equals(user_id)){
+              list.add(e);
+          }
+        }
+        return list;
     }
 
 }

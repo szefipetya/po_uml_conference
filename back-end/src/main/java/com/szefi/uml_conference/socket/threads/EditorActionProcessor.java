@@ -20,6 +20,7 @@ import com.szefi.uml_conference.model.dto.socket.Response.TARGET_TYPE;
 import com.szefi.uml_conference.model.dto.socket.SessionState;
 import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -99,15 +100,18 @@ public class EditorActionProcessor extends CustomProcessor {
                 break;
                 case UPDATE://-------------------------------------------------------------------
                          try {
-                    if (service.unLockObjectById(action.getTarget().getTarget_id(), action.getUser_id())) {
+                    if (service.updateObject(mapper.readValue(action.getJson(), DynamicSerialObject.class), action.getUser_id())!=null) {
                         //send a session state update to all
+                        
                         SessionState s;
                         try{
                             s=service.getSessionStateById(action.getTarget().getTarget_id()) ;
                            if( s!=null){
-                        if(s.getExtra().containsKey("placeholder"))       
+                        if(   service.getSessionStateById(action.getTarget().getTarget_id()).isDraft())     {  
                              s.getExtra().remove("placeholder");
+                             service.getSessionStateById(action.getTarget().getTarget_id()).setDraft(false);
 
+                        }
                            }
                         }catch(Exception e){
                             System.err.println(e.getMessage());
@@ -135,18 +139,19 @@ public class EditorActionProcessor extends CustomProcessor {
                             
                             action.setJson(mapper.writeValueAsString(obj));
                             service.getSessionStateById(obj.getId()).setExtra(new HashMap<String,String>());
+                            service.getSessionStateById(obj.getId()).setDraft(true);
                              service.getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+action.getUser_id());
                    
                             action.getExtra().put("sessionState", 
                                     mapper.writeValueAsString(service.getSessionStateById(obj.getId())));
-                           EditorActionResponse resp2 = new EditorActionResponse(action);
+                              EditorActionResponse resp2 = new EditorActionResponse(action);
                               resp2.setTarget_id(action.getTarget().getTarget_id());
                                resp2.setTarget_type(TARGET_TYPE.CONTAINER);
                                resp2.setTarget_user_id(action.getUser_id());
                 
                 actionResponseQueue.add(resp2);
                             
-                        /*   SessionStateResponse resp = new SessionStateResponse(
+              /*             SessionStateResponse resp = new SessionStateResponse(
                         service.getSessionStateById(obj.getId()),action.getId());
                 resp.setTarget_user_id(action.getUser_id());
                 resp.setTarget_id(obj.getId());
@@ -168,13 +173,48 @@ public class EditorActionProcessor extends CustomProcessor {
                     break;
 
                 case DELETE:
-
+                    System.out.println("DELETE REQUEST "+action.getTarget().getTarget_id()+" parent:"+action.getTarget().getParent_id());
+                       if(this.service.deleteItemFromContainerById(action.getUser_id(), action.getTarget().getTarget_id(),action.getTarget().getParent_id())){
+                           //delete succesful
+                           sendAll(action, Q.ACTION);
+                           
+                       }else{
+                try {
+                    this.sendDeleteRestoreMessage(action, "the item does not exists or you dont have a lock on it.");
+                    //  sendBackPrivate(action, Q.ACTION, "te item does not exists or you dont have a lock on it.");
+                } catch (JsonProcessingException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                       }
                     break;
+                    
+                //SERVER_SIDE ACTIONS ////////////////////////////////////////////
+                case S_USER_DISCONNECT:            
+                  //delete draft elements, send message about them
+                       List<String> deleted=service.deleteDraftsByUser(action.getUser_id());
+                  for(String id:deleted){
+                   action.setAction(ACTION_TYPE.DELETE);
+                       EditorActionResponse resp2 = new EditorActionResponse(action);
+                resp2.setTarget_id(id);
+                actionResponseQueue.add(resp2);
+                  }
+                     List<String> unlocked= service.deleteLocksRelatedToUser(action.getUser_id());
+                     for(String id:unlocked){
+                         SessionStateResponse resp = new SessionStateResponse(service.getSessionStateById(id),"");
+                   
+                         resp.setTarget_user_id(action.getUser_id());
+                         resp.setTarget_id(id);
+                         sessionStateResponseQueue.add(resp);
+                     }
+                          //list of target_id, that have been deleted
+                  
+                  //unlock everything, that had been locked by him.
+                     /* */
                 default:
                     break;
             }
             // if(action==null) continue;   
-
+                
         }
     }
     
@@ -197,6 +237,28 @@ public class EditorActionProcessor extends CustomProcessor {
                 break;
         }
     }
+    
+      void sendBackPrivate(EditorAction action, Q queue,String msg) {
+        switch (queue) {
+            case STATE:
+                SessionStateResponse resp = new SessionStateResponse(
+                        service.getSessionStateById(action.getTarget().getTarget_id()),
+                         action.getId());
+                resp.setTarget_user_id(action.getUser_id());
+                resp.setTarget_id(action.getTarget().getTarget_id());
+                resp.setScope(RESPONSE_SCOPE.PRIVATE);
+                sessionStateResponseQueue.add(resp);
+                break;
+            case ACTION:
+                EditorActionResponse resp2 = new EditorActionResponse(action);
+                resp2.setTarget_id(action.getTarget().getTarget_id());
+                resp2.setScope(RESPONSE_SCOPE.PRIVATE);
+                resp2.setResponse_msg("could not complete delete request");
+                actionResponseQueue.add(resp2);
+                break;
+        }
+    }
+
 
     private enum Q {
         STATE, ACTION
@@ -206,16 +268,37 @@ public class EditorActionProcessor extends CustomProcessor {
         SessionStateResponse resp = new SessionStateResponse(
                 service.getSessionStateById(action.getTarget().getTarget_id()),
                  action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
-
+       resp.setTarget_id(action.getTarget().getTarget_id());
+       resp.setTarget_user_id(action.getUser_id());
+      
         sessionStateResponseQueue.add(resp);
         //Vissza kell állítani az objektet, mert illetéktelenül próbálta meg kiválasztani.
-        EditorAction ar = new EditorAction();
-        ar.setAction(ACTION_TYPE.RESTORE);
-        ar.setId(action.getId());
-        ar.setUser_id(action.getUser_id());
+      
+        action.setAction(ACTION_TYPE.RESTORE);
+        action.setJson(mapper.writeValueAsString(service.getItemById(action.getTarget().getTarget_id())));
+        EditorActionResponse resp2 = new EditorActionResponse(action, action.getUser_id());
+        resp2.setTarget_user_id(action.getUser_id());
+        resp2.setTarget_id(action.getTarget().getTarget_id());
+        resp2.setScope(RESPONSE_SCOPE.PRIVATE);
+       resp2.setResponse_msg(message);
+        actionResponseQueue.add(resp2);
         
-        ar.setJson(mapper.writeValueAsString(service.getRestoredModel(action.getTarget().getTarget_id())));
-        EditorActionResponse resp2 = new EditorActionResponse(ar, action.getUser_id());
+        System.out.println("object restoration is sent");
+    }
+    
+     void sendDeleteRestoreMessage(EditorAction action,String message) throws JsonProcessingException {
+            SessionStateResponse resp = new SessionStateResponse(
+                service.getSessionStateById(action.getTarget().getTarget_id()),
+                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
+            resp.setTarget_id(action.getTarget().getTarget_id());
+            resp.setTarget_user_id(action.getUser_id());
+        sessionStateResponseQueue.add(resp);
+        //Vissza kell állítani az objektet, mert illetéktelenül próbálta meg kiválasztani.
+      
+        action.setAction(ACTION_TYPE.RESTORE);
+        action.getExtra().put("sessionState", mapper.writeValueAsString( service.getSessionStateById(action.getTarget().getTarget_id())));
+        action.setJson(mapper.writeValueAsString(service.getItemById(action.getTarget().getTarget_id())));
+        EditorActionResponse resp2 = new EditorActionResponse(action, action.getUser_id());
         resp2.setTarget_user_id(action.getUser_id());
         resp2.setTarget_id(action.getTarget().getTarget_id());
         resp2.setScope(RESPONSE_SCOPE.PRIVATE);

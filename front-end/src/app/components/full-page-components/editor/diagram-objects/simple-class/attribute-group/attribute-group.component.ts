@@ -34,6 +34,12 @@ export class AttributeGroupComponent
   constructor(private socket: EditorSocketControllerService) {
     // this.model._type = 'SimpleClassElementGroup';
   }
+  hasItem(target_id: string) {
+    return this.model.attributes.find((t) => target_id == t.id) != null;
+  }
+  public getId(): string {
+    return this.model.id;
+  }
   callback_queue: CallbackItem[] = [];
   updateItemWithOld(model, extra) {
     this.model.attributes.map((i) => {
@@ -105,7 +111,7 @@ export class AttributeGroupComponent
   createLocal(visibility, name, type) {
     // this..clientModel.canvas.edit_element_id = id;
     if (name == '') {
-      //name = '_?';
+      name = '';
     }
     let id = uniqId('a');
     let newAttr = {

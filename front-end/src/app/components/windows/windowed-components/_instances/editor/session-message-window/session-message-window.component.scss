@@ -1,0 +1,45 @@
+.bg {
+  background-color: #222;
+  color: white;
+  scroll-behavior: smooth;
+
+  .log-content {
+    &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      background-color: #222;
+    }
+
+    &::-webkit-scrollbar {
+      width: 12px;
+      background-color: #232323;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      background-color: #555;
+    }
+
+    background-color: #222;
+    overflow-x: scroll;
+    height: 100%;
+    border: 3px solid #333;
+    padding: 3px 5px;
+    .log-item:hover {
+      // text-shadow: white 0px 0px 0.5px;
+    }
+    .log-info {
+      color: darkcyan;
+    }
+    .log-info:hover {
+      color: rgb(113, 199, 199);
+    }
+    .log-error {
+      color: crimson;
+    }
+    .log-error:hover {
+      color: rgb(235, 140, 159);
+    }
+  }
+}

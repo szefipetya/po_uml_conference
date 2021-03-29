@@ -99,12 +99,12 @@ public class SessionInitProcessor extends CustomProcessor {
             
                 }else if(action.getAction()==ACTION_TYPE.UPDATE){
                     
-                     try {
+                
                         
                          
                          if( service.unLockObjectById(action.getTarget().getTarget_id(), action.getUser_id())){ 
                              
-                            Pair<SessionState,DynamicSerialObject> result=  service.updateObject(mapper.readValue(action.getJson(),DynamicSerialObject.class));
+                          //  Pair<SessionState,DynamicSerialObject> result=  service.updateObject(mapper.readValue(action.getJson(),DynamicSerialObject.class));
                               
                              //the object is free
                           /*   SessionStateResponse resp=new SessionStateResponse(
@@ -117,10 +117,8 @@ public class SessionInitProcessor extends CustomProcessor {
                              
                          }else{
                              //Can not update
-
-                         }   } catch (JsonProcessingException ex) {
-                         Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
-                     }
+                         }
+                        
                 }
             
         }

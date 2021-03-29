@@ -17,11 +17,12 @@ export class DiagramObjectComponent implements OnInit, SessionInteractiveItem {
   constructor(socket: EditorSocketControllerService) {
     this.socket = socket;
   }
+  deleteSelfFromParent() {}
   callback_queue: CallbackItem[];
   restoreModel(model: any) {
     throw new Error('Method not implemented.');
   }
-  msgPopup(msg: string) {
+  log(msg: string) {
     throw new Error('Method not implemented.');
   }
   sessionState: SessionState;

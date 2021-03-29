@@ -35,6 +35,21 @@ export class WindowManagerComponent implements OnInit {
         contentViewModelInstance: null,
       },
       {
+        selector: 'app-session-message-window',
+        fixed: false,
+        head: {
+          height: 25,
+          title: 'Log',
+        },
+        height: 120,
+        width: 250,
+        id: 'log',
+        left: 0,
+        top: window.innerHeight - 120,
+        viewModelInstance: null,
+        contentViewModelInstance: null,
+      },
+      {
         selector: 'app-socket-communication-window',
         fixed: false,
         head: {

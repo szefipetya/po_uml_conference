@@ -120,6 +120,14 @@ public class SocketThreadManager {
             Logger.getLogger(SocketThreadManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+      public void postStateResponse(SessionStateResponse a){
+        try {
+            sessionStateResponseQueue.put(a);
+            System.out.println("putted on list");
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SocketThreadManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     @EventListener(ApplicationReadyEvent.class)
     private void executeProcessors(){

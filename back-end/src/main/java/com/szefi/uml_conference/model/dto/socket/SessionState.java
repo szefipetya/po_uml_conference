@@ -17,7 +17,15 @@ public class SessionState {
     private LOCK_TYPE[] locks;
     private String lockerUser_id;
     private  Map<String,String> extra;
+    private boolean draft;
 
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
+    }
     public Map<String, String> getExtra() {
         return extra;
     }

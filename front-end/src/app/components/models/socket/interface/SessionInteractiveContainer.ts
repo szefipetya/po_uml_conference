@@ -9,8 +9,10 @@ export interface SessionInteractiveContainer {
   updateItemWithOld(old_id: string, model: any);
 
   createItem(model: DynamicSerialObject, extra?: any);
+  hasItem(target_id: string);
   restoreItem(item_id: string, model: DynamicSerialObject);
 
   deleteItem(item_id: string);
   msgPopup(msg: string);
+  getId(): string;
 }

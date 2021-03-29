@@ -1,7 +1,12 @@
 import { InteractivityChecker } from '@angular/cdk/a11y';
+import { SessionInteractiveContainer } from 'src/app/components/models/socket/interface/SessionInteractiveContainer';
+import { SessionInteractiveItem } from 'src/app/components/models/socket/interface/SessionInteractiveItem';
 import { SessionStateResponse } from 'src/app/components/models/socket/response/SessionStateResponse';
 import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TYPE';
-import { EditorSocketControllerService } from '../editor-socket-controller.service';
+import {
+  EditorSocketControllerService,
+  Pair,
+} from '../editor-socket-controller.service';
 import { SocketWrapper } from './SocketWrapper_I';
 
 export class SessionSocket implements SocketWrapper {
@@ -18,18 +23,17 @@ export class SessionSocket implements SocketWrapper {
       let s: SessionStateResponse;
       s = JSON.parse(e.data);
       console.log('SESSION MESSAGE', s);
-
+      let si: SessionInteractiveItem;
+      let sc: SessionInteractiveContainer;
       switch (s.target_type) {
         case 'CONTAINER':
-          this.parent.service.containerViewModelMap
-            .find((l) => l.key == s.target_id)
-            .value.updateState(s.sessionState, s.action_id);
+          sc = this.parent.getContainer(s.target_id);
+          if (sc) sc.updateState(s.sessionState, s.action_id);
           break;
 
         case 'ITEM':
-          this.parent.service.itemViewModelMap
-            .find((l) => l.key == s.target_id)
-            .value.updateState(s.sessionState, s.action_id);
+          si = this.parent.getItem(s.target_id);
+          if (si) si.updateState(s.sessionState, s.action_id);
           console.log('ITEMS SESSION UPDATED');
           break;
       }
@@ -70,5 +74,21 @@ export class SessionSocket implements SocketWrapper {
 
   disconnect() {
     throw new Error('Method not implemented.');
+  }
+  getItem(id) {
+    let p: Pair<
+      String,
+      SessionInteractiveItem
+    > = this.service.itemViewModelMap.find((i) => i.key == id);
+    if (p) return p.value;
+    else return null;
+  }
+  getContainer(id) {
+    let p: Pair<
+      String,
+      SessionInteractiveContainer
+    > = this.service.containerViewModelMap.find((i) => i.key == id);
+    if (p) return p.value;
+    else return null;
   }
 }

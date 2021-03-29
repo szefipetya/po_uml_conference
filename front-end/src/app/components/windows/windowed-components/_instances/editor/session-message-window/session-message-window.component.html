@@ -1,0 +1,33 @@
+<ng-template #content>
+  <div
+    [style.height]="model.height + 'px'"
+    [style.width]="model.width + 'px'"
+    class="bg"
+  >
+    <div #log_cont class="log-content">
+      <div
+        class="log-row"
+        *ngFor="let item of this.commonService.getLatestLog(50)"
+      >
+        <div
+          class="log-item log-info"
+          *ngIf="item.type == 'INFO'"
+          (mouseenter)="this.onLoghover(item)"
+          (mouseleave)="this.onLoghoverEnd(item)"
+        >
+          {{ item.msg }}
+        </div>
+        <div
+          class="log-item log-error"
+          *ngIf="item.type == 'ERROR'"
+          (mouseenter)="this.onLoghover(item)"
+          (mouseleave)="this.onLoghoverEnd(item)"
+        >
+          {{ item.msg }}
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<app-window [contentTemplate]="content" [model]="this.model"> </app-window>

@@ -40,6 +40,14 @@ protected String name;
         this.edit = edit;
     }
 
+    @Override
+    public void update(DynamicSerialObject obj) {
+        if(obj instanceof Element_c){
+            Element_c casted=(Element_c)obj;
+            this.name=casted.name; 
+        }
+    }
+
 
 
   

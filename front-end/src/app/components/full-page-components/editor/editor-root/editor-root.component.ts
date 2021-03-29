@@ -67,11 +67,11 @@ export class EditorRootComponent implements OnInit {
     ) {
       console.log('false on all');
       this.editorService.model.dgObjects.map((clas) => {
-        console.log(clas);
-        console.log(clas instanceof SimpleClass);
+        //  console.log(clas);
+        //  console.log(clas instanceof SimpleClass);
 
         clas.viewModel.disableEdit();
-        console.log('edit is false');
+        //  console.log('edit is false');
       });
       this.inputDOM = undefined;
     } else if (e.target.id == '#editor-input') this.inputDOM = e.target;
@@ -83,7 +83,7 @@ export class EditorRootComponent implements OnInit {
 
   onMouseDown = (e) => {
     // e.persist();
-    console.log('handle');
+    //  console.log('handle');
     this.handleAsync(e);
   };
 
@@ -93,7 +93,7 @@ export class EditorRootComponent implements OnInit {
       this.disableEdits(e, true);
     }
     if (e.key.match('Delete') || e.keyCode == 46) {
-      console.log('del');
+      //   console.log('del');
       let input = document.querySelector('#editor-input');
       if (!input) {
         e.preventDefault();
@@ -103,7 +103,7 @@ export class EditorRootComponent implements OnInit {
           );
         });
       }
-      console.log(this.editorService.model.dgObjects);
+      //  console.log(this.editorService.model.dgObjects);
     }
     //  this.forceUpdate();
   };

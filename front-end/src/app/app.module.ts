@@ -31,6 +31,7 @@ import { LineCanvasComponent } from './components/full-page-components/editor/ca
 import { SocketCommunicationWindowComponent } from './components/windows/windowed-components/_instances/editor/socket-communication-window/socket-communication-window.component';
 import { NoteBoxComponent } from './components/full-page-components/editor/diagram-objects/note-box/note-box.component';
 import { DiagramObjectComponent } from './components/full-page-components/editor/diagram-objects/diagram-object/diagram-object.component';
+import { SessionMessageWindowComponent } from './components/windows/windowed-components/_instances/editor/session-message-window/session-message-window.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { DiagramObjectComponent } from './components/full-page-components/editor
     SocketCommunicationWindowComponent,
     NoteBoxComponent,
     DiagramObjectComponent,
+    SessionMessageWindowComponent,
   ],
   imports: [
     //Angular core

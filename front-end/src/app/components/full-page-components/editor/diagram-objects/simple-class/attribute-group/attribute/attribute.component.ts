@@ -16,18 +16,29 @@ import { SessionInteractiveItem } from 'src/app/components/models/socket/interfa
 import { SessionState } from 'src/app/components/models/socket/SessionState';
 import { AttributeElement } from '../../../../../../models/DiagramObjects/AttributeElement';
 import { EditorSocketControllerService } from '../../../../services/editor-socket-controller/editor-socket-controller.service';
+import {
+  CommonService,
+  MSG_TYPE,
+} from '../../../../services/common/common.service';
 import { AttributeGroupComponent } from '../attribute-group.component';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { SimpleClassComponent } from '../../simple-class.component';
 import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
-
+import { uniqId } from 'src/app/components/utils/utils';
+import { SessionInteractiveContainer } from 'src/app/components/models/socket/interface/SessionInteractiveContainer';
+import { LogInteractive_I } from 'src/app/components/models/socket/interface/LogInteractive_I';
 @Component({
   selector: 'app-attribute',
   templateUrl: './attribute.component.html',
   styleUrls: ['./attribute.component.scss'],
 })
 export class AttributeComponent
-  implements OnInit, OnChanges, AfterContentInit, SessionInteractiveItem {
+  implements
+    OnInit,
+    OnChanges,
+    AfterContentInit,
+    SessionInteractiveItem,
+    LogInteractive_I {
   targetDOM: any;
   inputDOM: Element;
   clname: string;
@@ -45,14 +56,30 @@ export class AttributeComponent
 
   loading: boolean = false;
   extra_overlay: string = '';
-  constructor(private socket: EditorSocketControllerService) {
-    //this.sessionState = new SessionState();
+  onSingleClick(e) {
+    console.log(this.getSessionState());
   }
+  constructor(
+    private socket: EditorSocketControllerService,
+    private commonService: CommonService
+  ) {
+    // this.geSessionState() = new SessionState();
+  }
+  highlightMe(on: boolean, color: string): void {
+    if (on) this.box_shadow = ' 0px 0px 21px 1px ' + color;
+    else this.box_shadow = '';
+  }
+  box_shadow: string = '';
   callback_queue: CallbackItem[] = [];
   getParentClass(): SimpleClassComponent {
     if (this.isTitle) {
       return this.parent;
     } else return this.parent.parent;
+  }
+  getParentContainer(): SessionInteractiveContainer {
+    if (this.isTitle) {
+      return this.parent;
+    } else return this.parent;
   }
 
   restoreModel(model: any, action_id: string, msg: string) {
@@ -62,38 +89,49 @@ export class AttributeComponent
     this.callback_queue = this.callback_queue.filter(
       (q) => q.action_id != action_id
     );
-    if (msg) this.msgPopup(msg);
+    if (msg) this.log(msg, MSG_TYPE.INFO);
     this.render();
   }
-  msgPopup(msg: string) {
-    this.responseMsg = msg;
-    setTimeout(() => {
-      this.responseMsg = '';
-    }, 2000);
+  log(msg: string, type: MSG_TYPE) {
+    this.commonService.putLog(msg, type, this);
   }
 
-  sessionState: SessionState;
+  private sessionState: SessionState;
+  public getSessionState(): SessionState {
+    return this.sessionState;
+  }
+  private setSessionState(s) {
+    console.log('set state', s);
+    this.sessionState = s;
+  }
   updateState(state: SessionState, callback_action_id = ''): void {
+    if (state == undefined) return;
+    console.log('state to be inserted', state);
     this.callback_queue = this.callback_queue.filter(
       (q) => q.action_id != callback_action_id
     );
-    this.sessionState = state;
+    this.setSessionState(state);
+    /*  this.geSessionState().locks = state.locks;
+     this.geSessionState().lockerUser_id = state.lockerUser_id;
+     this.geSessionState().extra = state.extra;*/
     if (state.lockerUser_id != this.socket.user.id) {
       this.model.edit = false;
     } else {
       //we are the owner
-      if (this.sessionState?.extra?.placeholder) {
-        this.sessionState.extra.placeholder = null;
+      this.model.edit = true;
+      if (this.getSessionState()?.extra?.placeholder) {
+        this.getSessionState().extra.placeholder = null;
       }
     }
-    console.log('STATE UPDATED', this.sessionState);
-    this.loading = false;
-    this.render();
+
+    console.log('STATE UPDATED', this.model, this.getSessionState());
+    // this.render();
   }
   sendAction(action: EditorAction) {
     this.callback_queue.push(new CallbackItem(action.id));
     this.socket.send(action);
   }
+  deleted = false;
   editBegin() {
     let action = new EditorAction(this.model.id, this.model.attr_type, '');
 
@@ -101,11 +139,12 @@ export class AttributeComponent
     action.json = '{}';
     action.target.target_id = this.model.id;
     if (this.isTitle) action.target.parent_id = this.parent.model.id;
-    else action.target.parent_id = this.parent.parent.model.id;
+    else action.target.parent_id = this.parent.model.id;
 
     this.sendAction(action);
   }
   editEnd() {
+    if (this.deleted) return;
     let action = new EditorAction(this.model.id, this.model._type, '');
     action.action = ACTION_TYPE.UPDATE;
 
@@ -114,7 +153,7 @@ export class AttributeComponent
     this.model.viewModel = this;
 
     if (this.isTitle) action.target.parent_id = this.parent.model.id;
-    else action.target.parent_id = this.parent.parent.model.id;
+    else action.target.parent_id = this.parent.model.id;
     console.log('edit ended', action.json);
     this.sendAction(action);
   }
@@ -124,7 +163,8 @@ export class AttributeComponent
     this.model.attr_type = model.attr_type;
     this.model.visibility = model.visibility;
     this.model.edit = model.edit;
-    if (this.sessionState?.extra) this.sessionState.extra.placeholder = null;
+    if (this.getSessionState()?.extra)
+      this.getSessionState().extra.placeholder = null;
     // this.model = model;
     //this.model.edit = false;
 
@@ -143,19 +183,22 @@ export class AttributeComponent
     else return '';
   }
   isLocked(): string {
-    if (this.sessionState == null) return 'null';
-    if (this.sessionState.lockerUser_id == this.socket.user.id)
+    //  if (this.model.id == '1') console.log( this.geSessionState());
+    if (this.getSessionState() == undefined) return 'null';
+    if (this.getSessionState().lockerUser_id == this.socket.user.id)
       return 'editing';
-    if (this.sessionState.locks.length > 0) return 'locked';
+    if (this.getSessionState().locks.length > 0)
+      return 'locked:' + this.getSessionState().lockerUser_id;
     else return '';
   }
 
   ngOnInit(): void {
     this.model.viewModel = this;
-    console.log('attr registered with id', this.model);
+    //  console.log('attr registered with id', this.model);
     //this.model._type = 'AttributeElement';
     this.socket.register(this.model.id, this);
     this.socket.popInjectionQueue(this.model.id);
+    this.log('init', MSG_TYPE.ERROR);
     this.render();
   }
   ngOnChanges() {
@@ -168,9 +211,24 @@ export class AttributeComponent
   }
   parentClass;
   deleteSelfFromParent = () => {
+    console.log('del triggered');
+    this.model.name = '';
+    this.socket.unregister(this);
     this.parent.delete(this.model.id);
   };
+  deleteMessageToServer() {
+    let a = new EditorAction(
+      this.model.id,
+      this.model._type,
+      this.getParentContainer().getId()
+    );
+    a.action = ACTION_TYPE.DELETE;
+    a.id = uniqId();
+    this.socket.send(a);
+    this.deleteSelfFromParent();
+  }
   saveEvent(wastrue) {
+    if (this.getSessionState() == null) return;
     if (this.isTitle) {
       if (this.model.name == '') {
         this.model.name = '';
@@ -181,7 +239,7 @@ export class AttributeComponent
     } else {
       //NOT TITLE
       if (this.model.name == '') {
-        this.deleteSelfFromParent();
+        this.deleteMessageToServer();
         console.log('deleted', this.model);
       } else {
         if (wastrue) this.editEnd();
@@ -190,8 +248,21 @@ export class AttributeComponent
   }
 
   onClick(e) {
-    if (this.sessionState == null) return;
-    if (this.sessionState.locks.length > 0) return;
+    if (this.getSessionState() == null) {
+      this.log('Session State is null', MSG_TYPE.ERROR);
+      return;
+    }
+    if (this.getSessionState().locks.length > 0) {
+      if (this.getSessionState().lockerUser_id != this.socket.user.id) {
+        this.log(
+          "Object is locked (locker's id: " +
+            this.sessionState.lockerUser_id +
+            ')',
+          MSG_TYPE.INFO
+        );
+      }
+      return;
+    }
 
     this.editBegin();
     this.model.edit = true;
@@ -362,8 +433,8 @@ export class AttributeComponent
         }
       }
     }
-    if (this.sessionState?.extra?.placeholder) {
-      this.extra_overlay = this.sessionState.extra.placeholder;
+    if (this.getSessionState()?.extra?.placeholder) {
+      this.extra_overlay = this.getSessionState().extra.placeholder;
     } else {
       this.extra_overlay = '';
     }

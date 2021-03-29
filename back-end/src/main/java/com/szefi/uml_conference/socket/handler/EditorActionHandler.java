@@ -66,9 +66,6 @@ public class EditorActionHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
      //init step to identify the session
-  //  Random r=new Random();
-   //  int num=r.nextInt(2500-1500)+1500;
-    // Thread.sleep(2300);
         if(initMap.get(session)==0){
           for(UserWebSocket u:sessionService.getSockets(SOCKET.ACTION)){
               if(u.getSocket()==session){
@@ -77,10 +74,10 @@ public class EditorActionHandler extends TextWebSocketHandler {
              System.out.println("action msg"+message.getPayload());
               }
           }
-           
          initMap.replace(session,1);
     }
         else{
+            //handle message
       threadManager.postAction(mapper.readValue(message.getPayload(), EditorAction.class));
          System.out.println(message.getPayload());
         }

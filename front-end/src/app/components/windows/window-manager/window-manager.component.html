@@ -34,6 +34,8 @@
           *ngIf="win.id == 'socket'"
         >
         </app-socket-communication-window>
+        <app-session-message-window [model]="win" *ngIf="win.id == 'log'">
+        </app-session-message-window>
       </div>
     </div>
   </div>

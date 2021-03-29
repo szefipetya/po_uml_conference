@@ -22309,18 +22309,18 @@
 												"$ref": "AAAAAAF4NWOPkyo3vQw="
 											},
 											"font": "Arial;18;0",
-											"left": 355.9599609375,
+											"left": 362.0595703125,
 											"top": 77,
-											"width": 70.0400390625,
+											"width": 63.9404296875,
 											"height": 18,
 											"text": "Interface",
 											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;18;0",
-									"left": 350.9599609375,
+									"left": 357.0595703125,
 									"top": 72,
-									"width": 80.0400390625,
+									"width": 73.9404296875,
 									"height": 28
 								}
 							],
@@ -30916,7 +30916,7 @@
 					"_parent": {
 						"$ref": "AAAAAAF4TyPehXeFffY="
 					},
-					"name": "Interaction1",
+					"name": "SESSION_Locking",
 					"ownedElements": [
 						{
 							"_type": "UMLSequenceDiagram",
@@ -30979,9 +30979,9 @@
 													"visible": false,
 													"font": "Arial;18;0",
 													"left": -288,
-													"width": 147.0498046875,
+													"width": 205.06640625,
 													"height": 18,
-													"text": "(from Interaction1)"
+													"text": "(from SESSION_Locking)"
 												},
 												{
 													"_type": "LabelView",
@@ -31095,9 +31095,9 @@
 													"visible": false,
 													"font": "Arial;18;0",
 													"left": -32,
-													"width": 147.0498046875,
+													"width": 205.06640625,
 													"height": 18,
-													"text": "(from Interaction1)"
+													"text": "(from SESSION_Locking)"
 												},
 												{
 													"_type": "LabelView",
@@ -31211,9 +31211,9 @@
 													"visible": false,
 													"font": "Arial;18;0",
 													"left": -16,
-													"width": 147.0498046875,
+													"width": 205.06640625,
 													"height": 18,
-													"text": "(from Interaction1)"
+													"text": "(from SESSION_Locking)"
 												},
 												{
 													"_type": "LabelView",
@@ -31327,9 +31327,9 @@
 													"visible": false,
 													"font": "Arial;18;0",
 													"left": -48,
-													"width": 147.0498046875,
+													"width": 205.06640625,
 													"height": 18,
-													"text": "(from Interaction1)"
+													"text": "(from SESSION_Locking)"
 												},
 												{
 													"_type": "LabelView",
@@ -31441,9 +31441,9 @@
 													},
 													"visible": false,
 													"font": "Arial;18;0",
-													"width": 147.0498046875,
+													"width": 205.06640625,
 													"height": 18,
-													"text": "(from Interaction1)"
+													"text": "(from SESSION_Locking)"
 												},
 												{
 													"_type": "LabelView",
@@ -34190,7 +34190,8 @@
 					"_parent": {
 						"$ref": "AAAAAAF4TyPehXeFffY="
 					},
-					"name": "Role3"
+					"name": "Role3",
+					"type": ""
 				},
 				{
 					"_type": "UMLAttribute",
@@ -34198,7 +34199,8 @@
 					"_parent": {
 						"$ref": "AAAAAAF4TyPehXeFffY="
 					},
-					"name": "Role4"
+					"name": "Role4",
+					"type": ""
 				},
 				{
 					"_type": "UMLAttribute",
@@ -34206,7 +34208,8 @@
 					"_parent": {
 						"$ref": "AAAAAAF4TyPehXeFffY="
 					},
-					"name": "Role5"
+					"name": "Role5",
+					"type": ""
 				},
 				{
 					"_type": "UMLAttribute",
@@ -34214,7 +34217,8 @@
 					"_parent": {
 						"$ref": "AAAAAAF4TyPehXeFffY="
 					},
-					"name": "Role6"
+					"name": "Role6",
+					"type": ""
 				},
 				{
 					"_type": "UMLAttribute",
@@ -34222,7 +34226,8 @@
 					"_parent": {
 						"$ref": "AAAAAAF4TyPehXeFffY="
 					},
-					"name": "Role7"
+					"name": "Role7",
+					"type": ""
 				}
 			]
 		},

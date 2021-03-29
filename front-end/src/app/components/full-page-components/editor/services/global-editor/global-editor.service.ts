@@ -22,7 +22,8 @@ import { User } from 'src/app/components/models/User';
 export class GlobalEditorService {
   model: Diagram;
   alignment;
-  url_pre = 'http://86.59.220.241:8101/';
+  //url_pre = 'http://84.2.193.197:8101/';
+  url_pre = 'http://localhost:8101/';
   url_pre_test = 'https://jsonplaceholder.typicode.com/posts';
   url_get_diagram = 'get/dg';
   clientModel: ClientModel;
