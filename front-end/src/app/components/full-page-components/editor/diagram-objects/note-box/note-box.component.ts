@@ -10,6 +10,7 @@ import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/Si
 import { NoteBox } from '../../../../models/DiagramObjects/NoteBox';
 import { CommonService } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
+import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
 import { DiagramObjectComponent } from '../diagram-object/diagram-object.component';
 @Component({
   selector: 'app-note-box',
@@ -19,27 +20,16 @@ import { DiagramObjectComponent } from '../diagram-object/diagram-object.compone
 export class NoteBoxComponent
   extends DiagramObjectComponent
   implements OnInit, AfterViewChecked {
-  public editBegin(): void {
-    //  throw new Error('Method not implemented.');
-  }
-  public editEnd(): void {
-    //  throw new Error('Method not implemented.');
-  }
-  updateModel(model: any, action_id: string, msg?: string): void {
-    //  throw new Error('Method not implemented.');
-  }
-  saveEvent(wastrue: any): void {
-    // throw new Error('Method not implemented.');
-  }
   @Input()
   model: NoteBox;
   @Input() public general: SimpleClass_General;
   @ViewChild('texta') textarea: ElementRef<HTMLTextAreaElement>;
   constructor(
-    socket: EditorSocketControllerService,
-    commonService: CommonService
+    protected socket: EditorSocketControllerService,
+    protected commonService: CommonService,
+    protected editorService: GlobalEditorService
   ) {
-    super(socket, commonService);
+    super(socket, commonService, editorService);
   }
   updateScales(scale): void {
     this.updateFont();
@@ -58,8 +48,9 @@ export class NoteBoxComponent
     }
   }
   onContentClick(e) {
-    this.model.edit = true;
+    if (this.isAccessible()) this.model.edit = true;
   }
+
   inputClick(e) {}
   updateHeight() {
     if (!this.textarea) return;
@@ -69,17 +60,27 @@ export class NoteBoxComponent
         this.textarea.nativeElement.scrollHeight,
         this.getInnerHeight()
       ) + 'px';
+    //  this.sendDimensionUpdate();
   }
   textInput(e) {
     this.updateHeight();
   }
-  ngOnInit(): void {
-    console.log('GENERAL', this.general);
-    this.model.viewModel = this;
+  onKeyPress(e) {
+    console.log(e);
   }
+
   disableEdit() {
-    this.model.edit = false;
     console.log('notebox edit false');
     if (this.textarea) this.model.content = this.textarea.nativeElement.value;
+    if (this.model.edit) this.editEnd();
+    this.model.edit = false;
+  }
+  ngOnInit(): void {
+    //this.model._type = 'SimpleClass';
+    this.model.viewModel = this;
+    super.ngOnInit();
+  }
+  ngOnChanges(): void {
+    console.log('changed');
   }
 }

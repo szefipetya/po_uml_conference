@@ -45,7 +45,7 @@ export class SessionSocket implements SocketWrapper {
   }
   oninitmessage(e: any) {
     let responses: SessionStateResponse[] = JSON.parse(e.data);
-    console.log(this);
+    console.log(responses);
     responses.forEach((r) => {
       console.log(r);
       this.parent.service.itemViewModelMap

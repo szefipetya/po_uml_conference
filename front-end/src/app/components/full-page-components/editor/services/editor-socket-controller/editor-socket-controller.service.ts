@@ -119,7 +119,7 @@ export class EditorSocketControllerService {
   actionSocket: ActionSocket;
 
   public connect() {
-    this.actionSocket = new ActionSocket(this);
+    this.actionSocket = new ActionSocket(this, this.editorService);
     this.sessionSocket = new SessionSocket(this);
 
     this.sessionSocket.connect(this.url_pre + 'state');

@@ -130,7 +130,7 @@ public class EditorActionProcessor extends CustomProcessor {
 
                     } else {
                         //Can not update
-                        sendRestoreMessage(action,"[lock error] (locker's id: "+service.getSessionStateById(action.getTarget().getTarget_id()).getLockerUser_id()+").\n [Object RESTORED]");
+                        sendRestoreMessage(action,"[lock error] (locker's id: "+this.getLockerIdIfexists(action.getTarget().getTarget_id())+").\n [Object RESTORED]");
                    
 //+service.getSessionStateById(action.getTarget().getTarget_id()).getLockerUser_id()+" has lock on this.\n object restored.");
 
@@ -146,8 +146,9 @@ public class EditorActionProcessor extends CustomProcessor {
                             // sendAll(action, Q.STATE);
                             action.setAction(ACTION_TYPE.UPDATE);//átállítom update-ra, hogy a kliens oldal ugyan úgy kezelje
                         sendAll(action, Q.ACTION); 
+                        sendAll(action, Q.STATE); 
                         }else{
-                               sendRestoreMessage(action,"[lock error] Can not update dimensions (locker's id: "+service.getSessionStateById(action.getTarget().getTarget_id()).getLockerUser_id()+").\n [Object RESTORED]");
+                               sendRestoreMessage(action,"[lock error] Can not update dimensions (locker's id: "+this.getLockerIdIfexists(action.getTarget().getTarget_id())+").\n [Object RESTORED]");
 
                         }
                     } catch (JsonProcessingException ex) {
@@ -207,7 +208,9 @@ public class EditorActionProcessor extends CustomProcessor {
                            
                        }else{
                 try {
-                    this.sendDeleteRestoreMessage(action, "[lock error] you can't delete an item if you don't have a lock on it (locker's id: "+service.getSessionStateById(action.getTarget().getTarget_id()).getLockerUser_id()+"). \n Object restored");
+                    this.sendDeleteRestoreMessage(action, 
+                            "[lock error] you can't delete an item if you don't have a lock on it (locker's id: "
+                                    +getLockerIdIfexists(action.getTarget().getTarget_id())+"). \n Object restored");
                     //  sendBackPrivate(action, Q.ACTION, "te item does not exists or you dont have a lock on it.");
                 } catch (JsonProcessingException ex) {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
@@ -245,7 +248,12 @@ public class EditorActionProcessor extends CustomProcessor {
         }
     }
     
-    
+    String getLockerIdIfexists(String target_id){
+       if(service.getSessionStateById(target_id).getLockerUser_id()!=null){
+           return service.getSessionStateById(target_id).getLockerUser_id();
+       }
+       return "null";
+    }
     
     void sendAll(EditorAction action, Q queue) {
         switch (queue) {

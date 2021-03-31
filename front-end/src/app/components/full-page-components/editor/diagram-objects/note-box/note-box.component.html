@@ -1,22 +1,32 @@
 <ng-template #contentc>
-  <div
-    class="note-box-content"
-    (dblclick)="this.onContentClick($event)"
-    [style.height]="getInnerHeight() + 'px'"
-  >
-    <textarea
-      #texta
-      name="text"
-      *ngIf="model.edit"
-      class="INPUT"
-      [style.width]="this.getInnerWidth() + 'px'"
-      (input)="textInput($event)"
-      (click)="inputClick($event)"
-      >{{ model.content }}</textarea
+  <div (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)">
+    <div
+      style="position: absolute"
+      [style.left]="this.model.scaledModel.width_scaled + 'px'"
+      [style.top]="'-20' + 'px'"
     >
+      {{ this.isLocked() }} {{ this.isLoading() }}
+    </div>
+    <div
+      class="note-box-content"
+      (dblclick)="this.onContentClick($event)"
+      [style.height]="getInnerHeight() + 'px'"
+    >
+      <textarea
+        #texta
+        name="text"
+        *ngIf="model.edit"
+        class="INPUT"
+        [style.width]="this.getInnerWidth() + 'px'"
+        (input)="textInput($event)"
+        (click)="inputClick($event)"
+        (keypress)="onKeyPress($event)"
+        >{{ model.content }}</textarea
+      >
 
-    <div *ngIf="!model.edit">
-      {{ model.content }}
+      <div *ngIf="!model.edit">
+        {{ model.content }}
+      </div>
     </div>
   </div>
 </ng-template>

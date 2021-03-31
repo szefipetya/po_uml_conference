@@ -13,31 +13,37 @@ import { RESPONSE_SCOPE } from 'src/app/components/models/socket/response/RESPON
 import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TYPE';
 import { TOKEN_TYPE } from '../InjectionToken_c';
 import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';
+import { GlobalEditorService } from '../../global-editor/global-editor.service';
 
 export class ActionSocket implements SocketWrapper {
   [x: string]: any;
   socket: any;
   service: EditorSocketControllerService;
-  constructor(service) {
+  constructor(service, private editorService: GlobalEditorService) {
     this.service = service;
   }
 
   onmessage(e: any) {
     setTimeout(() => {
-      console.log('ACTION MESSAGE', JSON.parse(e.data).action);
-
       let resp: EditorActionResponse;
       resp = JSON.parse(e.data);
       let load = JSON.parse(resp.action.json);
       let si: SessionInteractiveItem;
       let sc: SessionInteractiveContainer;
-
+      console.log(
+        'ACTION MESSAGE',
+        JSON.parse(e.data).action,
+        this.parent.service.user.id,
+        resp.action.user_id
+      );
       switch (resp.action.action) {
         case ACTION_TYPE.UPDATE:
           si = this.parent.getItem(resp.target_id);
           console.log(si);
-          if (si) si.updateModel(load, resp.action.id);
-          console.log('UPDATE RECEIVED', load);
+          if (resp.action.user_id != this.parent.service.user.id) {
+            if (si) si.updateModel(load, resp.action.id);
+          } else
+            console.log('UPDATE RECEIVED OWNER', this.parent.service.user.id);
           break;
         case ACTION_TYPE.RESTORE:
           if (resp.target_type == TARGET_TYPE.CONTAINER) {
@@ -47,34 +53,52 @@ export class ActionSocket implements SocketWrapper {
             si = this.parent.getItem(resp.target_id);
             if (si) {
               console.log(si);
-              sc = this.parent.getContainer(resp.action.target.parent_id);
-              if (resp.action.extra.sessionState) {
-                console.log('injection added', resp.action.extra.sessionState);
-                this.parent.addToInjectionQueue(load.id, TOKEN_TYPE.COMBINED, {
-                  sessionState: JSON.parse(resp.action.extra.sessionState),
-                  model: load,
-                });
-              }
-              console.log('SC ', sc);
-              //parent container owns it?
-              if (sc != null)
-                if (!sc.hasItem(resp.target_id)) {
-                  sc.createItem(load, resp.action?.extra);
-                }
               si.restoreModel(load, resp.action.id, resp.response_msg);
             } else {
-              //user have deleted it
+              //user have deleted it, item not found
               sc = this.parent.getContainer(resp.action.target.parent_id);
-              if (sc) {
-                if (resp.target_user_id == this.parent.service.user.id) {
+              if (resp.target_user_id == this.parent.service.user.id) {
+                if (sc) {
                   //we are the owner of the object
                   // load.edit = true;
-                  //we need to replace the old id with the new one
                   if (resp.action.extra.sessionState) {
                     console.log('injection added');
-                    this.parent.addToInjectionQueue(load.id, resp);
+                    //this.parent.addToInjectionQueue(load.id,resp );
+                    this.parent.addToInjectionQueue(
+                      load.id,
+                      TOKEN_TYPE.COMBINED,
+                      {
+                        sessionState: JSON.parse(
+                          resp.action.extra.sessionState
+                        ),
+                        model: load,
+                      }
+                    );
                   }
                   sc.createItem(load, resp.action.extra);
+                } else {
+                  //parent is null-> global object
+                  console.log('RESTORE1');
+                  if (resp.action.extra.sessionState) {
+                    console.log(
+                      'injection added',
+                      resp.action.extra.sessionState
+                    );
+                    this.parent.addToInjectionQueue(
+                      load.id,
+                      TOKEN_TYPE.COMBINED,
+                      {
+                        sessionState: JSON.parse(
+                          resp.action.extra.sessionState
+                        ),
+                        model: load,
+                      }
+                    );
+                  }
+                  if (!this.parent.editorService.hasGlobalObject(load)) {
+                    this.parent.editorService.createGlobalObject(load);
+                    console.log('RESTORE2');
+                  }
                 }
               }
             }

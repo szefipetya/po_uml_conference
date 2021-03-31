@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Diagram } from 'src/app/components/models/Diagram/Diagram';
+import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
+import { NoteBox } from 'src/app/components/models/DiagramObjects/NoteBox';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
+import { SimpleClassComponent } from '../diagram-objects/simple-class/simple-class.component';
 import { GlobalEditorService } from '../services/global-editor/global-editor.service';
 
 @Component({
@@ -66,12 +69,18 @@ export class EditorRootComponent implements OnInit {
       (e.target.nodeName != 'INPUT' && e.target.className != 'INPUT')
     ) {
       console.log('false on all');
-      this.editorService.model.dgObjects.map((clas) => {
+      this.editorService.model.dgObjects.map((clas: DiagramObject) => {
         //  console.log(clas);
-        //  console.log(clas instanceof SimpleClass);
+        clas.viewModel.disableEdit();
+        /* if (clas._type == 'SimpleClass') {
+          ((clas as SimpleClass)
+            .viewModel as SimpleClassComponent).disableEdit();
+        }
+        if (clas._type == 'NoteBox') {
+          (clas as NoteBox).viewModel.disableEdit();
+        }
 
-        clas.viewModel?.disableEdit();
-        //  console.log('edit is false');
+        console.log('edit is false on' + clas.id);*/
       });
       this.inputDOM = undefined;
     } else if (e.target.id == '#editor-input') this.inputDOM = e.target;
@@ -92,15 +101,17 @@ export class EditorRootComponent implements OnInit {
       // enter
       this.disableEdits(e, true);
     }
-    if (e.key.match('Delete') || e.keyCode == 46) {
+    if (e.key?.match('Delete') || e.keyCode == 46) {
       //   console.log('del');
       let input = document.querySelector('#editor-input');
       if (!input) {
         e.preventDefault();
         this.editorService.clientModel.canvas.selectedClassIds.map((id) => {
-          this.editorService.model.dgObjects = this.editorService.model.dgObjects.filter(
-            (clas) => clas.id != id
-          );
+          this.editorService.model.dgObjects.map((clas: DiagramObject) => {
+            if (clas.id == id) {
+              clas.viewModel.deleteAsync('root');
+            }
+          });
         });
       }
       //  console.log(this.editorService.model.dgObjects);

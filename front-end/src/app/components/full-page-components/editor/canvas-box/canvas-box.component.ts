@@ -145,17 +145,17 @@ export class CanvasBoxComponent implements OnInit {
     this.editorService.clientModel.canvas.selectedClassIds.map((i) => {
       //ha nem azt választom, ki, ami már ki van, akkor
       if (i != this.targetObject_stored.id)
-        this.findClassById(i).viewModel?.editEnd();
+        this.findClassById(i)?.viewModel?.editEnd();
     });
     if (
       this.editorService.clientModel.canvas.selectedClassIds.includes(
         this.targetObject_stored.id
       )
     )
-      // this.editorService.clientModel.canvas.selectedClassIds = [];
       this.editorService.clientModel.canvas.selectedClassIds = this.editorService.clientModel.canvas.selectedClassIds.filter(
         (i) => i != this.targetObject_stored.id
       );
+    this.editorService.clientModel.canvas.selectedClassIds = [];
     if (
       this.targetObject_stored &&
       !this.editorService.clientModel.canvas.selectedClassIds.includes(
@@ -345,6 +345,7 @@ export class CanvasBoxComponent implements OnInit {
     // class újraméretezés//
     else this.resizeExistingClassOrMove(e);
   };
+
   resizeExistingClassOrMove = (e) => {
     let nohover = 0;
     if (
@@ -356,6 +357,7 @@ export class CanvasBoxComponent implements OnInit {
       this.targetClass != undefined &&
       e.target.className != 'INPUT'
     ) {
+      if (!this.targetClass?.viewModel.isAccessible()) return;
       unFocus();
       this.targetClass.scaledModel.posx_scaled =
         e.clientX - this.targetRect.left - this.xdiff;
@@ -664,7 +666,7 @@ export class CanvasBoxComponent implements OnInit {
       // selection off
 
       this.editorService.clientModel.canvas.selectedClassIds.map((i) =>
-        this.findClassById(i).viewModel?.editEnd()
+        this.findClassById(i)?.viewModel?.editEnd()
       );
       this.editorService.clientModel.canvas.selectedClassIds = [];
       this.updateClassSelection();
@@ -675,10 +677,12 @@ export class CanvasBoxComponent implements OnInit {
       e.target.nodeName != 'INPUT' &&
       this.targetClass
     ) {
+      if (!this.targetClass?.viewModel.isAccessible()) return;
       console.log('selected a class');
       this.setTargets(e);
       this.setStoredTargets(e);
       // selection
+
       this.selectClickedClassOnly();
       this.updateClassSelection();
       // zindex problem

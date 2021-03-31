@@ -79,6 +79,15 @@ private int  z;
         }
       
     }
+    
+  
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof DiagramObject){
+            return ((DiagramObject)obj).getId().equals(this.getId());
+        }
+        return false;
+    }
 
   
 }

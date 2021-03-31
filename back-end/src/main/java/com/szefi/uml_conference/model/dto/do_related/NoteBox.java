@@ -6,6 +6,7 @@
 package com.szefi.uml_conference.model.dto.do_related;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
 
 /**
  *
@@ -21,5 +22,12 @@ public class NoteBox extends DiagramObject {
 
     public void setContent(String content) {
         this.content = content;
+    }
+     @Override
+    public void update(DynamicSerialObject obj) {
+        super.update(obj);
+        if(obj instanceof NoteBox){
+            this.content=((NoteBox)obj).getContent();
+        }
     }
 }

@@ -68,6 +68,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
   isEditLockedByMe(): boolean {
     return this.sessionState?.lockerUser_id == this.socket.user.id;
   }
+
   //_Session Functions---------------------------------
   //Logging Utils-------------------------------------
   box_shadow: string = '';
@@ -91,6 +92,15 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
   }
   render(): void {}
   //DML functions-v-v-v-v-v-v-v-v-v-v-
+  deleteAsync(parent_id: string) {
+    if (this.isEditLockedByMe()) {
+      this.deleteMessageToServer(parent_id);
+    } else {
+      this.queuedActionsAfterLockReceived.push(
+        this.queueDeleteAction(parent_id)
+      );
+    }
+  }
   abstract deleteSelfFromParent(): void;
   deleteMessageToServer(parent_id: string) {
     let a = new EditorAction(this.model.id, this.model._type, parent_id);
@@ -98,6 +108,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     a.id = uniqId();
     this.socket.send(a);
     this.deleteSelfFromParent();
+    this.socket.unregister(this);
   }
   abstract saveEvent(wastrue): void;
   queueDeleteAction(parent_id: string): EditorAction {
@@ -106,6 +117,8 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     a.id = uniqId();
 
     this.deleteSelfFromParent();
+    this.socket.unregister(this);
+
     return a;
   }
   queueUpdateAction(parent_id: string): EditorAction {
@@ -116,11 +129,19 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     this.model.viewModel = this;
     return action;
   }
+  isLoading(): string {
+    if (this.callback_queue.length > 0)
+      return 'loading ' + this.callback_queue.length;
+    else return '';
+  }
   isAccessible(): boolean {
     if (this.sessionState == null) {
       return false;
     }
-    if (this.sessionState.locks.length > 0) {
+    if (
+      this.sessionState.locks.length > 0 &&
+      this.socket.user.id != this.sessionState.lockerUser_id
+    ) {
       if (this.sessionState.lockerUser_id != this.socket.user.id) {
         this.log(
           "Object is locked (locker's id: " +
@@ -134,4 +155,5 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
 
     return true;
   }
+  abstract disableEdit(): void;
 }

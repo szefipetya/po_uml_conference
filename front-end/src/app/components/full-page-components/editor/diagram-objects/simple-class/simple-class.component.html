@@ -1,7 +1,11 @@
 <ng-template #contentc>
   <div (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)">
-    <div>
-      {{ this.isLocked() }}
+    <div
+      style="position: absolute"
+      [style.left]="this.model.scaledModel.width_scaled + 'px'"
+      [style.top]="'-20' + 'px'"
+    >
+      {{ this.isLocked() }} {{ this.isLoading() }}
     </div>
     <app-attribute
       [parent]="this"

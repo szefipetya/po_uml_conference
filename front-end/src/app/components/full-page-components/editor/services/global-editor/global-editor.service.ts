@@ -16,10 +16,22 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { ClientModel } from 'src/app/components/models/Diagram/ClientModel';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { User } from 'src/app/components/models/User';
+import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 @Injectable({
   providedIn: 'root',
 })
 export class GlobalEditorService {
+  deleteGlobalObject(model: DiagramObject) {
+    this.model.dgObjects = this.model.dgObjects.filter(
+      (obj) => obj.id != model.id
+    );
+  }
+  hasGlobalObject(model: DiagramObject): boolean {
+    return this.model.dgObjects.find((o) => o.id == model.id) != null;
+  }
+  createGlobalObject(model: DiagramObject) {
+    this.model.dgObjects.push(model);
+  }
   model: Diagram;
   alignment;
   //url_pre = 'http://84.2.193.197:8101/';
@@ -103,7 +115,12 @@ export class GlobalEditorService {
 
     console.log({ ...response });
     this.model = { ...response };
-
+    this.model.dgObjects.map((dg) => {
+      dg.scaledModel.posx_scaled = dg.dimensionModel.x;
+      dg.scaledModel.posy_scaled = dg.dimensionModel.y;
+      dg.scaledModel.width_scaled = dg.dimensionModel.width;
+      dg.scaledModel.height_scaled = dg.dimensionModel.height;
+    });
     console.log(JSON.stringify(this.model));
   }
   getDiagramFromServer(id: string): Promise<Diagram> {
@@ -124,6 +141,7 @@ export class GlobalEditorService {
       return of(result as T);
     };
   }
+
   init(): Diagram {
     return null;
     /*let model = {

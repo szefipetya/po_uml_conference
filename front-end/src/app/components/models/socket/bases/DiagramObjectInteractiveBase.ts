@@ -1,32 +1,16 @@
-import {
-  Component,
-  Directive,
-  Input,
-  OnInit,
-  TemplateRef,
-} from '@angular/core';
-import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
-import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
-import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
-import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
-import { DiagramObjectInteractiveItemBase } from 'src/app/components/models/socket/bases/DiagramObjectInteractiveBase';
-import { EditorAction } from 'src/app/components/models/socket/EditorAction';
-import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
-import { SessionInteractiveItem } from 'src/app/components/models/socket/interface/SessionInteractiveItem';
-import { SessionState } from 'src/app/components/models/socket/SessionState';
-import { soft_copy } from 'src/app/components/utils/utils';
-import { CommonService } from '../../services/common/common.service';
-import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
-import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
+import { Input, TemplateRef } from '@angular/core';
+import { CommonService } from '../../../full-page-components/editor/services/common/common.service';
+import { EditorSocketControllerService } from '../../../full-page-components/editor/services/editor-socket-controller/editor-socket-controller.service';
+import { GlobalEditorService } from '../../../full-page-components/editor/services/global-editor/global-editor.service';
+import { soft_copy } from '../../../utils/utils';
+import { DiagramObject } from '../../DiagramObjects/DiagramObject';
+import { SimpleClass_General } from '../../DiagramObjects/SimpleClass_General';
 
-@Component({
-  selector: 'app-diagram-object',
-  templateUrl: './diagram-object.component.html',
-  styleUrls: ['./diagram-object.component.scss'],
-})
-export class DiagramObjectComponent
-  extends InteractiveItemBase
-  implements OnInit, SessionInteractiveItem {
+import { ACTION_TYPE } from '../ACTION_TYPE';
+import { EditorAction } from '../EditorAction';
+import { CallbackItem } from '../interface/CallbackItem';
+import { InteractiveItemBase } from './InteractiveItemBase';
+export abstract class DiagramObjectInteractiveItemBase extends InteractiveItemBase {
   onMouseDown(e) {
     this.editBegin();
     this.dragged = true;
@@ -54,9 +38,6 @@ export class DiagramObjectComponent
   }
   dragged = false;
   updateModel(model: any, action_id: string, msg?: string): void {
-    let vm = this.model.viewModel;
-    soft_copy(model, this.model, ['edit', 'viewModel', 'scaledModel']);
-    this.model.viewModel = vm;
     this.model.dimensionModel = model.dimensionModel;
     this.model.scaledModel.posy_scaled =
       this.model.dimensionModel.y * this.editorService.clientModel.canvas.scale;
@@ -80,7 +61,7 @@ export class DiagramObjectComponent
 
   onSelect() {}
   editBegin() {
-    if (!this.isAccessible()) return;
+    //   if (!this.isAccessible()) return;
     let action = new EditorAction(this.model.id, this.model._type, '');
 
     action.action = ACTION_TYPE.SELECT;
@@ -100,7 +81,7 @@ export class DiagramObjectComponent
       'titleModel',
       'scaledModel',
     ]);
-    console.log('COPY', copy);
+    console.log(copy);
     action.json = JSON.stringify(copy);
     console.log('edit ended', action.json);
     this.sendAction(action);
@@ -116,9 +97,7 @@ export class DiagramObjectComponent
 
   // socket: EditorSocketControllerService;
 
-  deleteSelfFromParent() {
-    this.editorService.deleteGlobalObject(this.model);
-  }
+  deleteSelfFromParent() {}
   callback_queue: CallbackItem[];
   restoreModel(model: any) {
     // throw new Error('Method not implemented.');
@@ -126,7 +105,7 @@ export class DiagramObjectComponent
   log(msg: string) {
     //  throw new Error('Method not implemented.');
   }
-  sessionState: SessionState;
+  // sessionState: SessionState;
 
   updateScales(scale): void {}
   update(): void {}
@@ -145,19 +124,20 @@ export class DiagramObjectComponent
       this.model.scaledModel.height_scaled - this.general.padding_scaled * 2
     );
   }
-  @Input() public contentTemplate: TemplateRef<any>;
-  @Input() public model: DiagramObject;
-  @Input() public general: SimpleClass_General;
+  /* @Input() */ public contentTemplate: TemplateRef<any>;
+  /*  @Input() */ public model: DiagramObject;
+  /*   @Input() */ public general: SimpleClass_General;
 
-  ngAfterContentInit(): void {
-    //  this.model.viewModel = this;
+  //SET viewModel+register/*  */!!!!!!!!!!!!!!!!
+  /* ngAfterContentInit(): void {
+    this.model.viewModel = this;
   }
   ngOnInit(): void {
     //this.model._type = 'SimpleClass';
-    // this.model.viewModel = this;
+    this.model.viewModel = this;
     this.init_register();
-  }
-  ngOnChanges(): void {
+  }*/
+  /* ngOnChanges(): void {
     console.log('changed');
-  }
+  }*/
 }

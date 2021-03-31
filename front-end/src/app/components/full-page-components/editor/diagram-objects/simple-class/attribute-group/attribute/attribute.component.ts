@@ -41,6 +41,9 @@ export class AttributeComponent
     AfterContentInit,
     SessionInteractiveItem,
     LogInteractive_I {
+  disableEdit(): void {
+    //  throw new Error('Method not implemented.');
+  }
   targetDOM: any;
   inputDOM: Element;
   clname: string;

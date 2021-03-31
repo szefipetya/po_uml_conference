@@ -12,6 +12,7 @@ import com.szefi.uml_conference.model.dto.diagram.Diagram;
 import com.szefi.uml_conference.model.dto.do_related.AttributeElement;
 import com.szefi.uml_conference.model.dto.do_related.DiagramObject;
 import com.szefi.uml_conference.model.dto.do_related.Element_c;
+import com.szefi.uml_conference.model.dto.do_related.NoteBox;
 import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
 import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
 import com.szefi.uml_conference.model.dto.socket.LOCK_TYPE;
@@ -190,10 +191,15 @@ public class SocketSessionService {
                 objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 dg = objectMapper.readValue(targetFile, Diagram.class);
-                for (DiagramObject d : dg.getDgObjects()) {
+                for (DiagramObject d : dg.getDgObjects()) { 
+                      sessionItemMap.put(d.getId(),Pair.of(new SessionState(),d));
+                    if(d instanceof NoteBox){
+                        NoteBox n=(NoteBox)d;
+                       // sessionItemMap.put(n.getId(),Pair.of(new SessionState(),n));
+                    }
                     if (d instanceof SimpleClass) {
                         SimpleClass c = (SimpleClass) d;
-                         sessionItemMap.put(c.getId(),Pair.of(new SessionState(),c));
+                        // sessionItemMap.put(c.getId(),Pair.of(new SessionState(),c));
                          System.out.println("putted on map:"+c.getId());
                         sessionItemMap.put(c.getTitleModel().getId(), Pair.of(new SessionState(),c.getTitleModel()));
                         for (SimpleClassElementGroup g : c.getGroups()) {
@@ -269,6 +275,29 @@ public class SocketSessionService {
                    sessionItemMap.remove(target_id);
                    return cont.getContainer().remove(obj);
                }
+            }else{
+                if(parent_id.equals("root")){//global object
+                  
+                        DynamicSerialObject item=this.getItemById(target_id);
+                    if(item instanceof SimpleClass){
+                        System.out.println("this is a SimpleClass delete");
+                        SimpleClass casted=(SimpleClass)item;
+                        for(SimpleClassElementGroup g: casted.getGroups()){
+                             this.sessionItemMap.remove(g.getId());
+                               for(AttributeElement e:g.getAttributes()){
+                                   this.sessionItemMap.remove(e.getId());
+                               }
+                        }
+                        this.sessionItemMap.remove(casted.getTitleModel().getId());
+                    }
+                    
+                 
+                         sessionItemMap.remove(target_id);
+                    DiagramObject ob=new DiagramObject();
+                    ob.setId(target_id);
+                   
+                    return  this.dg.getDgObjects().remove(ob);//the equals is overrided with id comparison;
+                }
             }
         }
         
@@ -329,6 +358,7 @@ public class SocketSessionService {
           if(s!=null){
                 s.setDraft(false);
                if(this.isItemLockedByMe(obj.getId(), user_id)){
+                   System.out.println("object updated");
                    this.getItemById(obj.getId()).update(obj); 
                    return this.sessionItemMap.get(obj.getId());
                 }

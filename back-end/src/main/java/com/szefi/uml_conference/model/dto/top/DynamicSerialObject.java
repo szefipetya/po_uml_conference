@@ -51,4 +51,11 @@ public abstract class DynamicSerialObject {
         this.id = id;
     }
     public abstract void update(DynamicSerialObject obj);
+      @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof DynamicSerialObject){
+            return ((DynamicSerialObject)obj).getId().equals(this.getId());
+        }
+        return false;
+    }
 }

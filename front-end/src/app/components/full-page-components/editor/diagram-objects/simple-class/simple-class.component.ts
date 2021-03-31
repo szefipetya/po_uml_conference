@@ -26,7 +26,7 @@ import { DiagramObjectComponent } from '../diagram-object/diagram-object.compone
 export class SimpleClassComponent
   extends DiagramObjectComponent
   implements OnInit, OnChanges, AfterContentInit {
-  onMouseDown(e) {
+  /*  onMouseDown(e) {
     this.editBegin();
     this.dragged = true;
     console.log('mousedown');
@@ -34,9 +34,10 @@ export class SimpleClassComponent
   onMouseUp(e) {
     this.sendDimensionUpdate();
     this.dragged = false;
-    console.log('update');
+    //    console.log('update classssss');
   }
   sendDimensionUpdate() {
+    console.log('update classdimmm');
     let action = new EditorAction(this.model.id, this.model._type, '');
     action.action = ACTION_TYPE.DIMENSION_UPDATE;
     let copy = {};
@@ -68,9 +69,9 @@ export class SimpleClassComponent
   constructor(
     protected socket: EditorSocketControllerService,
     protected commonService: CommonService,
-    private editorService: GlobalEditorService
+    protected editorService: GlobalEditorService
   ) {
-    super(socket, commonService);
+    super(socket, commonService, editorService);
   }
   saveEvent(wastrue: any): void {}
   updateScales(scale: any): void {
@@ -120,7 +121,7 @@ export class SimpleClassComponent
     if (this.sessionState.locks.length > 0)
       return 'locked:' + this.sessionState.lockerUser_id;
     else return '';
-  }
+  } */
   update(): void {
     this.model.groups.map((group) => {
       group.attributes.map((a) => {
@@ -167,7 +168,7 @@ export class SimpleClassComponent
   ngOnInit(): void {
     this.model._type = 'SimpleClass';
     this.model.viewModel = this;
-    this.init_register();
+    super.ngOnInit();
   }
   ngOnChanges(): void {
     console.log('changed');
