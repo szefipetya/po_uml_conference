@@ -57,9 +57,10 @@ export class ActionSocket implements SocketWrapper {
               }
               console.log('SC ', sc);
               //parent container owns it?
-              if (!sc.hasItem(resp.target_id)) {
-                sc.createItem(load, resp.action?.extra);
-              }
+              if (sc != null)
+                if (!sc.hasItem(resp.target_id)) {
+                  sc.createItem(load, resp.action?.extra);
+                }
               si.restoreModel(load, resp.action.id, resp.response_msg);
             } else {
               //user have deleted it

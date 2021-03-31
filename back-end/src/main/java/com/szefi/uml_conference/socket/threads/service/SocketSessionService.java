@@ -117,7 +117,7 @@ public class SocketSessionService {
         if(s!=null){
         //even if someone locked it, and its me, i can still lock it again for myself
            if(s.getLocks().length==0||
-                   (s.getLockerUser_id() == null ? user_id == null 
+                   ("-".equals(s.getLockerUser_id()) ? user_id == null 
                    : s.getLockerUser_id().equals(user_id)))
            {
                 System.out.println("locks are set for object"+target_id);
@@ -191,9 +191,10 @@ public class SocketSessionService {
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 dg = objectMapper.readValue(targetFile, Diagram.class);
                 for (DiagramObject d : dg.getDgObjects()) {
-                    sessionItemMap.put(d.getId(),Pair.of(new SessionState(),d));
                     if (d instanceof SimpleClass) {
                         SimpleClass c = (SimpleClass) d;
+                         sessionItemMap.put(c.getId(),Pair.of(new SessionState(),c));
+                         System.out.println("putted on map:"+c.getId());
                         sessionItemMap.put(c.getTitleModel().getId(), Pair.of(new SessionState(),c.getTitleModel()));
                         for (SimpleClassElementGroup g : c.getGroups()) {
                             sessionContainerMap.put(g.getId(), Pair.of(new SessionState(), g));
@@ -243,7 +244,7 @@ public class SocketSessionService {
         return false;
     }
 
-    public Pair<SessionState,DynamicSerialObject> updateObject(DynamicSerialObject obj,String user_id) throws NullPointerException {
+    public Pair<SessionState,DynamicSerialObject> updateObjectAndUnlock(DynamicSerialObject obj,String user_id) throws NullPointerException {
        
        
           SessionState s=this.getSessionStateById(obj.getId());
@@ -321,6 +322,18 @@ public class SocketSessionService {
           }
         }
         return list;
+    }
+
+    public Object updateObjectAndHoldLock(DynamicSerialObject obj, String user_id) {
+          SessionState s=this.getSessionStateById(obj.getId());
+          if(s!=null){
+                s.setDraft(false);
+               if(this.isItemLockedByMe(obj.getId(), user_id)){
+                   this.getItemById(obj.getId()).update(obj); 
+                   return this.sessionItemMap.get(obj.getId());
+                }
+          }
+         return null;      
     }
 
 }

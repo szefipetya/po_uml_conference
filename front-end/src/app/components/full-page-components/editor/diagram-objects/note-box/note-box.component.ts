@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
 import { NoteBox } from '../../../../models/DiagramObjects/NoteBox';
+import { CommonService } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { DiagramObjectComponent } from '../diagram-object/diagram-object.component';
 @Component({
@@ -18,12 +19,27 @@ import { DiagramObjectComponent } from '../diagram-object/diagram-object.compone
 export class NoteBoxComponent
   extends DiagramObjectComponent
   implements OnInit, AfterViewChecked {
+  public editBegin(): void {
+    //  throw new Error('Method not implemented.');
+  }
+  public editEnd(): void {
+    //  throw new Error('Method not implemented.');
+  }
+  updateModel(model: any, action_id: string, msg?: string): void {
+    //  throw new Error('Method not implemented.');
+  }
+  saveEvent(wastrue: any): void {
+    // throw new Error('Method not implemented.');
+  }
   @Input()
   model: NoteBox;
   @Input() public general: SimpleClass_General;
   @ViewChild('texta') textarea: ElementRef<HTMLTextAreaElement>;
-  constructor(socket: EditorSocketControllerService) {
-    super(socket);
+  constructor(
+    socket: EditorSocketControllerService,
+    commonService: CommonService
+  ) {
+    super(socket, commonService);
   }
   updateScales(scale): void {
     this.updateFont();

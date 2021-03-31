@@ -1,14 +1,19 @@
 <ng-template #contentc>
-  <app-attribute
-    [parent]="this"
-    [isTitle]="true"
-    [model]="this.model.titleModel"
-  >
-  </app-attribute>
-  <div class="class-elements">
-    <div *ngFor="let item of this.model.groups">
-      <app-attribute-group [parent]="this" [model]="item">
-      </app-attribute-group>
+  <div (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)">
+    <div>
+      {{ this.isLocked() }}
+    </div>
+    <app-attribute
+      [parent]="this"
+      [isTitle]="true"
+      [model]="this.model.titleModel"
+    >
+    </app-attribute>
+    <div class="class-elements">
+      <div *ngFor="let item of this.model.groups">
+        <app-attribute-group [parent]="this" [model]="item">
+        </app-attribute-group>
+      </div>
     </div>
   </div>
 </ng-template>

@@ -96,11 +96,18 @@ public class EditorActionProcessor extends CustomProcessor {
                     }
                 } catch (JsonProcessingException e) {
                     System.out.println(action.getTarget().getTarget_id());
+                }catch(NullPointerException ex){
+                try {
+                    sendRestoreMessage(action,"[lock error] the object does not exists");
+                } catch (JsonProcessingException ex1) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+ 
                 }
                 break;
                 case UPDATE://-------------------------------------------------------------------
                          try {
-                    if (service.updateObject(mapper.readValue(action.getJson(), DynamicSerialObject.class), action.getUser_id())!=null) {
+                    if (service.updateObjectAndUnlock(mapper.readValue(action.getJson(), DynamicSerialObject.class), action.getUser_id())!=null) {
                         //send a session state update to all
                         
                         SessionState s;
@@ -132,6 +139,24 @@ public class EditorActionProcessor extends CustomProcessor {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+                case DIMENSION_UPDATE:
+                {
+                    try {
+                        if (service.updateObjectAndHoldLock(mapper.readValue(action.getJson(), DynamicSerialObject.class), action.getUser_id())!=null) {
+                            // sendAll(action, Q.STATE);
+                            action.setAction(ACTION_TYPE.UPDATE);//átállítom update-ra, hogy a kliens oldal ugyan úgy kezelje
+                        sendAll(action, Q.ACTION); 
+                        }else{
+                               sendRestoreMessage(action,"[lock error] Can not update dimensions (locker's id: "+service.getSessionStateById(action.getTarget().getTarget_id()).getLockerUser_id()+").\n [Object RESTORED]");
+
+                        }
+                    } catch (JsonProcessingException ex) {
+                        Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                        
+                    break;
+
                 case CREATE:
                     try {
                         //----------------------------------------------------------------------

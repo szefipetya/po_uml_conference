@@ -15,45 +15,29 @@ import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
  */
 
 public class DiagramObject extends DynamicSerialObject {
- private float posx;
- private float posy;
-  private float width;
-  private float height;
+Rect dimensionModel;
+
+    public Rect getDimensionModel() {
+        return dimensionModel;
+    }
+
+    public void setDimensionModel(Rect dimensionModel) {
+        this.dimensionModel = dimensionModel;
+    }
  private DiagramObject_Scaled scaledModel;
 private float  min_height;
 private int  z;
  private boolean edit;
-    public float getPosx() {
-        return posx;
+ private String doc;
+
+    public String getDoc() {
+        return doc;
     }
 
-    public void setPosx(float posx) {
-        this.posx = posx;
+    public void setDoc(String doc) {
+        this.doc = doc;
     }
-
-    public float getPosy() {
-        return posy;
-    }
-
-    public void setPosy(float posy) {
-        this.posy = posy;
-    }
-
-    public float getWidth() {
-        return width;
-    }
-
-    public void setWidth(float width) {
-        this.width = width;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
+   
 
     public DiagramObject_Scaled getScaledModel() {
         return scaledModel;
@@ -89,7 +73,11 @@ private int  z;
 
     @Override
     public void update(DynamicSerialObject obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("update diagram on backend");
+        if(obj instanceof DiagramObject){
+           this.dimensionModel= ((DiagramObject) obj).getDimensionModel();
+        }
+      
     }
 
   

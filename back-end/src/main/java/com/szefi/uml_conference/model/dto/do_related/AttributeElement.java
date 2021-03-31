@@ -16,7 +16,25 @@ import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
 public class AttributeElement extends Element_c  {
     private String visibility;
     private String attr_type;
-    
+   private String doc;
+
+    public String getDoc() {
+        return doc;
+    }
+
+    public void setDoc(String doc) {
+        this.doc = doc;
+    }
+    private int index;
+
+   
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
     public String getVisibility() {
         return visibility;
     }
@@ -27,7 +45,8 @@ public class AttributeElement extends Element_c  {
         this.attr_type=casted.attr_type;
         this.name=casted.name;
         this.visibility=casted.visibility;
-       
+       this.doc=casted.doc;
+       this.index=casted.index;
          }else throw new UnsupportedClassVersionError("update class's type is incorrect");
     }
     public void setVisibility(String visibility) {

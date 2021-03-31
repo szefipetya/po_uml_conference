@@ -18,7 +18,7 @@ public class SimpleClass extends DiagramObject{
    private List<SimpleClassElementGroup> groups;
    private Element_c titleModel;
    private String  name;
-
+  
     public String getName() {
         return name;
     }

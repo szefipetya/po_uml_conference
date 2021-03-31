@@ -27,12 +27,15 @@ import { CallbackItem } from 'src/app/components/models/socket/interface/Callbac
 })
 export class AttributeGroupComponent
   implements OnInit, AfterContentInit, SessionInteractiveContainer {
-  @Input() model: SimpleClassElementGroup;
+  @Input() private model: SimpleClassElementGroup;
   inputDOM: any;
   @Input() parent: SimpleClassComponent;
 
   constructor(private socket: EditorSocketControllerService) {
     // this.model._type = 'SimpleClassElementGroup';
+  }
+  public getModel() {
+    return this.model;
   }
   hasItem(target_id: string) {
     return this.model.attributes.find((t) => target_id == t.id) != null;
@@ -57,10 +60,11 @@ export class AttributeGroupComponent
 
   updateState(state: SessionState, action_id: string): void {}
   createItem(model: any, extra?: any) {
-    model.edit = 'false';
+    model.edit = false;
     model.extra = extra;
     this.model.attributes.push(model);
     console.log('attr created');
+    this.sort();
   }
   restoreItem(item_id: string, model: DynamicSerialObject) {}
   deleteItem(item_id: string) {}
@@ -87,8 +91,14 @@ export class AttributeGroupComponent
 
     console.dir('this.state.elements', this.model.attributes);
     //        this.state.elements = this.state.elements.filter(el => el.id != id)
+    this.sort();
   }
-
+  sort() {
+    this.model.attributes = this.model.attributes.sort(
+      (a, b) => a.index - b.index
+    );
+    console.log('sorted');
+  }
   onMouseOver = (e) => {
     // e.target.
   };
@@ -107,6 +117,13 @@ export class AttributeGroupComponent
     return '' + (maxid + 1);
     // return '_' + Math.random().toString(36).substr(2, 9);
   };
+  getHghestIndex() {
+    let max = 0;
+    this.model.attributes.map((i) => {
+      if (i.index > max) max = i.index;
+    });
+    return max;
+  }
 
   createLocal(visibility, name, type) {
     // this..clientModel.canvas.edit_element_id = id;
@@ -115,6 +132,8 @@ export class AttributeGroupComponent
     }
     let id = uniqId('a');
     let newAttr = {
+      doc: '',
+      index: this.getHghestIndex() + 1,
       extra: null,
       edit: true,
       id: id,
@@ -145,6 +164,7 @@ export class AttributeGroupComponent
       }
     }, 0);
     this.socket.send(action);
+    this.sort();
   }
 
   onNewButtonClick = (e) => {

@@ -26,6 +26,7 @@ import { SimpleClassComponent } from '../../simple-class.component';
 import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
 import { uniqId } from 'src/app/components/utils/utils';
 import { SessionInteractiveContainer } from 'src/app/components/models/socket/interface/SessionInteractiveContainer';
+import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
 import { LogInteractive_I } from 'src/app/components/models/socket/interface/LogInteractive_I';
 @Component({
   selector: 'app-attribute',
@@ -33,6 +34,7 @@ import { LogInteractive_I } from 'src/app/components/models/socket/interface/Log
   styleUrls: ['./attribute.component.scss'],
 })
 export class AttributeComponent
+  extends InteractiveItemBase
   implements
     OnInit,
     OnChanges,
@@ -53,23 +55,15 @@ export class AttributeComponent
 
   @Input() isTitle: boolean;
   @Input() model: AttributeElement;
-
-  loading: boolean = false;
   extra_overlay: string = '';
-  onSingleClick(e) {
-    console.log(this.getSessionState());
-  }
+
   constructor(
-    private socket: EditorSocketControllerService,
-    private commonService: CommonService
-  ) {}
-  highlightMe(on: boolean, color: string): void {
-    if (on) this.box_shadow = ' 0px 0px 21px 1px ' + color;
-    else this.box_shadow = '';
+    protected socket: EditorSocketControllerService,
+    protected commonService: CommonService
+  ) {
+    super(socket, commonService);
   }
 
-  box_shadow: string = '';
-  callback_queue: CallbackItem[] = [];
   getParentClass(): SimpleClassComponent {
     if (this.isTitle) {
       return this.parent;
@@ -80,72 +74,9 @@ export class AttributeComponent
       return this.parent;
     } else return this.parent;
   }
-
-  restoreModel(model: any, action_id: string, msg: string) {
-    this.updateModel(model, action_id, msg);
-    this.model.edit = false;
-    console.log('RESTORED');
-    this.callback_queue = this.callback_queue.filter(
-      (q) => q.action_id != action_id
-    );
-    if (msg) this.log(msg, MSG_TYPE.ERROR);
-    this.render();
-  }
-  log(msg: string, type: MSG_TYPE) {
-    this.commonService.putLog(msg, type, this);
-  }
-
-  private sessionState: SessionState;
-  public getSessionState(): SessionState {
-    return this.sessionState;
-  }
-  private setSessionState(s) {
-    console.log('set state', s);
-    this.sessionState = s;
-  }
-
-  updateState(state: SessionState, callback_action_id = ''): void {
-    if (state == undefined) return;
-    console.log('state to be inserted', state);
-    this.callback_queue = this.callback_queue.filter(
-      (q) => q.action_id != callback_action_id
-    );
-    this.setSessionState(state);
-    while (this.queuedActionsAfterLockReceived.length > 0) {
-      let action = this.queuedActionsAfterLockReceived.pop();
-      //this is needed because if its a new object, the fresh id is now injected
-      console.log('ACTUAL ID', this.model.id);
-      action.target.target_id = this.model.id;
-      if (action.json != null) {
-        let parsed = JSON.parse(action.json);
-        parsed.id = this.model.id;
-        action.json = JSON.stringify(parsed);
-      }
-      this.sendAction(action);
-    }
-    /*  this.geSessionState().locks = state.locks;
-     this.geSessionState().lockerUser_id = state.lockerUser_id;
-     this.geSessionState().extra = state.extra;*/
-    if (state.lockerUser_id != this.socket.user.id) {
-      this.model.edit = false;
-    } else {
-      //we are the owner
-
-      if (this.getSessionState()?.extra?.placeholder) {
-        this.getSessionState().extra.placeholder = null;
-      }
-    }
-
-    console.log('STATE UPDATED', this.model, this.getSessionState());
-    // this.render();
-  }
-  sendAction(action: EditorAction) {
-    this.callback_queue.push(new CallbackItem(action.id));
-    this.socket.send(action);
-  }
-  deleted = false;
+  /*abstract override*/
   editBegin() {
-    let action = new EditorAction(this.model.id, this.model.attr_type, '');
+    let action = new EditorAction(this.model.id, this.model._type, '');
 
     action.action = ACTION_TYPE.SELECT;
     action.json = '{}';
@@ -155,6 +86,7 @@ export class AttributeComponent
 
     this.sendAction(action);
   }
+  /*abstract override*/
   editEnd() {
     let action = new EditorAction(this.model.id, this.model._type, '');
     action.action = ACTION_TYPE.UPDATE;
@@ -168,6 +100,7 @@ export class AttributeComponent
     console.log('edit ended', action.json);
     this.sendAction(action);
   }
+  /*abstract override*/
   updateModel(model: any, action_id: string, msg: string, extra?: string) {
     this.model.id = model.id;
     if (this.sessionState != null) {
@@ -175,9 +108,7 @@ export class AttributeComponent
       this.model.attr_type = model.attr_type;
       this.model.visibility = model.visibility;
     }
-    // this.model.edit = model.edit;
-    if (this.getSessionState()?.extra)
-      this.getSessionState().extra.placeholder = null;
+    if (this.sessionState?.extra) this.sessionState.extra.placeholder = null;
     console.log('view updated: ', this.model.id);
     this.render();
   }
@@ -185,32 +116,29 @@ export class AttributeComponent
   ngAfterContentInit(): void {
     this.render();
   }
+  //view needs this to represent the remaining unended transactions
   isLoading(): string {
     if (this.callback_queue.length > 0)
       return 'loading ' + this.callback_queue.length;
     else return '';
   }
+  //view needs this to represent lock state
   isLocked(): string {
-    //  if (this.model.id == '1') console.log( this.geSessionState());
-    if (this.getSessionState() == undefined) return 'null';
-    if (this.getSessionState().lockerUser_id == this.socket.user.id)
+    if (this.sessionState == undefined) return 'null';
+    if (this.sessionState.lockerUser_id == this.socket.user.id)
       return 'editing';
-    if (this.getSessionState().locks.length > 0)
-      return 'locked:' + this.getSessionState().lockerUser_id;
+    if (this.sessionState.locks.length > 0)
+      return 'locked:' + this.sessionState.lockerUser_id;
     else return '';
   }
 
-  queuedActionsAfterLockReceived: EditorAction[] = [];
+  // queuedActionsAfterLockReceived: EditorAction[] = [];
 
   ngOnInit(): void {
     this.model.viewModel = this;
-    //  console.log('attr registered with id', this.model);
-    //this.model._type = 'AttributeElement';
-    this.socket.register(this.model.id, this);
-    this.socket.popInjectionQueue(this.model.id);
-    //  this.log('init', MSG_TYPE.ERROR);
-    this.render();
+    this.init_register();
   }
+
   ngOnChanges() {
     //  this.render();
   }
@@ -220,23 +148,14 @@ export class AttributeComponent
     this.render();
   }
   parentClass;
-  deleteSelfFromParent = () => {
+  /*abstract override*/
+  deleteSelfFromParent() {
     console.log('del triggered');
     this.model.name = '';
     this.socket.unregister(this);
     this.parent.delete(this.model.id);
-  };
-  deleteMessageToServer() {
-    let a = new EditorAction(
-      this.model.id,
-      this.model._type,
-      this.getParentContainer().getId()
-    );
-    a.action = ACTION_TYPE.DELETE;
-    a.id = uniqId();
-    this.socket.send(a);
-    this.deleteSelfFromParent();
   }
+
   saveEvent(wastrue) {
     this.model.edit = false;
 
@@ -250,64 +169,27 @@ export class AttributeComponent
     } else {
       //NOT TITLE
       if (this.model.name == '' && this.isEditLockedByMe()) {
-        this.deleteMessageToServer();
+        this.deleteMessageToServer(this.getParentContainer().getId());
         console.log('deleted', this.model);
       } else {
         if (this.model.name == '' && !this.isEditLockedByMe()) {
           console.log('PUTTED ON DEL LIST');
-          this.queuedActionsAfterLockReceived.push(this.queueDeleteAction());
+          this.queuedActionsAfterLockReceived.push(
+            this.queueDeleteAction(this.getParentContainer().getId())
+          );
         }
 
         if (this.model.name != '' && !this.isEditLockedByMe()) {
-          this.queuedActionsAfterLockReceived.push(this.queueUpdateAction());
+          this.queuedActionsAfterLockReceived.push(
+            this.queueUpdateAction(this.getParentContainer().getId())
+          );
         } else if (wastrue) this.editEnd();
       }
     }
   }
-  queueDeleteAction(): EditorAction {
-    let a = new EditorAction(
-      this.model.id,
-      this.model._type,
-      this.getParentContainer().getId()
-    );
-    a.action = ACTION_TYPE.DELETE;
-    a.id = uniqId();
 
-    this.deleteSelfFromParent();
-    return a;
-  }
-  queueUpdateAction(): EditorAction {
-    let action = new EditorAction(this.model.id, this.model._type, '');
-    action.action = ACTION_TYPE.UPDATE;
-
-    this.model.viewModel = null;
-    action.json = JSON.stringify(this.model);
-    this.model.viewModel = this;
-
-    if (this.isTitle) action.target.parent_id = this.parent.model.id;
-    else action.target.parent_id = this.parent.model.id;
-    console.log('queued', action);
-    return action;
-  }
-  isEditLockedByMe(): boolean {
-    return this.sessionState?.lockerUser_id == this.socket.user.id;
-  }
   onClick(e) {
-    if (this.getSessionState() == null) {
-      return;
-    }
-    if (this.getSessionState().locks.length > 0) {
-      if (this.getSessionState().lockerUser_id != this.socket.user.id) {
-        this.log(
-          "Object is locked (locker's id: " +
-            this.sessionState.lockerUser_id +
-            ')',
-          MSG_TYPE.INFO
-        );
-      }
-      return;
-    }
-
+    if (!this.isAccessible()) return;
     this.editBegin();
     this.model.edit = true;
     this.targetDOM = e.target;
@@ -477,8 +359,8 @@ export class AttributeComponent
         }
       }
     }
-    if (this.getSessionState()?.extra?.placeholder) {
-      this.extra_overlay = this.getSessionState().extra.placeholder;
+    if (this.sessionState?.extra?.placeholder) {
+      this.extra_overlay = this.sessionState.extra.placeholder;
     } else {
       this.extra_overlay = '';
     }

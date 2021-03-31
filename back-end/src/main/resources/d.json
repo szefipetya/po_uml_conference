@@ -9,10 +9,9 @@
     "dgObjects": [{
             "_type": "SimpleClass",
             "id": "c1",
-            "posx": 110,
-            "posy": 220,
-            "width": 110,
-            "height": 250,
+           "dimensionModel":{
+                "x":110,"y":220,"width":110,"height":250
+           },
             "min_height": 75,
             "scaledModel": {
                 "posx_scaled": 110,
@@ -37,13 +36,14 @@
                     "group_name": "attributes",
                     "group_syntax": 1,
                     "attributes": [{
+                            "index":0,
                             "id": "1", "_type": "AttributeElement",
                             "visibility": "+",
                             "edit": false,
                             "name": "attr1",
                             "attr_type": "int",
                             "viewModel": null
-                        }, {
+                        }, {"index":1,
                             "id": "2","_type": "AttributeElement",
                             "visibility": "+",
                             "edit": false,
@@ -57,13 +57,14 @@
                     "group_name": "functions","_type": "SimpleClassElementGroup",
                     "group_syntax": 0,
                     "attributes": [{
+                            "index":0,
                             "id": "3","_type": "AttributeElement",
                             "visibility": "-",
                             "edit": false,
                             "name": "func1",
                             "attr_type": "int",
                             "viewModel": null
-                        }, {
+                        }, {"index":1,
                             "id": "4","_type": "AttributeElement",
                             "visibility": "#",
                             "edit": false,
@@ -75,10 +76,9 @@
         }, {
             "id": "c2",
             "_type": "SimpleClass",
-            "posx": 310,
-            "posy": 420,
-            "width": 110,
-            "height": 250,
+             "dimensionModel":{
+                "x":310,"y":420,"width":110,"height":250
+           },
             "min_height": 75,
             "scaledModel": {
                 "posx_scaled": 310,
@@ -102,13 +102,14 @@
                     "group_name": "attributes","_type": "SimpleClassElementGroup",
                     "group_syntax": 1,
                     "attributes": [{
+                            "index":0,
                             "id": "5","_type": "AttributeElement",
                             "visibility": "+",
                             "edit": false,
                             "name": "name",
                             "attr_type": "string",
                             "viewModel": null
-                        }, {
+                        }, {"index":1,
                             "id": "6","_type": "AttributeElement",
                             "visibility": "#",
                             "edit": false,
@@ -122,6 +123,7 @@
                     "group_name": "functions","_type": "SimpleClassElementGroup",
                     "group_syntax": 0,
                     "attributes": [{
+                            "index":0,
                             "id": "7","_type": "AttributeElement",
                             "visibility": "-",
                             "edit": false,
@@ -129,6 +131,7 @@
                             "attr_type": "void",
                             "viewModel": null
                         }, {
+                            "index":1,
                             "id": "8","_type": "AttributeElement",
                             "visibility": "#",
                             "edit": false,
@@ -140,10 +143,9 @@
         }, {
             "_type": "NoteBox",
             "id": "n1",
-            "posx": 310,
-            "posy": 220,
-            "width": 110,
-            "height": 250,
+            "dimensionModel":{
+                "x":310,"y":220,"width":110,"height":250
+           },
             "min_height": 75,
             "scaledModel": {
                 "posx_scaled": 310,

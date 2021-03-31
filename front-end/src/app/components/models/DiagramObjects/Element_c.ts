@@ -2,7 +2,6 @@ import { AttributeComponent } from '../../full-page-components/editor/diagram-ob
 import { DynamicSerialObject } from '../common/DynamicSerialObject';
 export class Element_c extends DynamicSerialObject {
   name: string;
-  edit: boolean;
   viewModel: AttributeComponent;
   extra: any;
 }

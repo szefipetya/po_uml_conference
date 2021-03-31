@@ -1,10 +1,10 @@
 <div class="class-element-group" (onmouseover)="this.onMouseOver($event)">
   <div class="class-element-group-name">
-    {{ this.model.group_name }}
+    {{ this.getModel().group_name }}
   </div>
 
   <app-attribute
-    *ngFor="let item of this.model.attributes"
+    *ngFor="let item of this.getModel().attributes"
     [model]="item"
     [parent]="this"
     [isTitle]="false"

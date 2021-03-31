@@ -73,7 +73,7 @@ export class GlobalEditorService {
         gridSize: 10,
         drawMode: 'cursor',
         drawRect: null,
-        selectedClassIds: ['c1'],
+        selectedClassIds: [],
         clip: {
           width: 0,
           height: 0,

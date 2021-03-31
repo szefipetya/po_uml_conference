@@ -1,8 +1,4 @@
-<div
-  style="position: relative"
-  (click)="this.onSingleClick($event)"
-  [style.box-shadow]="this.box_shadow"
->
+<div style="position: relative" [style.box-shadow]="this.box_shadow">
   <span
     style="position: absolute"
     [style.left]="this.getParentClass().model.scaledModel.width_scaled + 'px'"

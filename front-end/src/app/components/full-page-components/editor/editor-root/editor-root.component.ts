@@ -70,7 +70,7 @@ export class EditorRootComponent implements OnInit {
         //  console.log(clas);
         //  console.log(clas instanceof SimpleClass);
 
-        clas.viewModel.disableEdit();
+        clas.viewModel?.disableEdit();
         //  console.log('edit is false');
       });
       this.inputDOM = undefined;

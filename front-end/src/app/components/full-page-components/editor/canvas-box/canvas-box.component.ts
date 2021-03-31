@@ -9,6 +9,8 @@ import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramO
 import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
 import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
 import { uniqId } from 'src/app/components/utils/utils';
+import { renderFlagCheckIfStmt } from '@angular/compiler/src/render3/view/template';
+import { SimpleClassComponent } from '../diagram-objects/simple-class/simple-class.component';
 
 @Component({
   selector: 'app-canvas-box',
@@ -21,11 +23,11 @@ export class CanvasBoxComponent implements OnInit {
   targetResizeHoverXL: boolean;
   targetResizeHoverYR: boolean;
   targetResizeHoverYL: boolean;
-  findClassById = (id) => {
-    const cls = this.editorService.model.dgObjects.filter((e) => e.id == id);
+  findClassById(id): DiagramObject {
+    const cls = this.editorService.model.dgObjects.filter((e) => e.id == id)[0];
 
     return cls;
-  };
+  }
 
   zoom(event) {
     console.log('zoom');
@@ -40,7 +42,7 @@ export class CanvasBoxComponent implements OnInit {
       e.scaledModel.posy_scaled *= scale;
       e.scaledModel.width_scaled *= scale;
       e.scaledModel.height_scaled *= scale;
-      e.viewModel.updateScales(scale);
+      e.viewModel?.updateScales(scale);
     });
     this.editorService.clientModel.class_general.fontsize_scaled *= scale;
     this.editorService.clientModel.class_general.padding_scaled *= scale;
@@ -99,7 +101,7 @@ export class CanvasBoxComponent implements OnInit {
     }
     if (dclass) {
       if (e.target.className != 'edit-box' && e.target.nodeName != 'INPUT') {
-        this.targetClass = this.findClassById(dclass.id)[0];
+        this.targetClass = this.findClassById(dclass.id);
         this.targetRect = dclass.parentNode.getBoundingClientRect();
         this.targetInner = dclass.getBoundingClientRect();
       }
@@ -122,7 +124,7 @@ export class CanvasBoxComponent implements OnInit {
       const dclass = e.target.closest('.d-class');
       if (dclass) {
         this.dclass = dclass;
-        this.targetObject_stored = this.findClassById(dclass.id)[0];
+        this.targetObject_stored = this.findClassById(dclass.id);
         this.targetWidth_stored = this.targetObject_stored.scaledModel.width_scaled;
         this.targetHeight_stored = this.targetObject_stored.scaledModel.height_scaled;
         this.targetRect_stored = dclass.parentNode.getBoundingClientRect();
@@ -140,11 +142,31 @@ export class CanvasBoxComponent implements OnInit {
     }
   };
   selectClickedClassOnly = () => {
-    this.editorService.clientModel.canvas.selectedClassIds = [];
-    if (this.targetObject_stored)
+    this.editorService.clientModel.canvas.selectedClassIds.map((i) => {
+      //ha nem azt választom, ki, ami már ki van, akkor
+      if (i != this.targetObject_stored.id)
+        this.findClassById(i).viewModel?.editEnd();
+    });
+    if (
+      this.editorService.clientModel.canvas.selectedClassIds.includes(
+        this.targetObject_stored.id
+      )
+    )
+      // this.editorService.clientModel.canvas.selectedClassIds = [];
+      this.editorService.clientModel.canvas.selectedClassIds = this.editorService.clientModel.canvas.selectedClassIds.filter(
+        (i) => i != this.targetObject_stored.id
+      );
+    if (
+      this.targetObject_stored &&
+      !this.editorService.clientModel.canvas.selectedClassIds.includes(
+        this.targetObject_stored.id
+      )
+    ) {
       this.editorService.clientModel.canvas.selectedClassIds.push(
         this.targetObject_stored.id
       );
+      this.targetObject_stored.viewModel?.editBegin();
+    }
   };
   resizePadding = 14;
   targetCurrentId = '1';
@@ -185,19 +207,24 @@ export class CanvasBoxComponent implements OnInit {
       } = this.targetObject_stored.scaledModel;
       if (posx_scaled < 0) {
         this.targetObject_stored.scaledModel.posx_scaled = 0;
+        this.targetObject_stored.dimensionModel.x = 0;
         c++;
       }
       if (posy_scaled < 0) {
         this.targetObject_stored.scaledModel.posy_scaled = 0;
+        this.targetObject_stored.dimensionModel.y = 0;
         c++;
       }
       if (posx_scaled + width_scaled > canvas.width) {
         this.targetObject_stored.scaledModel.posx_scaled =
           canvas.width - width_scaled;
+        this.targetObject_stored.dimensionModel.x = canvas.width - width_scaled;
         c++;
       }
       if (posy_scaled + height_scaled > canvas.height) {
         this.targetObject_stored.scaledModel.posy_scaled =
+          canvas.height - height_scaled;
+        this.targetObject_stored.dimensionModel.y =
           canvas.height - height_scaled;
         c++;
       }
@@ -209,6 +236,7 @@ export class CanvasBoxComponent implements OnInit {
           }, this.targetCorrigateTransition);
         }
         this.updateCanvas();
+        this.targetObject_stored.viewModel.sendDimensionUpdate();
       }
     }
   };
@@ -218,20 +246,28 @@ export class CanvasBoxComponent implements OnInit {
       if (
         this.targetClass.scaledModel.width_scaled <
         this.editorService.clientModel.class_general.min_width_scaled
-      )
+      ) {
         this.targetClass.scaledModel.width_scaled = round(
           this.editorService.clientModel.class_general.min_width_scaled,
           this.editorService.clientModel.canvas.gridSize
         );
+        this.targetClass.dimensionModel.width =
+          this.targetClass.scaledModel.width_scaled /
+          this.editorService.clientModel.canvas.scale;
+      }
       if (
         this.targetClass.scaledModel.height_scaled <
         this.editorService.clientModel.class_general.min_height_scaled
-      )
+      ) {
         this.targetClass.scaledModel.height_scaled = round(
           this.editorService.clientModel.class_general.min_height_scaled,
           this.editorService.clientModel.canvas.gridSize
         );
-      this.targetClass.viewModel.update();
+        this.targetClass.dimensionModel.height =
+          this.targetClass.scaledModel.height_scaled /
+          this.editorService.clientModel.canvas.scale;
+      }
+      this.targetClass.viewModel?.update();
     }
   };
   targetResizeGrabXR: boolean;
@@ -323,16 +359,31 @@ export class CanvasBoxComponent implements OnInit {
       unFocus();
       this.targetClass.scaledModel.posx_scaled =
         e.clientX - this.targetRect.left - this.xdiff;
+      /*     this.targetClass.dimensionModel.x =
+        this.targetClass.scaledModel.posx_scaled /
+        this.editorService.clientModel.canvas.scale; */
+
       this.targetClass.scaledModel.posy_scaled =
         e.clientY - this.targetRect.top - this.ydiff;
+      /*   this.targetClass.dimensionModel.y =
+        this.targetClass.scaledModel.posy_scaled /
+        this.editorService.clientModel.canvas.scale; */
+
       this.targetClass.scaledModel.posx_scaled = round(
         this.targetClass.scaledModel.posx_scaled,
         this.editorService.clientModel.canvas.gridSize
       );
+      this.targetClass.dimensionModel.x =
+        this.targetClass.scaledModel.posx_scaled /
+        this.editorService.clientModel.canvas.scale;
+
       this.targetClass.scaledModel.posy_scaled = round(
         this.targetClass.scaledModel.posy_scaled,
         this.editorService.clientModel.canvas.gridSize
       );
+      this.targetClass.dimensionModel.y =
+        this.targetClass.scaledModel.posy_scaled /
+        this.editorService.clientModel.canvas.scale;
       this.updateCanvas();
       return;
     }
@@ -353,6 +404,10 @@ export class CanvasBoxComponent implements OnInit {
       this.targetObject_stored.scaledModel.width_scaled =
         this.xdiff_rel_to_stored +
         (this.targetWidth_stored - this.stored_xdiff);
+
+      this.targetClass.dimensionModel.width =
+        this.targetClass.scaledModel.width_scaled /
+        this.editorService.clientModel.canvas.scale;
       this.targetDOM.style.borderRight = this.borderString_scale;
       this.updateCanvas();
       // return;
@@ -381,6 +436,13 @@ export class CanvasBoxComponent implements OnInit {
         this.targetObject_stored.scaledModel.posx_scaled,
         this.editorService.clientModel.canvas.gridSize
       );
+      this.targetClass.dimensionModel.x =
+        this.targetClass.scaledModel.posx_scaled /
+        this.editorService.clientModel.canvas.scale;
+
+      this.targetClass.dimensionModel.width =
+        this.targetClass.scaledModel.width_scaled /
+        this.editorService.clientModel.canvas.scale;
     }
     //  }
     // resize yr
@@ -400,6 +462,11 @@ export class CanvasBoxComponent implements OnInit {
       this.targetObject_stored.scaledModel.height_scaled =
         this.ydiff_rel_to_stored +
         (this.targetHeight_stored - this.stored_ydiff);
+
+      this.targetClass.dimensionModel.height =
+        this.targetClass.scaledModel.height_scaled /
+        this.editorService.clientModel.canvas.scale;
+
       this.targetDOM.style.borderBottom = this.borderString_scale;
     }
 
@@ -429,6 +496,14 @@ export class CanvasBoxComponent implements OnInit {
         this.targetObject_stored.scaledModel.posy_scaled,
         this.editorService.clientModel.canvas.gridSize
       );
+
+      this.targetClass.dimensionModel.height =
+        this.targetClass.scaledModel.height_scaled /
+        this.editorService.clientModel.canvas.scale;
+
+      this.targetClass.dimensionModel.y =
+        this.targetClass.scaledModel.posy_scaled /
+        this.editorService.clientModel.canvas.scale;
       // return;
     }
     if (nohover == 4) {
@@ -457,10 +532,19 @@ export class CanvasBoxComponent implements OnInit {
         this.targetClass.scaledModel.width_scaled,
         this.editorService.clientModel.canvas.gridSize
       );
+
+      this.targetClass.dimensionModel.width =
+        this.targetClass.scaledModel.width_scaled /
+        this.editorService.clientModel.canvas.scale;
+
       this.targetClass.scaledModel.height_scaled = round(
         this.targetClass.scaledModel.height_scaled,
         this.editorService.clientModel.canvas.gridSize
       );
+
+      this.targetClass.dimensionModel.height =
+        this.targetClass.scaledModel.height_scaled /
+        this.editorService.clientModel.canvas.scale;
       this.corrigateTargetClassDimensions();
     }
   };
@@ -486,14 +570,21 @@ export class CanvasBoxComponent implements OnInit {
       const x = e.clientX - rect.left; // x position within the element.
       const y = e.clientY - rect.top;
 
-      this.findClassById(this.drawedClassId)[0].scaledModel.width_scaled =
+      this.findClassById(this.drawedClassId).scaledModel.width_scaled =
         x - this.drawedClassX;
-      this.findClassById(this.drawedClassId)[0].scaledModel.height_scaled =
+      this.findClassById(this.drawedClassId).dimensionModel.width =
+        this.findClassById(this.drawedClassId).scaledModel.width_scaled /
+        this.editorService.clientModel.canvas.scale;
+      this.findClassById(this.drawedClassId).scaledModel.height_scaled =
         y - this.drawedClassY;
+      this.findClassById(this.drawedClassId).dimensionModel.height =
+        this.findClassById(this.drawedClassId).scaledModel.height_scaled /
+        this.editorService.clientModel.canvas.scale;
       unFocus();
       this.updateCanvas();
     }
   };
+
   findClassDOMbyId(id): any {
     let dom = document.querySelector('.edit-box').querySelector('#' + id);
     //console.log(dom);
@@ -514,7 +605,9 @@ export class CanvasBoxComponent implements OnInit {
       this.drawedClassPositionSpecified = false;
       this.drawedClassId = undefined;
     }
-
+    if (this.targetClass != null) {
+      this.targetClass.viewModel.onMouseUp(e);
+    }
     if (this.targetDOM != undefined)
       this.targetDOM.style.border = `${this.editorService.clientModel.class_general.border_scaled}px solid rgba(255, 255, 255, 0.19)`;
     this.resetMouseState();
@@ -569,6 +662,10 @@ export class CanvasBoxComponent implements OnInit {
       this.holding = true;
       this.clipDOM = e.target.closest('.edit-box-clip');
       // selection off
+
+      this.editorService.clientModel.canvas.selectedClassIds.map((i) =>
+        this.findClassById(i).viewModel?.editEnd()
+      );
       this.editorService.clientModel.canvas.selectedClassIds = [];
       this.updateClassSelection();
     }
@@ -587,6 +684,9 @@ export class CanvasBoxComponent implements OnInit {
       // zindex problem
       const max = this.getHighestClassZIndex();
       if (this.targetClass) this.targetClass.z = max;
+      if (this.targetClass) {
+        this.targetClass.viewModel.onMouseDown(e);
+      }
       // grabxr
       let n = 0;
       if (
@@ -636,12 +736,15 @@ export class CanvasBoxComponent implements OnInit {
     this.drawedClassId = `c${this.getNewClassId()}`;
     let newclass: SimpleClass;
     newclass = {
+      doc: '',
       _type: 'SimpleClass',
       id: this.drawedClassId,
-      width: 1,
-      height: 1,
-      posx: this.drawedClassX,
-      posy: this.drawedClassY,
+      dimensionModel: {
+        width: 1,
+        height: 1,
+        x: this.drawedClassX,
+        y: this.drawedClassY,
+      },
       min_height: 75,
       viewModel: null,
       scaledModel: {
@@ -661,6 +764,8 @@ export class CanvasBoxComponent implements OnInit {
           group_syntax: GROUP_SYNTAX.ATTRIBUTE,
           attributes: [],
           _type: 'SimpleClassElementGroup',
+          viewModel: null,
+          edit: false,
         },
         {
           id: 'g' + uniqId,
@@ -668,6 +773,8 @@ export class CanvasBoxComponent implements OnInit {
           group_syntax: GROUP_SYNTAX.FUNCTION,
           attributes: [],
           _type: 'SimpleClassElementGroup',
+          viewModel: null,
+          edit: false,
         },
       ],
       titleModel: {
