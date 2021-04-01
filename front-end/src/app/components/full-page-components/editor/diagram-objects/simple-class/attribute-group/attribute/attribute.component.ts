@@ -67,6 +67,9 @@ export class AttributeComponent
     super(socket, commonService);
   }
 
+  getId() {
+    return this.model.id;
+  }
   getParentClass(): SimpleClassComponent {
     if (this.isTitle) {
       return this.parent;
@@ -153,10 +156,10 @@ export class AttributeComponent
   parentClass;
   /*abstract override*/
   deleteSelfFromParent() {
-    console.log('del triggered');
+    // console.log('del triggered');
     this.model.name = '';
     this.socket.unregister(this);
-    this.parent.delete(this.model.id);
+    if (!this.isTitle) this.parent?.delete(this.model.id); //if its a titlemodel, this is not relevant.
   }
 
   saveEvent(wastrue) {

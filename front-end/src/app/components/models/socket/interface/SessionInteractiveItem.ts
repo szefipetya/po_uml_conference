@@ -12,4 +12,5 @@ export interface SessionInteractiveItem {
   restoreModel(model: any, action_id: string, msg?: string);
   deleteSelfFromParent();
   log(msg: string, type: MSG_TYPE);
+  getId();
 }

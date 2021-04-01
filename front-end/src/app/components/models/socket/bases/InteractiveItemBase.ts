@@ -21,6 +21,9 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     protected socket: EditorSocketControllerService,
     protected commonService: CommonService
   ) {}
+  getId() {
+    return this.model.id;
+  }
   //Session funcions---------------------------------
   updateState(state: SessionState, callback_action_id = ''): void {
     if (state == undefined) return;
@@ -29,6 +32,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
       (q) => q.action_id != callback_action_id
     );
     this.sessionState = state;
+    console.log('my new session state');
     while (this.queuedActionsAfterLockReceived.length > 0) {
       let action = this.queuedActionsAfterLockReceived.pop();
       //this is needed because if its a new object, the fresh id is now injected
@@ -106,9 +110,10 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     let a = new EditorAction(this.model.id, this.model._type, parent_id);
     a.action = ACTION_TYPE.DELETE;
     a.id = uniqId();
-    this.socket.send(a);
+
     this.deleteSelfFromParent();
     this.socket.unregister(this);
+    this.socket.send(a);
   }
   abstract saveEvent(wastrue): void;
   queueDeleteAction(parent_id: string): EditorAction {
@@ -118,7 +123,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
 
     this.deleteSelfFromParent();
     this.socket.unregister(this);
-
+    this.socket.send(a);
     return a;
   }
   queueUpdateAction(parent_id: string): EditorAction {

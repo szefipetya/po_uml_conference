@@ -63,9 +63,11 @@ ObjectMapper mapper;
                 System.out.println(s.getUser_id());
                 if(response.getScope()==RESPONSE_SCOPE.PUBLIC||s.getUser_id().equals(response.getTarget_user_id())){
                     try {
-                        if(s.getSocket().isOpen())
+                        if(s.getSocket().isOpen()){
                         s.getSocket().sendMessage(new TextMessage(mapper.writeValueAsString(response)));
                         System.out.println("stateresponse sent to user "+s.getUser_id());
+                            if(response.getScope()==RESPONSE_SCOPE.PRIVATE) break;
+                        }
                     } catch (IOException ex) {
                         Logger.getLogger(SessionStateResponseProcessor.class.getName()).log(Level.SEVERE, null, ex);
                     }

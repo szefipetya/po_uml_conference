@@ -76,6 +76,9 @@ export class DiagramObjectComponent
   ) {
     super(socket, commonService);
   }
+  getId() {
+    return this.model.id;
+  }
   saveEvent(wastrue: any): void {}
 
   onSelect() {}

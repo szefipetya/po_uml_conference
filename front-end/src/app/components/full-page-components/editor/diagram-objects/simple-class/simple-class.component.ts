@@ -173,4 +173,16 @@ export class SimpleClassComponent
   ngOnChanges(): void {
     console.log('changed');
   }
+
+  deleteSelfFromParent() {
+    this.editorService.deleteGlobalObject(this.model);
+    this.model.groups.map((g) => {
+      g.attributes.map((e) => {
+        e.viewModel.deleteAsync(g.id);
+      });
+      g.viewModel.socket.unregisterContainer(g.viewModel);
+    });
+    this.model.titleModel.viewModel.deleteAsync(this.model.id);
+    this.socket.unregister(this);
+  }
 }

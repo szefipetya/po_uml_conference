@@ -31,7 +31,7 @@ export class AttributeGroupComponent
   inputDOM: any;
   @Input() parent: SimpleClassComponent;
 
-  constructor(private socket: EditorSocketControllerService) {
+  constructor(public socket: EditorSocketControllerService) {
     // this.model._type = 'SimpleClassElementGroup';
   }
   public getModel() {
@@ -75,6 +75,7 @@ export class AttributeGroupComponent
   }
 
   ngOnInit(): void {
+    this.model.viewModel = this;
     this.socket.registerContainer(this.model.id, this);
   }
   delete(id) {

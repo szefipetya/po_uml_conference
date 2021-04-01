@@ -7,6 +7,7 @@ import {
   EditorSocketControllerService,
   Pair,
 } from '../editor-socket-controller.service';
+import { TOKEN_TYPE } from '../InjectionToken_c';
 import { SocketWrapper } from './SocketWrapper_I';
 
 export class SessionSocket implements SocketWrapper {
@@ -20,22 +21,34 @@ export class SessionSocket implements SocketWrapper {
     setTimeout(() => {
       console.log(this);
 
-      let s: SessionStateResponse;
-      s = JSON.parse(e.data);
-      console.log('SESSION MESSAGE', s);
+      let resp: SessionStateResponse;
+      resp = JSON.parse(e.data);
+      console.log('SESSION MESSAGE', resp);
       let si: SessionInteractiveItem;
       let sc: SessionInteractiveContainer;
-      switch (s.target_type) {
+      switch (resp.target_type) {
         case 'CONTAINER':
-          sc = this.parent.getContainer(s.target_id);
-          if (sc) sc.updateState(s.sessionState, s.action_id);
+          sc = this.parent.getContainer(resp.target_id);
+          if (sc) sc.updateState(resp.sessionState, resp.action_id);
           break;
 
         case 'ITEM':
-          si = this.parent.getItem(s.target_id);
-          if (si) si.updateState(s.sessionState, s.action_id);
+          si = this.parent.getItem(resp.target_id);
+          if (si) si.updateState(resp.sessionState, resp.action_id);
           console.log('ITEMS SESSION UPDATED');
           break;
+        case 'ITEM_INJECTION':
+          this.parent.service.popFutureCallbackInjectionQueue(
+            resp.target_id,
+            TOKEN_TYPE.SESSION_STATE,
+            { sessionState: resp.sessionState }
+          );
+        case 'CONTAINER_INJECTION':
+          this.parent.service.popFutureCallbackInjectionQueue(
+            resp.target_id,
+            TOKEN_TYPE.SESSION_STATE,
+            { sessionState: resp.sessionState }
+          );
       }
     }, this.parent.service.test.ping);
   }

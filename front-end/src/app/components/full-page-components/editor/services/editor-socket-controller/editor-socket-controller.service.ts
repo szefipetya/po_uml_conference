@@ -21,10 +21,12 @@ import { SessionInteractiveContainer } from 'src/app/components/models/socket/in
 import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TYPE';
 import { InjectionToken_c } from './InjectionToken_c';
 import { TOKEN_TYPE } from './InjectionToken_c';
+import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
+import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 declare var SockJS: any;
 declare var Stomp: any;
 class Test {
-  ping: number = 0;
+  ping: number = 2000;
   changePing(v) {
     this.ping = v;
   }
@@ -53,7 +55,28 @@ export class EditorSocketControllerService {
     this.test = new Test();
   }
   user: User;
+  //the data exists. we just need to wait for the view
+  // to be ready and inject its own state and model
   injectionQueue: InjectionToken_c[] = [];
+  //this is for future injection, the data is not known yet,
+  // the injection process is started by a response
+  futureCallbackInjectionQueue: InjectionToken_c[] = [];
+
+  createGlobalObjectAndRequestStateInjectionForSimpleClass(model: SimpleClass) {
+    model.groups.map((g) => {
+      g.attributes.forEach((e) => {
+        if (this.getItem(e.id)) {
+          this.addToFutureCallbackInjectionQueue(
+            TOKEN_TYPE.SESSION_STATE,
+            e.id,
+            TARGET_TYPE.ITEM
+          );
+        }
+      });
+    });
+
+    this.editorService.createGlobalObject(model);
+  }
 
   popInjectionQueue(req_target_id: string) {
     let self = this;
@@ -72,16 +95,33 @@ export class EditorSocketControllerService {
         }
       }
     });
-    // console.log('injqueue', this.injectionQueue);
-    // console.log('vm map', this.itemViewModelMap);
-
-    // if (token.target_type == TARGET_TYPE.ITEM) {
-    // if (token.type == TOKEN_TYPE.SESSION_STATE) {
-
-    //   }
-    //  }
   }
+  popFutureCallbackInjectionQueue(
+    req_target_id: string,
+    type: TOKEN_TYPE,
+    data: any
+  ) {
+    let self = this;
+    this.futureCallbackInjectionQueue.map((i) => {
+      if (i.target_id == req_target_id) {
+        let item: SessionInteractiveItem = self.itemViewModelMap.find(
+          (i) => i.key == req_target_id
+        )?.value;
 
+        if (item) {
+          if (i.type == type && type == TOKEN_TYPE.SESSION_STATE) {
+            item.updateState(data.sessionState);
+          } else if (i.type == type && type == TOKEN_TYPE.COMBINED) {
+            item.updateState(data.sessionState);
+            item.restoreModel(data.model, '');
+          }
+        } else {
+          //add to normal injection queue, because the view is not ready yet
+          this.addToInjectionQueue(req_target_id, type, data);
+        }
+      }
+    });
+  }
   addToInjectionQ(
     type: TOKEN_TYPE,
     target_id: string,
@@ -95,14 +135,33 @@ export class EditorSocketControllerService {
     token.target_type = target_type;
     this.injectionQueue.push(token);
   }
+  addToFutureCallbackInjectionQueue(
+    type: TOKEN_TYPE,
+    target_id: string,
+    target_type: TARGET_TYPE
+  ) {
+    let token = new InjectionToken_c();
+    token.type = type;
+    token.target_id = target_id;
+    token.target_type = target_type;
+    this.futureCallbackInjectionQueue.push(token);
+  }
 
   public register(target_id: string, view: SessionInteractiveItem) {
     this.itemViewModelMap.push(new Pair(target_id, view));
+    /* console.log('REGISTERED: ' + target_id);*/
   }
   public unregister(view: SessionInteractiveItem) {
-    this.itemViewModelMap = this.itemViewModelMap.filter(
-      (f) => f.value != view
-    );
+    this.itemViewModelMap = this.itemViewModelMap.filter((f) => {
+      /*  if (f.key == view.getId()) console.log('UNREGISTERED: ' + f.key);*/
+      return f.key != view.getId();
+    });
+  }
+  public unregisterContainer(view: SessionInteractiveContainer) {
+    this.containerViewModelMap = this.containerViewModelMap.filter((f) => {
+      /* if (f.key == view.getId()) console.log('UNREGISTERED: ' + f.key);*/
+      return f.key != view.getId();
+    });
   }
   public registerContainer(
     target_id: string,
@@ -134,7 +193,15 @@ export class EditorSocketControllerService {
   public send(action: EditorAction) {
     // this.waitingForResponse_queue.push(new Pair(action, sender));
     action.user_id = this.user.id;
+    console.log('sent', action);
     this.actionSocket.send(action);
+  }
+  getItem(id) {
+    let p: Pair<String, SessionInteractiveItem> = this.itemViewModelMap.find(
+      (i) => i.key == id
+    );
+    if (p) return p.value;
+    else return null;
   }
 
   test: Test;

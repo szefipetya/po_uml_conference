@@ -63,10 +63,10 @@ export class ActionSocket implements SocketWrapper {
                   // load.edit = true;
                   if (resp.action.extra.sessionState) {
                     console.log('injection added');
-                    //this.parent.addToInjectionQueue(load.id,resp );
                     this.parent.addToInjectionQueue(
                       load.id,
                       TOKEN_TYPE.COMBINED,
+                      TARGET_TYPE.ITEM,
                       {
                         sessionState: JSON.parse(
                           resp.action.extra.sessionState
@@ -87,6 +87,7 @@ export class ActionSocket implements SocketWrapper {
                     this.parent.addToInjectionQueue(
                       load.id,
                       TOKEN_TYPE.COMBINED,
+                      TARGET_TYPE.ITEM,
                       {
                         sessionState: JSON.parse(
                           resp.action.extra.sessionState
@@ -96,8 +97,10 @@ export class ActionSocket implements SocketWrapper {
                     );
                   }
                   if (!this.parent.editorService.hasGlobalObject(load)) {
-                    this.parent.editorService.createGlobalObject(load);
-                    console.log('RESTORE2');
+                    if (load._type == 'SimpleClass')
+                      this.parent.service.createGlobalObjectAndRequestStateInjectionForSimpleClass(
+                        load
+                      );
                   }
                 }
               }
@@ -133,6 +136,7 @@ export class ActionSocket implements SocketWrapper {
               this.parent.addToInjectionQueue(
                 load.id,
                 TOKEN_TYPE.SESSION_STATE,
+                TARGET_TYPE.ITEM,
                 { sessionState: JSON.parse(resp.action.extra.sessionState) }
               );
             sc.createItem(load, resp.action.extra);
@@ -185,8 +189,8 @@ export class ActionSocket implements SocketWrapper {
     }, this.service.test.ping);
   }
   disconnect() {}
-  addToInjectionQueue(id, type: TOKEN_TYPE, data) {
+  addToInjectionQueue(id, type: TOKEN_TYPE, target: TARGET_TYPE, data) {
     console.log('data', data);
-    this.service.addToInjectionQ(type, id, TARGET_TYPE.ITEM, data);
+    this.service.addToInjectionQ(type, id, target, data);
   }
 }

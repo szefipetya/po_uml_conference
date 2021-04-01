@@ -10,5 +10,5 @@ package com.szefi.uml_conference.model.dto.socket.Response;
  * @author h9pbcl
  */
 public enum TARGET_TYPE {
-    CONTAINER,ITEM
+    CONTAINER,ITEM,ITEM_INJECTION,CONTAINER_INJECTION
 }
