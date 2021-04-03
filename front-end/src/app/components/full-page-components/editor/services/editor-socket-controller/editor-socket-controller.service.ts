@@ -23,20 +23,13 @@ import { InjectionToken_c } from './InjectionToken_c';
 import { TOKEN_TYPE } from './InjectionToken_c';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
+import { Pair } from '../../Utils/utils';
 declare var SockJS: any;
 declare var Stomp: any;
 class Test {
-  ping: number = 2000;
+  ping: number = 0;
   changePing(v) {
     this.ping = v;
-  }
-}
-export class Pair<K, V> {
-  key: K;
-  value: V;
-  constructor(key: K, value: V) {
-    this.key = key;
-    this.value = value;
   }
 }
 
@@ -46,13 +39,20 @@ export class Pair<K, V> {
 export class EditorSocketControllerService {
   [x: string]: any;
 
-  //url_pre = 'ws://84.2.193.197:8101/';
+  // url_pre = 'ws://84.2.193.197:8101/';
   url_pre = 'ws://localhost:8101/';
   constructor(private editorService: GlobalEditorService) {
     this.itemViewModelMap = [];
     this.waitingForResponse_queue = [];
     this.user = editorService.user;
     this.test = new Test();
+    this.editorService.addListenerAfterDgFetch(
+      this,
+      (target) => {
+        target.connect();
+      },
+      'init'
+    );
   }
   user: User;
   //the data exists. we just need to wait for the view

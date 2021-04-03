@@ -27,6 +27,9 @@ import { GlobalEditorService } from '../../services/global-editor/global-editor.
 export class DiagramObjectComponent
   extends InteractiveItemBase
   implements OnInit, SessionInteractiveItem {
+  getParentId(): string {
+    return 'root';
+  }
   onMouseDown(e) {
     this.editBegin();
     this.dragged = true;

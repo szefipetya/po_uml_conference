@@ -18,6 +18,7 @@ import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
 import com.szefi.uml_conference.model.dto.socket.LOCK_TYPE;
 import com.szefi.uml_conference.model.dto.socket.SessionState;
 import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.model.dto.top.AutoSessionInjectable_I;
 import com.szefi.uml_conference.model.dto.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.socket.threads.SocketThreadManager;
 
@@ -149,20 +150,20 @@ public class SocketSessionService {
   
     public DynamicSerialObject createItemForContainer(String user_id,String cont_id,DynamicSerialObject obj){
         Pair<SessionState,DynamicSerialContainer_I> s= this.sessionContainerMap.get(cont_id);
+         String rand_id=UUID.randomUUID().toString();
         if(s!=null){
             DynamicSerialContainer_I cont=s.getSecond();
-            String rand_id=UUID.randomUUID().toString();
+         
             obj.setId(rand_id);
-            cont.getContainer().add(obj);
-            if(obj instanceof Element_c){
-                
+            cont.container().add(obj);
+            if(obj instanceof Element_c){              
                 Element_c casted=(Element_c)obj;
                 casted.setEdit(false);
             }
          
             this.sessionItemMap.put(rand_id,Pair.of(new SessionState(),obj)); 
             this.lockObjectById(rand_id, user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
-            SessionState state=new SessionState();
+            SessionState state=getSessionStateById(obj.getId());
             state.setDraft(true);
             state.setLockerUser_id(user_id);
             System.out.println("obj created and locked for"+user_id);
@@ -171,6 +172,38 @@ public class SocketSessionService {
               
                    
             return obj;
+            //the object has no parent, therefore the container is the diagram itself
+        }else if(cont_id.equals("root")){
+            //most akkor a Diagramra bízzam a beinjektálást vagy csinááljam meg itt?
+           
+            if(obj instanceof AutoSessionInjectable_I){
+                AutoSessionInjectable_I casted=(AutoSessionInjectable_I)obj;
+              //  casted.injectIdWithPrefix(rand_id);
+                casted.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);
+               
+                
+            this.lockObjectById(obj.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+            SessionState state=getSessionStateById(obj.getId());
+            state.setDraft(true);
+           
+            
+            System.out.println("obj created and locked for"+user_id);
+              getSessionStateById(obj.getId()).setExtra(new HashMap<>());
+              getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+user_id);
+              if(obj instanceof DiagramObject){
+                DiagramObject dgo=(DiagramObject)obj;
+                    if(dgo instanceof SimpleClass){
+                        SimpleClass cls=(SimpleClass)dgo;
+                      this.lockObjectById(cls.getTitleModel().getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+
+                    }
+
+
+                this.dg.getDgObjects().add(dgo);
+              }       
+                return obj;
+            }
+            return null;
         }
       return null;
     }
@@ -192,24 +225,15 @@ public class SocketSessionService {
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 dg = objectMapper.readValue(targetFile, Diagram.class);
                 for (DiagramObject d : dg.getDgObjects()) { 
-                      sessionItemMap.put(d.getId(),Pair.of(new SessionState(),d));
+                    //  sessionItemMap.put(d.getId(),Pair.of(new SessionState(),d));
                     if(d instanceof NoteBox){
                         NoteBox n=(NoteBox)d;
-                       // sessionItemMap.put(n.getId(),Pair.of(new SessionState(),n));
+                        n.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
                     }
                     if (d instanceof SimpleClass) {
                         SimpleClass c = (SimpleClass) d;
-                        // sessionItemMap.put(c.getId(),Pair.of(new SessionState(),c));
-                         System.out.println("putted on map:"+c.getId());
-                        sessionItemMap.put(c.getTitleModel().getId(), Pair.of(new SessionState(),c.getTitleModel()));
-                        for (SimpleClassElementGroup g : c.getGroups()) {
-                            sessionContainerMap.put(g.getId(), Pair.of(new SessionState(), g));
-                            for (Element_c e : g.getAttributes()) {
-                                sessionItemMap.put(e.getId(), Pair.of(new SessionState(),e));
-                            }
-                        }
+                        c.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
                     }
-
                 }
             } catch (IOException ex) {
 
@@ -273,7 +297,7 @@ public class SocketSessionService {
                DynamicSerialObject obj=getItemById(target_id);
                if(obj!=null){
                    sessionItemMap.remove(target_id);
-                   return cont.getContainer().remove(obj);
+                   return cont.container().remove(obj);
                }
             }else{
                 if(parent_id.equals("root")){//global object
@@ -283,16 +307,16 @@ public class SocketSessionService {
                         System.out.println("this is a SimpleClass delete");
                         SimpleClass casted=(SimpleClass)item;
                         for(SimpleClassElementGroup g: casted.getGroups()){
-                             this.sessionItemMap.remove(g.getId());
+                         g.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
                                for(AttributeElement e:g.getAttributes()){
-                                   this.sessionItemMap.remove(e.getId());
+                                 e.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
                                }
                         }
                         this.sessionItemMap.remove(casted.getTitleModel().getId());
                     }
                     
                  
-                         sessionItemMap.remove(target_id);
+                         item.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
                     DiagramObject ob=new DiagramObject();
                     ob.setId(target_id);
                    
@@ -306,7 +330,7 @@ public class SocketSessionService {
 
     private String getItemParentId(String target_id){
         for(Entry<String, Pair<SessionState, DynamicSerialContainer_I>> e:this.sessionContainerMap.entrySet()){
-            for(Object item:e.getValue().getSecond().getContainer()){
+            for(Object item:e.getValue().getSecond().container()){
                 if(item instanceof DynamicSerialObject){
                    DynamicSerialObject casted=(DynamicSerialObject)item;
                    if(casted.getId().equals(target_id)){
@@ -360,6 +384,9 @@ public class SocketSessionService {
                if(this.isItemLockedByMe(obj.getId(), user_id)){
                    System.out.println("object updated");
                    this.getItemById(obj.getId()).update(obj); 
+                /*   if(obj.getExtra().containsKey("draft")){
+                       obj.getExtra().replace("draft", "false");
+                   }*/
                    return this.sessionItemMap.get(obj.getId());
                 }
           }

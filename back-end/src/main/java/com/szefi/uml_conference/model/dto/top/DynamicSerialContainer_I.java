@@ -14,5 +14,5 @@ import java.util.List;
  */
 
 public interface DynamicSerialContainer_I<T extends DynamicSerialObject> {
-    List<T> getContainer();
+    List<T> container();
 }

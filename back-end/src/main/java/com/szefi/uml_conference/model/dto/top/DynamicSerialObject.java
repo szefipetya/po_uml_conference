@@ -14,6 +14,8 @@ import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
 
 import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
 import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -31,10 +33,21 @@ import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
         
       
 })
-public abstract class DynamicSerialObject {
-    private String _type;
+public abstract class DynamicSerialObject implements AutoSessionInjectable_I {
+    private String _type="";
     private String id;
+    private Map<String,String>extra;
 
+    public Map<String, String> getExtra() {
+        if(extra==null){
+            this.extra=new HashMap<>();
+        }
+        return extra;
+    }
+
+    public void setExtra(Map<String, String> extra) {
+        this.extra = extra;
+    }
     public String getType() {
         return _type;
     }

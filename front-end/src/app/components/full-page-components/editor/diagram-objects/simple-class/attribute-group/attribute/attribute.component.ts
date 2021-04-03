@@ -41,6 +41,9 @@ export class AttributeComponent
     AfterContentInit,
     SessionInteractiveItem,
     LogInteractive_I {
+  getParentId(): string {
+    return this.getParentContainer().getId();
+  }
   disableEdit(): void {
     //  throw new Error('Method not implemented.');
   }
@@ -142,6 +145,9 @@ export class AttributeComponent
 
   ngOnInit(): void {
     this.model.viewModel = this;
+    if (this.isTitle) {
+      this.getParentClass().model.titleModel.viewModel = this;
+    }
     this.init_register();
   }
 

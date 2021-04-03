@@ -6,12 +6,16 @@ import {
   AfterContentInit,
   TemplateRef,
 } from '@angular/core';
+import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';
 import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
+import { Element_c } from 'src/app/components/models/DiagramObjects/Element_c';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
+import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
 import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
 import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
 import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
 import { EditorAction } from 'src/app/components/models/socket/EditorAction';
+import { SessionInteractiveContainer } from 'src/app/components/models/socket/interface/SessionInteractiveContainer';
 import { soft_copy } from 'src/app/components/utils/utils';
 import { CommonService } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
@@ -25,35 +29,30 @@ import { DiagramObjectComponent } from '../diagram-object/diagram-object.compone
 })
 export class SimpleClassComponent
   extends DiagramObjectComponent
-  implements OnInit, OnChanges, AfterContentInit {
-  /*  onMouseDown(e) {
-    this.editBegin();
-    this.dragged = true;
-    console.log('mousedown');
+  implements OnInit, OnChanges, AfterContentInit, SessionInteractiveContainer {
+  updateItemWithOld(old_id: string, model: any) {
+    throw new Error('Method not implemented.');
   }
-  onMouseUp(e) {
-    this.sendDimensionUpdate();
-    this.dragged = false;
-    //    console.log('update classssss');
-  }
-  sendDimensionUpdate() {
-    console.log('update classdimmm');
-    let action = new EditorAction(this.model.id, this.model._type, '');
-    action.action = ACTION_TYPE.DIMENSION_UPDATE;
-    let copy = {};
-    soft_copy(this.model, copy, [
-      'viewModel',
-      'groups',
-      'titleModel',
-      'scaledModel',
-    ]);
-    console.log(copy);
-    action.json = JSON.stringify(copy);
-    console.log('edit ended', action.json);
-    this.sendAction(action);
-  }
-  dragged = false;
   updateModel(model: any, action_id: string, msg?: string): void {
+    //let vm = this.model.viewModel;
+    //  let tvm = this.model.titleModel.viewModel;
+    /*  let gvms = [];
+    this.model.groups.map((g) => {
+      gvms.push(g.viewModel);
+    });*/
+    console.log('CLASS SIDE CUCC FUTOTT LE');
+    //  soft_copy(model, this.model, ['edit', 'viewModel', 'scaledModel']);
+
+    this.model.id = model.id;
+    /* this.model.groups.map((g, i) => {
+      this.model.groups[i].viewModel = gvms[i];
+    });*/
+
+    // this.model.titleModel.viewModel = tvm;
+    //   this.model.viewModel = vm;
+    //{
+    //if (this.sessionState.lockerUser_id != this.socket.user.id) {
+
     this.model.dimensionModel = model.dimensionModel;
     this.model.scaledModel.posy_scaled =
       this.model.dimensionModel.y * this.editorService.clientModel.canvas.scale;
@@ -65,70 +64,48 @@ export class SimpleClassComponent
       this.editorService.clientModel.canvas.scale;
     this.model.scaledModel.posx_scaled =
       this.model.dimensionModel.x * this.editorService.clientModel.canvas.scale;
+    // }
   }
-  constructor(
-    protected socket: EditorSocketControllerService,
-    protected commonService: CommonService,
-    protected editorService: GlobalEditorService
-  ) {
-    super(socket, commonService, editorService);
-  }
-  saveEvent(wastrue: any): void {}
-  updateScales(scale: any): void {
-    if (this.model.titleModel.edit) {
-      this.model.titleModel.viewModel.render();
+  createItem(model: DynamicSerialObject, extra?: any) {
+    console.log('creating:', model);
+    if (model._type == 'SimpleClassElementGroup') {
+      if (!this.hasItem(model.id))
+        this.model.groups.push(model as SimpleClassElementGroup);
     }
-    this.model.groups.map((group) => {
-      group.attributes.map((e2) => {
-        if (e2.edit) {
-          e2.viewModel.inputWidth *= scale;
-          e2.viewModel.render();
-        }
-      });
-    });
-  }
-  onSelect() {}
-  editBegin() {
-    if (!this.isAccessible()) return;
-    let action = new EditorAction(this.model.id, this.model._type, '');
+    let vm = this.model.viewModel;
 
-    action.action = ACTION_TYPE.SELECT;
-    action.json = '{}';
-    action.target.target_id = this.model.id;
-    this.sendAction(action);
-    console.log('action sent');
+    if (model._type == 'Element_c') {
+      this.getTitleVm().updateModel(model, '', '');
+      console.log(this.model.titleModel);
+      //title model
+    }
+  }
+  getTitleVm() {
+    return this.socket.getItem(this.model.titleModel.id);
+  }
+  hasItem(target_id: string) {
+    return this.model.groups.filter((g) => g.id == target_id).length > 0;
+  }
+  restoreItem(item_id: string, model: DynamicSerialObject) {
+    throw new Error('Method not implemented.');
+  }
+  deleteItem(item_id: string) {
+    throw new Error('Method not implemented.');
+  }
+  msgPopup(msg: string) {
+    throw new Error('Method not implemented.');
+  }
+  getParentId(): string {
+    return 'root';
   }
 
-  editEnd() {
-    let action = new EditorAction(this.model.id, this.model._type, '');
-    action.action = ACTION_TYPE.UPDATE;
-    let copy = {};
-    soft_copy(this.model, copy, [
-      'viewModel',
-      'groups',
-      'titleModel',
-      'scaledModel',
-    ]);
-    console.log(copy);
-    action.json = JSON.stringify(copy);
-    console.log('edit ended', action.json);
-    this.sendAction(action);
-  }
-  isLocked(): string {
-    if (this.sessionState == undefined) return 'null';
-    if (this.sessionState.lockerUser_id == this.socket.user.id)
-      return 'editing';
-    if (this.sessionState.locks.length > 0)
-      return 'locked:' + this.sessionState.lockerUser_id;
-    else return '';
-  } */
   update(): void {
     this.model.groups.map((group) => {
       group.attributes.map((a) => {
-        a.viewModel.render();
+        a.viewModel?.render();
       });
     });
-    this.model.titleModel.viewModel.render();
+    (this.getTitleVm() as InteractiveItemBase).render();
   }
 
   disableEdit() {
@@ -144,7 +121,7 @@ export class SimpleClassComponent
       }
     let prev = this.model.titleModel.edit;
     //   this.model.titleModel.edit = false;
-    this.model.titleModel.viewModel.save(prev);
+    (this.getTitleVm() as InteractiveItemBase).saveEvent(prev);
 
     this.model.groups.map((egroup) => {
       egroup.attributes.map((e) => {
@@ -165,10 +142,16 @@ export class SimpleClassComponent
   ngAfterContentInit(): void {
     this.model.viewModel = this;
   }
+  //we need custom Init, because its a container
   ngOnInit(): void {
     this.model._type = 'SimpleClass';
     this.model.viewModel = this;
-    super.ngOnInit();
+    this.socket.registerContainer(this.model.id, this);
+    this.socket.register(this.model.id, this);
+    this.socket.popInjectionQueue(this.model.id);
+    //  this.log('init', MSG_TYPE.ERROR);
+    this.render();
+    //super.ngOnInit();
   }
   ngOnChanges(): void {
     console.log('changed');
@@ -178,11 +161,12 @@ export class SimpleClassComponent
     this.editorService.deleteGlobalObject(this.model);
     this.model.groups.map((g) => {
       g.attributes.map((e) => {
-        e.viewModel.deleteAsync(g.id);
+        this.socket.unregister(e.viewModel);
       });
-      g.viewModel.socket.unregisterContainer(g.viewModel);
+      this.socket.unregisterContainer(g.viewModel);
     });
-    this.model.titleModel.viewModel.deleteAsync(this.model.id);
+    this.socket.unregister(this.getTitleVm() as InteractiveItemBase);
     this.socket.unregister(this);
+    this.socket.unregisterContainer(this);
   }
 }

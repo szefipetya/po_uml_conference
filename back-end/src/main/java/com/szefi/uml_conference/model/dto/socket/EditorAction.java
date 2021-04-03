@@ -31,6 +31,12 @@ Map<String,String> extra;
 
     public EditorAction() {
         this.extra=new HashMap<>();
+        this.target=new ActionTarget();
+    }
+       public EditorAction(ACTION_TYPE type) {
+           this.setAction(type);
+        this.extra=new HashMap<>();
+        this.target=new ActionTarget();
     }
 
   

@@ -6,9 +6,13 @@
 package com.szefi.uml_conference.model.dto.do_related;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.szefi.uml_conference.model.dto.socket.SessionState;
 import com.szefi.uml_conference.model.dto.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import org.springframework.data.util.Pair;
 
 /**
  *
@@ -47,12 +51,31 @@ private GROUP_SYNTAX group_syntax;
     }
 
     @Override
-    public List<AttributeElement> getContainer() {
+    public List<AttributeElement> container() {
         return this.getAttributes();
     }
 
     @Override
     public void update(DynamicSerialObject obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+
+
+   @Override
+    public void injectSelfToStateMap(Map<String, Pair<SessionState, DynamicSerialObject>> sessionItemMap, Map<String, Pair<SessionState, DynamicSerialContainer_I>> sessionContainerMap) {
+            this.injectIdWithPrefix("c"+UUID.randomUUID());
+            sessionContainerMap.put(getId(), Pair.of(new SessionState(),this));
+
+    }
+
+    @Override
+    public void injectIdWithPrefix(String newid) {
+        this.setId("g"+newid);
+    }
+
+    @Override
+    public void deleteSelfFromStateMap(Map<String, Pair<SessionState, DynamicSerialObject>> sessionItemMap, Map<String, Pair<SessionState, DynamicSerialContainer_I>> sessionContainerMap) {
+        sessionContainerMap.remove(getId());
     }
 }

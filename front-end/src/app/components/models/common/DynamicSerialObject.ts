@@ -3,4 +3,5 @@ export class DynamicSerialObject {
   id: string;
   viewModel: any;
   edit: boolean;
+  extra: any;
 }

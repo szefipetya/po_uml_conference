@@ -10,18 +10,34 @@ import {
 } from '../../../full-page-components/editor/services/common/common.service';
 import { ACTION_TYPE } from '../ACTION_TYPE';
 import { DynamicSerialObject } from '../../common/DynamicSerialObject';
-import { TARGET_TYPE } from '../response/TARGET_TYPE';
-export abstract class InteractiveItemBase implements SessionInteractiveItem {
+import { SessionInteractiveContainer } from '../interface/SessionInteractiveContainer';
+export abstract class InterActiveContainerBase
+  implements SessionInteractiveContainer {
   model: DynamicSerialObject;
   //session requirements
   callback_queue: CallbackItem[] = [];
-  protected sessionState: SessionState;
+  sessionState: SessionState;
   queuedActionsAfterLockReceived: EditorAction[] = [];
 
   constructor(
     protected socket: EditorSocketControllerService,
     protected commonService: CommonService
   ) {}
+  createItem(model: DynamicSerialObject, extra?: any) {
+    throw new Error('Method not implemented.');
+  }
+  hasItem(target_id: string) {
+    throw new Error('Method not implemented.');
+  }
+  restoreItem(item_id: string, model: DynamicSerialObject) {
+    throw new Error('Method not implemented.');
+  }
+  deleteItem(item_id: string) {
+    throw new Error('Method not implemented.');
+  }
+  msgPopup(msg: string) {
+    throw new Error('Method not implemented.');
+  }
   getId() {
     return this.model.id;
   }
@@ -89,9 +105,10 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     this.callback_queue.push(new CallbackItem(action.id));
     this.socket.send(action);
   }
-  init_register(type?: TARGET_TYPE) {
+  init_register() {
     if (this.model?.extra?.temp_id) {
-    } else this.socket.register(this.model.id, this);
+    }
+    this.socket.register(this.model.id, this);
     this.socket.popInjectionQueue(this.model.id);
     //  this.log('init', MSG_TYPE.ERROR);
     this.render();

@@ -3,12 +3,10 @@ import { SessionInteractiveContainer } from 'src/app/components/models/socket/in
 import { SessionInteractiveItem } from 'src/app/components/models/socket/interface/SessionInteractiveItem';
 import { SessionStateResponse } from 'src/app/components/models/socket/response/SessionStateResponse';
 import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TYPE';
-import {
-  EditorSocketControllerService,
-  Pair,
-} from '../editor-socket-controller.service';
+import { EditorSocketControllerService } from '../editor-socket-controller.service';
 import { TOKEN_TYPE } from '../InjectionToken_c';
 import { SocketWrapper } from './SocketWrapper_I';
+import { Pair } from '../../../Utils/utils';
 
 export class SessionSocket implements SocketWrapper {
   [x: string]: any;
@@ -59,15 +57,13 @@ export class SessionSocket implements SocketWrapper {
   oninitmessage(e: any) {
     let responses: SessionStateResponse[] = JSON.parse(e.data);
     console.log(responses);
-    responses.forEach((r) => {
+    responses.map((r) => {
       console.log(r);
-      this.parent.service.itemViewModelMap
-        .find((v) => v.key == r.target_id)
-        .value.updateState(r.sessionState);
-      console.log(
-        this.parent.service.itemViewModelMap.find((v) => v.key == r.target_id)
-          .value.sessionState
+      let it = this.parent.service.itemViewModelMap.find(
+        (v) => v.key == r.target_id
       );
+      if (it) it.value.updateState(r.sessionState);
+      else console.error('No view for SessionState:', r);
     });
     this.parent.socket.onmessage = this.parent.onmessage;
     console.log(this);

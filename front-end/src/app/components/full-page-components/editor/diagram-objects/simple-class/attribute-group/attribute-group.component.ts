@@ -19,6 +19,8 @@ import { EditorAction } from 'src/app/components/models/socket/EditorAction';
 import { Action } from 'rxjs/internal/scheduler/Action';
 import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
 import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
+import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
+import { CommonService } from '../../../services/common/common.service';
 
 @Component({
   selector: 'app-attribute-group',
@@ -26,13 +28,50 @@ import { CallbackItem } from 'src/app/components/models/socket/interface/Callbac
   styleUrls: ['./attribute-group.component.scss'],
 })
 export class AttributeGroupComponent
+  extends InteractiveItemBase
   implements OnInit, AfterContentInit, SessionInteractiveContainer {
-  @Input() private model: SimpleClassElementGroup;
+  public editBegin(): void {
+    //throw new Error('Method not implemented.');
+  }
+  public editEnd(): void {
+    //  throw new Error('Method not implemented.');
+  }
+  updateModel(model: any, action_id: string, msg?: string): void {
+    soft_copy(model, this.model, ['viewModel', 'edit']);
+  }
+  getParentId(): string {
+    return this.parent.getId();
+  }
+  deleteSelfFromParent(): void {
+    // throw new Error('Method not implemented.');
+  }
+  saveEvent(wastrue: any): void {
+    //throw new Error('Method not implemented.');
+  }
+  disableEdit(): void {
+    // throw new Error('Method not implemented.');
+  }
+  @Input() model: SimpleClassElementGroup;
   inputDOM: any;
   @Input() parent: SimpleClassComponent;
 
-  constructor(public socket: EditorSocketControllerService) {
+  constructor(
+    protected socket: EditorSocketControllerService,
+    protected commonService: CommonService
+  ) {
+    super(socket, commonService);
     // this.model._type = 'SimpleClassElementGroup';
+  }
+  updateItemWithOld(old_id: string, model: any) {
+    this.model.attributes.map((i) => {
+      if (i.id == old_id) {
+        soft_copy(i, model, ['viewModel', 'edit']);
+        i.id = model.id;
+        console.log('old item found, id injected.');
+        console.log(i);
+        return;
+      }
+    });
   }
   public getModel() {
     return this.model;
@@ -43,22 +82,10 @@ export class AttributeGroupComponent
   public getId(): string {
     return this.model.id;
   }
-  callback_queue: CallbackItem[] = [];
-  updateItemWithOld(model, extra) {
-    this.model.attributes.map((i) => {
-      if (i.id == extra.old_id) {
-        soft_copy(i, model, ['viewModel', 'edit']);
-        i.id = model.id;
-        i.extra = extra;
-        console.log('old item found, id injected.');
-        console.log(i);
-        return;
-      }
-    });
-  }
+  // callback_queue: CallbackItem[] = [];
+
   sessionState: SessionState;
 
-  updateState(state: SessionState, action_id: string): void {}
   createItem(model: any, extra?: any) {
     model.edit = false;
     model.extra = extra;
@@ -77,15 +104,11 @@ export class AttributeGroupComponent
   ngOnInit(): void {
     this.model.viewModel = this;
     this.socket.registerContainer(this.model.id, this);
+    this.socket.popInjectionQueue(this.model.id);
   }
   delete(id) {
     console.dir('before: this.state.elements', this.model.attributes);
-    /*  this.setState({
-             elements: this.state.elements.filter(function (el) {
-                 return el.id !== id || el.name.length > 0
-             })
-         });
-  */
+
     this.model.attributes = this.model.attributes.filter(function (el) {
       return el.id !== id || el.name.length > 0;
     });
@@ -135,7 +158,7 @@ export class AttributeGroupComponent
     let newAttr = {
       doc: '',
       index: this.getHghestIndex() + 1,
-      extra: null,
+      extra: { old_id: id, create_method: 'individual' },
       edit: true,
       id: id,
       visibility: visibility,
@@ -147,11 +170,11 @@ export class AttributeGroupComponent
     this.model.attributes.push(newAttr);
 
     let action: EditorAction = new EditorAction(
-      this.model.id,
-      this.model._type,
-      this.parent.model.id
+      id,
+      newAttr._type,
+      this.model.id
     );
-    action.extra = { old_id: id };
+    action.extra = { old_id: id, create_method: 'individual' };
     action.action = ACTION_TYPE.CREATE;
     action.json = JSON.stringify(newAttr);
 

@@ -10,6 +10,8 @@ import com.szefi.uml_conference.model.dto.do_related.DiagramObject;
 import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
 import com.szefi.uml_conference.model.dto.do_related.line.Line;
 import com.szefi.uml_conference.model.dto.management.User;
+import com.szefi.uml_conference.model.dto.top.DynamicSerialContainer_I;
+import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
 import java.io.Serializable;
 import java.util.List;
 
@@ -48,4 +50,7 @@ private List<Line> lines;
     public void setLines(List<Line> lines) {
         this.lines = lines;
     }
+
+  
+    
 }

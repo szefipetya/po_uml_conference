@@ -82,4 +82,13 @@ function clone1(obj, param1) {
 
 console.log(`Width:  ${getWindowWidth()}`);
 console.log(`Height: ${getWindowHeight()}`);
+
+export class Pair<K, V> {
+  key: K;
+  value: V;
+  constructor(key: K, value: V) {
+    this.key = key;
+    this.value = value;
+  }
+}
 export { round, unFocus, clamp, getRelativeCoordinates, clone, clone1 };

@@ -1,9 +1,6 @@
 import { SessionSocket } from './SessionSocket';
 import { SocketWrapper } from './SocketWrapper_I';
-import {
-  EditorSocketControllerService,
-  Pair,
-} from '../editor-socket-controller.service';
+import { EditorSocketControllerService } from '../editor-socket-controller.service';
 import { EditorAction } from 'src/app/components/models/socket/EditorAction';
 import { EditorActionResponse } from 'src/app/components/models/socket/response/EditorActionResponse';
 import { SessionInteractiveItem } from 'src/app/components/models/socket/interface/SessionInteractiveItem';
@@ -14,6 +11,7 @@ import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TY
 import { TOKEN_TYPE } from '../InjectionToken_c';
 import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';
 import { GlobalEditorService } from '../../global-editor/global-editor.service';
+import { Pair } from '../../../Utils/utils';
 
 export class ActionSocket implements SocketWrapper {
   [x: string]: any;
@@ -109,7 +107,8 @@ export class ActionSocket implements SocketWrapper {
           break;
         case ACTION_TYPE.CREATE:
           console.log('CREATE UZENET');
-          sc = this.parent.getContainer(resp.target_id);
+          sc = this.parent.getContainer(resp.action.target.parent_id);
+          console.log(resp.action.target);
           console.log(sc);
           console.log(resp.target_user_id);
           console.log(this.parent.service.user.id);
@@ -118,6 +117,18 @@ export class ActionSocket implements SocketWrapper {
             load.edit = true;
             //we need to replace the old id with the new one
             console.log('owner megtalálva');
+            if (resp.target_type == 'CONTAINER') {
+              this.parent.service.containerViewModelMap.map((i) => {
+                if (i.key == resp.action.extra['old_id']) {
+                  i.key = load.id;
+                  i.value.updateModel(load, resp.action.id);
+                  i.value.updateState(
+                    JSON.parse(resp.action.extra.sessionState)
+                  );
+                  console.log('id kicserélve', resp.action.extra);
+                }
+              });
+            }
             this.parent.service.itemViewModelMap.map((i) => {
               if (i.key == resp.action.extra['old_id']) {
                 i.key = load.id;
@@ -127,7 +138,7 @@ export class ActionSocket implements SocketWrapper {
               }
             });
 
-            sc.updateItemWithOld(load, resp.action.extra);
+            // sc.updateItemWithOld(resp.action.extra.old_id, load);
           } else {
             load.edit = false;
             //we are not the owner
@@ -136,7 +147,7 @@ export class ActionSocket implements SocketWrapper {
               this.parent.addToInjectionQueue(
                 load.id,
                 TOKEN_TYPE.SESSION_STATE,
-                TARGET_TYPE.ITEM,
+                resp.target_type,
                 { sessionState: JSON.parse(resp.action.extra.sessionState) }
               );
             sc.createItem(load, resp.action.extra);

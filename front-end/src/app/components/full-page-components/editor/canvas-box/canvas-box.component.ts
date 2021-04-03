@@ -8,16 +8,24 @@ import { DiagramObjectComponent } from '../diagram-objects/diagram-object/diagra
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
 import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
-import { uniqId } from 'src/app/components/utils/utils';
+import { soft_copy, uniqId } from 'src/app/components/utils/utils';
 import { renderFlagCheckIfStmt } from '@angular/compiler/src/render3/view/template';
 import { SimpleClassComponent } from '../diagram-objects/simple-class/simple-class.component';
+import { EditorSocketControllerService } from '../services/editor-socket-controller/editor-socket-controller.service';
+import { EditorAction } from 'src/app/components/models/socket/EditorAction';
+import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
+import { SessionInteractiveContainer } from 'src/app/components/models/socket/interface/SessionInteractiveContainer';
+import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';
+import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
+import { SessionState } from 'src/app/components/models/socket/SessionState';
+import { MSG_TYPE } from '../services/common/common.service';
 
 @Component({
   selector: 'app-canvas-box',
   templateUrl: './canvas-box.component.html',
   styleUrls: ['./canvas-box.component.scss'],
 })
-export class CanvasBoxComponent implements OnInit {
+export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   borderString_scale: string;
   targetResizeHoverXR: boolean;
   targetResizeHoverXL: boolean;
@@ -319,11 +327,37 @@ export class CanvasBoxComponent implements OnInit {
       /*  this.setState({ canvas }) */
     }
   };
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.socket.registerContainer(this.getId(), this);
+  }
   editorService: GlobalEditorService;
-  constructor(editorService: GlobalEditorService) {
+  constructor(
+    editorService: GlobalEditorService,
+    private socket: EditorSocketControllerService
+  ) {
     this.editorService = editorService;
   }
+  editBegin() {
+    throw new Error('Method not implemented.');
+  }
+  editEnd() {
+    throw new Error('Method not implemented.');
+  }
+  updateModel(model: any, action_id: string, msg?: string) {
+    throw new Error('Method not implemented.');
+  }
+  restoreModel(model: any, action_id: string, msg?: string) {
+    throw new Error('Method not implemented.');
+  }
+  deleteSelfFromParent() {
+    throw new Error('Method not implemented.');
+  }
+  log(msg: string, type: MSG_TYPE) {
+    throw new Error('Method not implemented.');
+  }
+  sessionState: SessionState;
+  callback_queue: CallbackItem[];
+
   onMouseMove = (e) => {
     //console.dir(e);
     // e.persist();
@@ -571,22 +605,21 @@ export class CanvasBoxComponent implements OnInit {
       const rect = ebox.getBoundingClientRect();
       const x = e.clientX - rect.left; // x position within the element.
       const y = e.clientY - rect.top;
-
-      this.findClassById(this.drawedClassId).scaledModel.width_scaled =
-        x - this.drawedClassX;
-      this.findClassById(this.drawedClassId).dimensionModel.width =
-        this.findClassById(this.drawedClassId).scaledModel.width_scaled /
-        this.editorService.clientModel.canvas.scale;
-      this.findClassById(this.drawedClassId).scaledModel.height_scaled =
-        y - this.drawedClassY;
-      this.findClassById(this.drawedClassId).dimensionModel.height =
-        this.findClassById(this.drawedClassId).scaledModel.height_scaled /
-        this.editorService.clientModel.canvas.scale;
-      unFocus();
-      this.updateCanvas();
+      if (this.drawedClass) {
+        this.drawedClass.scaledModel.width_scaled = x - this.drawedClassX;
+        this.drawedClass.dimensionModel.width =
+          this.drawedClass.scaledModel.width_scaled /
+          this.editorService.clientModel.canvas.scale;
+        this.drawedClass.scaledModel.height_scaled = y - this.drawedClassY;
+        this.drawedClass.dimensionModel.height =
+          this.drawedClass.scaledModel.height_scaled /
+          this.editorService.clientModel.canvas.scale;
+        unFocus();
+        this.updateCanvas();
+      }
     }
   };
-
+  drawedClass: DiagramObject;
   findClassDOMbyId(id): any {
     let dom = document.querySelector('.edit-box').querySelector('#' + id);
     //console.log(dom);
@@ -603,9 +636,8 @@ export class CanvasBoxComponent implements OnInit {
       this.lineCanvasComponent.drawEnd(e);
     }
     if (this.editorService.clientModel.canvas.drawMode != 'cursor') {
-      const drawedclass = this.findClassDOMbyId(this.drawedClassId);
       this.drawedClassPositionSpecified = false;
-      this.drawedClassId = undefined;
+      // this.drawedClass = undefined;
     }
     if (this.targetClass != null) {
       this.targetClass.viewModel.onMouseUp(e);
@@ -739,6 +771,8 @@ export class CanvasBoxComponent implements OnInit {
     this.drawedClassY = y;
     this.drawedClassId = `c${this.getNewClassId()}`;
     let newclass: SimpleClass;
+    let g1_id = 'g' + uniqId() + '1104234';
+    let g2_id = 'g' + uniqId();
     newclass = {
       doc: '',
       _type: 'SimpleClass',
@@ -749,6 +783,7 @@ export class CanvasBoxComponent implements OnInit {
         x: this.drawedClassX,
         y: this.drawedClassY,
       },
+      extra: { old_id: this.drawedClassId, draft: true },
       min_height: 75,
       viewModel: null,
       scaledModel: {
@@ -760,38 +795,75 @@ export class CanvasBoxComponent implements OnInit {
       },
       z: this.getHighestClassZIndex(),
       edit: false,
-      name: '',
+      name: 'Class',
       groups: [
         {
-          id: 'g' + uniqId + '1',
+          id: g1_id,
           group_name: 'attributes',
           group_syntax: GROUP_SYNTAX.ATTRIBUTE,
           attributes: [],
           _type: 'SimpleClassElementGroup',
           viewModel: null,
           edit: false,
+          extra: { old_id: g1_id },
         },
         {
-          id: 'g' + uniqId,
+          id: g2_id,
           group_name: 'functions',
           group_syntax: GROUP_SYNTAX.FUNCTION,
           attributes: [],
           _type: 'SimpleClassElementGroup',
           viewModel: null,
           edit: false,
+          extra: { old_id: g2_id },
         },
       ],
       titleModel: {
-        extra: null,
-        _type: 'AttributeElement',
+        extra: { old_id: this.drawedClassId + '-t', draft: true },
+        _type: 'Element_c',
         edit: true,
         id: this.drawedClassId + '-t',
         name: 'Class',
         viewModel: null,
       },
     };
-    this.editorService.model.dgObjects.push(newclass);
+    this.editorService.createGlobalObject(newclass);
+    //amikor létrejönnek a nézetek, akkor maguk küldenek külön kérést az id injekcióhoz.
+    this.sendDiagramObjectCreateMessage(newclass);
     this.targetClass = newclass;
+    this.drawedClass = newclass;
     this.drawedClassPositionSpecified = true;
+  }
+
+  sendDiagramObjectCreateMessage(obj: DiagramObject) {
+    let action: EditorAction = new EditorAction(obj.id, obj._type, 'root');
+    action.extra = { old_id: obj.id, create_method: 'nested' };
+    action.action = ACTION_TYPE.CREATE;
+    action.json = JSON.stringify(obj);
+    this.socket.send(action);
+  }
+
+  updateState(state: SessionState, action_id: string): void {}
+  updateItemWithOld(old_id: string, model: any) {}
+  createItem(model: DynamicSerialObject, extra?: any) {
+    //  if(extra.global_type=='DiagramObject')
+    //if(extra.global_type=='Line')
+    if (!this.editorService.hasGlobalObjectById(model.id))
+      this.editorService.createGlobalObject(model as DiagramObject);
+  }
+  hasItem(target_id: string) {
+    return this.editorService.hasGlobalObjectById(target_id);
+  }
+  restoreItem(item_id: string, model: DynamicSerialObject) {
+    throw new Error('Method not implemented.');
+  }
+  deleteItem(item_id: string) {
+    throw new Error('Method not implemented.');
+  }
+  msgPopup(msg: string) {
+    throw new Error('Method not implemented.');
+  }
+  getId(): string {
+    return 'root';
   }
 }

@@ -17,6 +17,7 @@ import { ClientModel } from 'src/app/components/models/Diagram/ClientModel';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { User } from 'src/app/components/models/User';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
+import { Pair } from '../../Utils/utils';
 @Injectable({
   providedIn: 'root',
 })
@@ -27,14 +28,17 @@ export class GlobalEditorService {
     );
   }
   hasGlobalObject(model: DiagramObject): boolean {
-    return this.model.dgObjects.find((o) => o.id == model.id) != null;
+    return this.model.dgObjects.find((o) => o.id == model?.id) != null;
+  }
+  hasGlobalObjectById(id: string): boolean {
+    return this.model.dgObjects.find((o) => o.id == id) != null;
   }
   createGlobalObject(model: DiagramObject) {
     this.model.dgObjects.push(model);
   }
   model: Diagram;
   alignment;
-  //url_pre = 'http://84.2.193.197:8101/';
+  // url_pre = 'http://84.2.193.197:8101/';
   url_pre = 'http://localhost:8101/';
   url_pre_test = 'https://jsonplaceholder.typicode.com/posts';
   url_get_diagram = 'get/dg';
@@ -122,6 +126,9 @@ export class GlobalEditorService {
       dg.scaledModel.height_scaled = dg.dimensionModel.height;
     });
     console.log(JSON.stringify(this.model));
+    this.afterDgFetchFunctions.map((p) => {
+      p.value(p.key.value);
+    });
   }
   getDiagramFromServer(id: string): Promise<Diagram> {
     return this.http
@@ -141,170 +148,13 @@ export class GlobalEditorService {
       return of(result as T);
     };
   }
+  //-----------------------------//target,alias,callback
+  afterDgFetchFunctions: Pair<Pair<string, any>, Function>[] = [];
+  addListenerAfterDgFetch(target, fn, alias: string = '') {
+    this.afterDgFetchFunctions.push(new Pair(new Pair(alias, target), fn));
+  }
 
   init(): Diagram {
-    return null;
-    /*let model = {
-      owner: {
-        id: '001',
-        username: 'test',
-        email: 'example@hu.hu',
-        name: 'test',
-      },
-
-      lines: [],
-
-      dgObjects: [],
-    };
-    let c1: SimpleClass = new SimpleClass();
-    c1 = {
-
-      _type: 'SimpleClass',
-      id: 'c1',
-      posx: 110,
-      posy: 220,
-      width: 110,
-      height: 250,
-      min_height: 75,
-      viewModel: null,
-      scaledModel: {
-        posx_scaled: 110,
-        posy_scaled: 220,
-        width_scaled: 110,
-        height_scaled: 250,
-        min_height_scaled: 75,
-      },
-      z: 2,
-      edit: false,
-      name: 'Class1',
-      titleModel: {
-        id: '-1',
-        edit: false,
-        name: 'attr2',
-        viewModel: null,
-      },
-      groups: [
-        {
-          group_name: 'attributes',
-          group_syntax: GROUP_SYNTAX.ATTRIBUTE,
-          attributes: [
-            {
-              id: '1',
-              visibility: '+',
-              edit: false,
-              name: 'attr1',
-              type: 'int',
-              viewModel: null,
-            },
-            {
-              id: '2',
-              visibility: '+',
-              edit: false,
-              name: 'attr2',
-              type: 'int',
-              viewModel: null,
-            },
-          ],
-        },
-        {
-          group_name: 'functions',
-          group_syntax: GROUP_SYNTAX.FUNCTION,
-          attributes: [
-            {
-              id: '3',
-              visibility: '-',
-              edit: false,
-              name: 'func1',
-              type: 'int',
-              viewModel: null,
-            },
-            {
-              id: '4',
-              visibility: '#',
-              edit: false,
-              name: 'func2',
-              type: 'int',
-              viewModel: null,
-            },
-          ],
-        },
-      ],
-    };
-    let c2: SimpleClass = new SimpleClass();
-    c2 = {
-
-      _type: 'SimpleClass',
-      id: 'c2',
-      posx: 310,
-      posy: 420,
-      width: 110,
-      height: 250,
-      min_height: 75,
-      viewModel: null,
-      scaledModel: {
-        posx_scaled: 310,
-        posy_scaled: 420,
-        width_scaled: 110,
-        height_scaled: 250,
-        min_height_scaled: 75,
-      },
-      z: 1,
-      edit: false,
-      name: 'Person',
-      titleModel: {
-        id: '-2',
-        edit: false,
-        name: 'attr2',
-        viewModel: null,
-      },
-      groups: [
-        {
-          group_name: 'attributes',
-          group_syntax: GROUP_SYNTAX.ATTRIBUTE,
-          attributes: [
-            {
-              id: '5',
-              visibility: '+',
-              edit: false,
-              name: 'name',
-              type: 'string',
-              viewModel: null,
-            },
-            {
-              id: '6',
-              visibility: '#',
-              edit: false,
-              name: 'age',
-              type: 'intssssssssssssssssssssssssssssssssssssssssssssssss',
-              viewModel: null,
-            },
-          ],
-        },
-        {
-          group_name: 'functions',
-          group_syntax: GROUP_SYNTAX.FUNCTION,
-          attributes: [
-            {
-              id: '7',
-              visibility: '-',
-              edit: false,
-              name: 'apply()',
-              type: 'void',
-              viewModel: null,
-            },
-            {
-              id: '8',
-              visibility: '#',
-              edit: false,
-              name: 'promote()',
-              type: 'void',
-              viewModel: null,
-            },
-          ],
-        },
-      ],
-    };
-    model.dgObjects.push(c1, c2);
-    return model;*/
+    return new Diagram();
   }
 }

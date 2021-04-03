@@ -3,5 +3,4 @@ import { DynamicSerialObject } from '../common/DynamicSerialObject';
 export class Element_c extends DynamicSerialObject {
   name: string;
   viewModel: AttributeComponent;
-  extra: any;
 }
