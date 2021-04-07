@@ -151,7 +151,7 @@ public class EditorActionProcessor extends CustomProcessor {
                             sendAll(action, Q.ACTION);
                             sendAll(action, Q.STATE);
                         } else {
-                            sendRestoreMessage(action, "[lock error] Can not update dimensions (locker's id: " + this.getLockerIdIfexists(action.getTarget().getTarget_id()) + ").\n [Object RESTORED]");
+                          //  sendRestoreMessage(action, "[lock error] Can not update dimensions (locker's id: " + this.getLockerIdIfexists(action.getTarget().getTarget_id()) + ").\n [Object RESTORED]");
 
                         }
                     } catch (JsonProcessingException ex) {
@@ -198,16 +198,7 @@ public class EditorActionProcessor extends CustomProcessor {
                             
                             if (obj instanceof SimpleClass) {
                                 SimpleClass casted = (SimpleClass) obj;
-                                //title model first
-                                   EditorAction action2=new EditorAction();
-                                  action2.setAction(ACTION_TYPE.CREATE);
-                                     action2.setUser_id(action.getUser_id());
-                                   action2.getExtra().put("old_id", casted.getTitleModel().getExtra().get("old_id"));
-                                 action2.getTarget().setParent_id(casted.getId());
-                                 action2.setJson(mapper.writeValueAsString(casted.getTitleModel()));
-                                    action2.getExtra().put("sessionState",
-                                        mapper.writeValueAsString(service.getSessionStateById( casted.getTitleModel().getId())));
-                                 this.sendCustomMessage(casted.getTitleModel().getId(), action2, Q.ACTION, TARGET_TYPE.ITEM, RESPONSE_SCOPE.PUBLIC, "");
+                              
                                 //the class
                                   EditorAction action1=new EditorAction();
                                   action1.setUser_id(action.getUser_id());
@@ -221,7 +212,17 @@ public class EditorActionProcessor extends CustomProcessor {
                                  this.sendCustomMessage(casted.getId(), action1, Q.ACTION, TARGET_TYPE.CONTAINER, RESPONSE_SCOPE.PUBLIC, "");
 
                                  //title model
-                            
+                             EditorAction action2=new EditorAction();
+                                  action2.setAction(ACTION_TYPE.CREATE);
+                                     action2.setUser_id(action.getUser_id());
+                                   action2.getExtra().put("old_id", casted.getTitleModel().getExtra().get("old_id"));
+                                 
+                                 action2.getTarget().setParent_id(casted.getId());
+                                 action2.setJson(mapper.writeValueAsString(casted.getTitleModel()));
+                                    action2.getExtra().put("sessionState",
+                                        mapper.writeValueAsString(service.getSessionStateById( casted.getTitleModel().getId())));
+                                 this.sendCustomMessage(casted.getTitleModel().getId(), action2, Q.ACTION, TARGET_TYPE.ITEM, RESPONSE_SCOPE.PUBLIC, "");
+                                 
                                 for (SimpleClassElementGroup g : casted.getGroups()) {
                                     //groups
                                     EditorAction actiong=new EditorAction();
@@ -330,14 +331,14 @@ public class EditorActionProcessor extends CustomProcessor {
         }
     }
 
-    String getLockerIdIfexists(String target_id) {
+   protected String getLockerIdIfexists(String target_id) {
         if (service.getSessionStateById(target_id) != null && service.getSessionStateById(target_id).getLockerUser_id() != null) {
             return service.getSessionStateById(target_id).getLockerUser_id();
         }
         return "null";
     }
 
-    void sendAll(EditorAction action, Q queue) {
+   protected void sendAll(EditorAction action, Q queue) {
         switch (queue) {
             case STATE:
                 SessionStateResponse resp = new SessionStateResponse(
@@ -355,7 +356,7 @@ public class EditorActionProcessor extends CustomProcessor {
         }
     }
 
-    void sendBackPrivate(EditorAction action, Q queue, String msg) {
+   protected void sendBackPrivate(EditorAction action, Q queue, String msg) {
         switch (queue) {
             case STATE:
                 SessionStateResponse resp = new SessionStateResponse(
@@ -379,7 +380,7 @@ public class EditorActionProcessor extends CustomProcessor {
     /**
      * this one only sends sessions
      */
-    private void sendSimpleClassDeleteRestoreMessage(SimpleClass obj, EditorAction action, String message) {
+  protected   void sendSimpleClassDeleteRestoreMessage(SimpleClass obj, EditorAction action, String message) {
         for (SimpleClassElementGroup g : obj.getGroups()) {
             sendCustomMessage(g.getId(), action, Q.STATE, TARGET_TYPE.CONTAINER_INJECTION, RESPONSE_SCOPE.PRIVATE, message);
 
@@ -394,7 +395,7 @@ public class EditorActionProcessor extends CustomProcessor {
         System.out.println("object restoration is sent");
     }
 
-    private void sendCustomMessage(String target_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
+    protected void sendCustomMessage(String target_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
 
         switch (queue) {
             case ACTION:
@@ -421,7 +422,7 @@ public class EditorActionProcessor extends CustomProcessor {
         }
     }
 
-    private void sendCustomMessage(EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
+    protected void sendCustomMessage(EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
 
         switch (queue) {
             case ACTION:
@@ -447,11 +448,11 @@ public class EditorActionProcessor extends CustomProcessor {
         }
     }
 
-    private enum Q {
+    public enum Q {
         STATE, ACTION
     }
 
-    void sendRestoreMessage(EditorAction action, String message) throws JsonProcessingException {
+  protected  void sendRestoreMessage(EditorAction action, String message) throws JsonProcessingException {
         SessionStateResponse resp = new SessionStateResponse(
                 service.getSessionStateById(action.getTarget().getTarget_id()),
                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
@@ -473,7 +474,7 @@ public class EditorActionProcessor extends CustomProcessor {
         System.out.println("object restoration is sent");
     }
 
-    void sendDeleteRestoreMessage(EditorAction action, String message) throws JsonProcessingException {
+   protected void sendDeleteRestoreMessage(EditorAction action, String message) throws JsonProcessingException {
         SessionStateResponse resp = new SessionStateResponse(
                 service.getSessionStateById(action.getTarget().getTarget_id()),
                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());

@@ -258,6 +258,13 @@ export class AttributeComponent
   str;
   render() {
     if (this.model) {
+      if (
+        this.sessionState &&
+        this.sessionState.lockerUser_id == this.socket.user.id
+      ) {
+        this.model.edit = true;
+      }
+
       let { name, attr_type, id } = this.model;
 
       if (attr_type == '') {

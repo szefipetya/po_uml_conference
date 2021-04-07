@@ -9,7 +9,6 @@ import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramO
 import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
 import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
 import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
-import { DiagramObjectInteractiveItemBase } from 'src/app/components/models/socket/bases/DiagramObjectInteractiveBase';
 import { EditorAction } from 'src/app/components/models/socket/EditorAction';
 import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
 import { SessionInteractiveItem } from 'src/app/components/models/socket/interface/SessionInteractiveItem';
@@ -52,13 +51,13 @@ export class DiagramObjectComponent
     ]);
     console.log(copy);
     action.json = JSON.stringify(copy);
-    console.log('edit ended', action.json);
+    console.log('dimension update', action.json);
     this.sendAction(action);
   }
   dragged = false;
   updateModel(model: any, action_id: string, msg?: string): void {
     let vm = this.model.viewModel;
-    soft_copy(model, this.model, ['edit', 'viewModel', 'scaledModel']);
+    //  soft_copy(model, this.model, ['edit', 'viewModel', 'scaledModel']);
     this.model.viewModel = vm;
     this.model.dimensionModel = model.dimensionModel;
     this.model.scaledModel.posy_scaled =
@@ -100,13 +99,16 @@ export class DiagramObjectComponent
     let action = new EditorAction(this.model.id, this.model._type, '');
     action.action = ACTION_TYPE.UPDATE;
     let copy = {};
+
     soft_copy(this.model, copy, [
       'viewModel',
       'groups',
       'titleModel',
       'scaledModel',
     ]);
-    console.log('COPY', copy);
+
+    /*   console.log('MODEL', this.model);
+    console.log('COPY', copy); */
     action.json = JSON.stringify(copy);
     console.log('edit ended', action.json);
     this.sendAction(action);

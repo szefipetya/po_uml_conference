@@ -8,6 +8,7 @@ package com.szefi.uml_conference.socket.threads;
 import com.szefi.uml_conference.model.dto.socket.EditorAction;
 import com.szefi.uml_conference.model.dto.socket.Response.SessionStateResponse;
 import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.socket.threads.service.NestedEditorActionProcessor;
 import com.szefi.uml_conference.socket.threads.service.QueueManager;
 import com.szefi.uml_conference.socket.threads.service.SOCKET;
 import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
@@ -86,6 +87,8 @@ public class SocketThreadManager {
     private TaskExecutor taskExecutor2;  
        @Autowired
     private TaskExecutor taskExecutor3;  
+          @Autowired
+    private TaskExecutor taskExecutor4;  
     
     
     
@@ -132,9 +135,9 @@ public class SocketThreadManager {
     @EventListener(ApplicationReadyEvent.class)
     private void executeProcessors(){
         taskExecutor.execute(ctx.getBean(EditorActionProcessor.class));
-    //    taskExecutor.execute(ctx.getBean(ActionResponseProcessor.class));
         taskExecutor2.execute(ctx.getBean(SessionStateResponseProcessor.class));
         taskExecutor3.execute(ctx.getBean(ActionResponseProcessor.class));
+        taskExecutor4.execute(ctx.getBean(NestedEditorActionProcessor.class));
         
         
       /*  actionProcessorThread=new Thread(new EditorActionProcessor(socketService,actionQueue,responseQueue,sessionStateResponseQueue));

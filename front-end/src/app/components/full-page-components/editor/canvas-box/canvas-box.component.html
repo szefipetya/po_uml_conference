@@ -26,18 +26,18 @@
           editorService.clientModel.canvas.gridSize.toString() +
           'px'
         "
+        (click)="onClick($event)"
         (mousemove)="onMouseMove($event)"
         (mouseup)="onMouseUp($event)"
         (mousedown)="onMouseDown($event)"
         (wheel)="zoom($event)"
+        (keypress)="this.onKeyPress($event)"
       >
         <app-line-canvas
-          [dgObjects]="editorService.model.dgObjects"
           [canvasModel]="editorService.clientModel.canvas"
           #linecanvas
           [class_general]="editorService.clientModel.class_general"
           [lineCanvasModel]="editorService.clientModel.lineCanvas"
-          [lines]="editorService.model.lines"
         >
         </app-line-canvas>
         <div *ngIf="this.editorService.model">

@@ -12,7 +12,7 @@ import { GlobalEditorService } from '../services/global-editor/global-editor.ser
   styleUrls: ['./editor-root.component.scss'],
 })
 export class EditorRootComponent implements OnInit {
-  editorService;
+  editorService: GlobalEditorService;
   toolBoxWidth = 300;
   menuBarHeight = 80;
   fullWidth: number;
@@ -25,7 +25,7 @@ export class EditorRootComponent implements OnInit {
     this.setup();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
   setup() {
     const p = new Promise(async (resolve, reject) => {
       await this.editorService.initFromServer();
@@ -41,7 +41,7 @@ export class EditorRootComponent implements OnInit {
         this.editorService.alignment.right_dock.width;
       this.editorService.clientModel.canvas.clip.height =
         this.fullHeight - this.editorService.alignment.bottom_dock.height;
-      this.editorService.editor_ref = this;
+
     });
   }
   newButton;
@@ -96,7 +96,8 @@ export class EditorRootComponent implements OnInit {
     this.handleAsync(e);
   };
 
-  onKeyPress = (e) => {
+  onKeyPress = (e: KeyboardEvent) => {
+
     if (e.which == 13 || e.keyCode == 13) {
       // enter
       this.disableEdits(e, true);
@@ -114,8 +115,10 @@ export class EditorRootComponent implements OnInit {
           });
         });
       }
+
       //  console.log(this.editorService.model.dgObjects);
     }
+    this.editorService.canvasBox.onKeyPress(e);
     //  this.forceUpdate();
   };
 

@@ -15,6 +15,9 @@ import com.szefi.uml_conference.model.dto.do_related.Element_c;
 import com.szefi.uml_conference.model.dto.do_related.NoteBox;
 import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
 import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
+import com.szefi.uml_conference.model.dto.do_related.line.Line;
+import com.szefi.uml_conference.model.dto.socket.ACTION_TYPE;
+import com.szefi.uml_conference.model.dto.socket.EditorAction;
 import com.szefi.uml_conference.model.dto.socket.LOCK_TYPE;
 import com.szefi.uml_conference.model.dto.socket.SessionState;
 import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,6 +58,10 @@ import org.springframework.stereotype.Service;
 @Configuration
 public class SocketSessionService {
 
+    @Autowired
+    @Qualifier("nestedActionQueue") 
+    BlockingQueue<EditorAction> nestedActionQueue;
+    
     @Autowired
     @Qualifier("actionSockets")
     private List<UserWebSocket> actionSockets;
@@ -190,6 +198,7 @@ public class SocketSessionService {
             System.out.println("obj created and locked for"+user_id);
               getSessionStateById(obj.getId()).setExtra(new HashMap<>());
               getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+user_id);
+              //extra step for titleModel locking
               if(obj instanceof DiagramObject){
                 DiagramObject dgo=(DiagramObject)obj;
                     if(dgo instanceof SimpleClass){
@@ -204,6 +213,23 @@ public class SocketSessionService {
                 return obj;
             }
             return null;
+        }else if(cont_id.equals("l_root")){
+            if(obj instanceof AutoSessionInjectable_I){
+                AutoSessionInjectable_I casted=(AutoSessionInjectable_I)obj;
+                casted.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);
+                 /*   this.lockObjectById(obj.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+            SessionState state=getSessionStateById(obj.getId());
+            state.setDraft(true);*/
+           
+            
+            System.out.println("obj created and locked for"+user_id);
+              getSessionStateById(obj.getId()).setExtra(new HashMap<>());
+              getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+user_id);
+              if(obj instanceof Line){
+                 this.dg.getLines().add((Line)obj);
+              return (Line)obj;
+              }
+            }      
         }
       return null;
     }
@@ -228,11 +254,24 @@ public class SocketSessionService {
                     //  sessionItemMap.put(d.getId(),Pair.of(new SessionState(),d));
                     if(d instanceof NoteBox){
                         NoteBox n=(NoteBox)d;
-                        n.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
+         sessionItemMap.put(n.getId(), Pair.of(new SessionState(),n));
+                       // n.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
                     }
                     if (d instanceof SimpleClass) {
                         SimpleClass c = (SimpleClass) d;
-                        c.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
+                        
+                         sessionItemMap.put(c.getId(), Pair.of(new SessionState(),c));
+                         sessionContainerMap.put(c.getId(), Pair.of(new SessionState(),c));
+                         sessionItemMap.put(c.getTitleModel().getId(), Pair.of(new SessionState(),c.getTitleModel()));
+                         for(SimpleClassElementGroup g:c.getGroups()){
+                             sessionContainerMap.put(g.getId(), Pair.of(new SessionState(),g));
+
+                             for(AttributeElement e:g.getAttributes()){
+                                sessionItemMap.put(e.getId(), Pair.of(new SessionState(),e));
+
+                             }
+                         }
+                        //c.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
                     }
                 }
             } catch (IOException ex) {
@@ -265,7 +304,7 @@ public class SocketSessionService {
     public boolean unLockObjectById(String target_id, String user_id) {
               SessionState s=getSessionStateById(target_id);
         if(s!=null)
-        if (user_id.equals(s.getLockerUser_id()==null?"":s.getLockerUser_id())) {
+       if (user_id.equals(s.getLockerUser_id()==null?"":s.getLockerUser_id())) {
             s.setLockerUser_id("-");
             s.setLocks(new LOCK_TYPE[0]);
            if(s.getExtra()!=null) s.getExtra().clear();
@@ -313,6 +352,27 @@ public class SocketSessionService {
                                }
                         }
                         this.sessionItemMap.remove(casted.getTitleModel().getId());
+                        
+                        //find any related lines. Delete them first.
+                        List<Line> filteredList=new ArrayList<>();
+                        for(Line l:this.dg.getLines()){
+                            if((l.getObject_start_id()==null?"":l.getObject_start_id()).equals(casted.getId())
+                                    ||(l.getObject_end_id()==null?"":l.getObject_end_id()).equals(casted.getId())){
+                                //send a delete event to the actionprocessor
+                                filteredList.add(l);
+                               
+                            }
+                        }
+                        for(Line l:filteredList){
+                               this.lockObjectById(l.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+                                EditorAction action=new EditorAction(ACTION_TYPE.DELETE);
+                                action.getTarget().setParent_id("l_root");
+                                action.getTarget().setTarget_id(l.getId());
+                                action.getTarget().setType("Line");
+                                action.setUser_id(user_id);
+                                nestedActionQueue.add(action);
+                        }
+                        filteredList.clear();
                     }
                     
                  
@@ -321,6 +381,16 @@ public class SocketSessionService {
                     ob.setId(target_id);
                    
                     return  this.dg.getDgObjects().remove(ob);//the equals is overrided with id comparison;
+                }else  if(parent_id.equals("l_root")){//global line
+                  
+                        DynamicSerialObject item=this.getItemById(target_id);
+                    if(item instanceof Line){
+                        System.out.println("this is a Line delete");
+                        Line casted=(Line)item;
+                        
+                      casted.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);             
+                    return  this.dg.getLines().remove(casted);//the equals is overrided with id comparison;
+                    }
                 }
             }
         }

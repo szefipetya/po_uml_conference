@@ -1,5 +1,5 @@
 export enum LINE_BODY {
-  DOTTED,
-  DASHED,
-  SOLID,
+  DOTTED = 'DOTTED',
+  DASHED = 'DASHED',
+  SOLID = 'SOLID',
 }

@@ -32,12 +32,14 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     this.callback_queue = this.callback_queue.filter(
       (q) => q.action_id != callback_action_id
     );
+    //TEMP
+    this.callback_queue = [];
     this.sessionState = state;
     console.log('my new session state');
     while (this.queuedActionsAfterLockReceived.length > 0) {
       let action = this.queuedActionsAfterLockReceived.pop();
       //this is needed because if its a new object, the fresh id is now injected
-      console.log('ACTUAL ID', this.model.id);
+      console.log('queuedActionsAfterLockReceived pop', this.model.id);
       action.target.target_id = this.model.id;
       if (action.json != null) {
         let parsed = JSON.parse(action.json);
@@ -87,11 +89,14 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
   //_Logging Utils--------------------------------------
   sendAction(action: EditorAction) {
     this.callback_queue.push(new CallbackItem(action.id));
-    this.socket.send(action);
+    if (this.sessionState == null) {
+      this.queuedActionsAfterLockReceived.push(action);
+    } else {
+      this.socket.send(action);
+    }
   }
   init_register(type?: TARGET_TYPE) {
-    if (this.model?.extra?.temp_id) {
-    } else this.socket.register(this.model.id, this);
+    this.socket.register(this.model.id, this);
     this.socket.popInjectionQueue(this.model.id);
     //  this.log('init', MSG_TYPE.ERROR);
     this.render();
@@ -156,16 +161,16 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
   }
   isAccessible(): boolean {
     if (this.sessionState == null) {
-      return false;
+      return true;
     }
     if (
-      this.sessionState.locks.length > 0 &&
-      this.socket.user.id != this.sessionState.lockerUser_id
+      this.sessionState?.locks.length > 0 &&
+      this.socket.user.id != this.sessionState?.lockerUser_id
     ) {
-      if (this.sessionState.lockerUser_id != this.socket.user.id) {
+      if (this.sessionState?.lockerUser_id != this.socket.user.id) {
         this.log(
           "Object is locked (locker's id: " +
-            this.sessionState.lockerUser_id +
+            this.sessionState?.lockerUser_id +
             ')',
           MSG_TYPE.INFO
         );

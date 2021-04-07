@@ -28,8 +28,14 @@ public class QueueManager {
     public BlockingQueue<EditorAction> getActionQueue(){
         return new  LinkedBlockingQueue<>();
     }
+    @Bean("nestedActionQueue")
+    public BlockingQueue<EditorAction> getNestedActionQueue(){
+        return new  LinkedBlockingQueue<>();
+    }
      @Bean("actionResponseQueue")
     public BlockingQueue<EditorActionResponse> getActionResponseQueue(){
         return new  LinkedBlockingQueue<>();
     }
+    
+    
 }

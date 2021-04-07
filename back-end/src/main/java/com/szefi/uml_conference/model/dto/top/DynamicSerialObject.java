@@ -14,6 +14,9 @@ import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
 
 import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
 import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
+import com.szefi.uml_conference.model.dto.do_related.line.BreakPoint;
+import com.szefi.uml_conference.model.dto.do_related.line.Line;
+import com.szefi.uml_conference.model.dto.do_related.line.Point;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +31,10 @@ import java.util.Map;
         @JsonSubTypes.Type(value=SimpleClass.class, name="SimpleClass"),
         @JsonSubTypes.Type(value=NoteBox.class, name="NoteBox"),
         @JsonSubTypes.Type(value=Element_c.class, name="Element_c"),
+        @JsonSubTypes.Type(value=Line.class, name="Line"),
         @JsonSubTypes.Type(value=AttributeElement.class, name="AttributeElement"),
+        @JsonSubTypes.Type(value=BreakPoint.class, name="BreakPoint"),
+      /*  @JsonSubTypes.Type(value=Point.class, name="Point"),*/
         @JsonSubTypes.Type(value=SimpleClassElementGroup.class, name="SimpleClassElementGroup"),
         
       

@@ -18,6 +18,7 @@ import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClas
 import { User } from 'src/app/components/models/User';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { Pair } from '../../Utils/utils';
+import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
 @Injectable({
   providedIn: 'root',
 })
@@ -27,6 +28,7 @@ export class GlobalEditorService {
       (obj) => obj.id != model.id
     );
   }
+  canvasBox: CanvasBoxComponent;
   hasGlobalObject(model: DiagramObject): boolean {
     return this.model.dgObjects.find((o) => o.id == model?.id) != null;
   }
@@ -120,15 +122,18 @@ export class GlobalEditorService {
     console.log({ ...response });
     this.model = { ...response };
     this.model.dgObjects.map((dg) => {
+      dg.scaledModel = new DiagramObject_Scaled();
       dg.scaledModel.posx_scaled = dg.dimensionModel.x;
       dg.scaledModel.posy_scaled = dg.dimensionModel.y;
       dg.scaledModel.width_scaled = dg.dimensionModel.width;
       dg.scaledModel.height_scaled = dg.dimensionModel.height;
+      dg.scaledModel.min_height_scaled = this.clientModel.class_general.min_height_scaled;
     });
     console.log(JSON.stringify(this.model));
     this.afterDgFetchFunctions.map((p) => {
       p.value(p.key.value);
     });
+
   }
   getDiagramFromServer(id: string): Promise<Diagram> {
     return this.http
@@ -148,10 +153,22 @@ export class GlobalEditorService {
       return of(result as T);
     };
   }
-  //-----------------------------//target,alias,callback
+  //-----------------------------//target,alias,callback with (target,model params)
+  eventListenerFunctions: Pair<Pair<string, any>, Function>[] = [];
   afterDgFetchFunctions: Pair<Pair<string, any>, Function>[] = [];
   addListenerAfterDgFetch(target, fn, alias: string = '') {
     this.afterDgFetchFunctions.push(new Pair(new Pair(alias, target), fn));
+  }
+  public triggerEvent(wich: string) {
+
+    this.eventListenerFunctions.map((p) => {
+      if (p.key.key == wich)
+        p.value(p.key.value);
+    });
+
+  }
+  addListenerToEvent(target, fn, alias: string = '') {
+    this.eventListenerFunctions.push(new Pair(new Pair(alias, target), fn));
   }
 
   init(): Diagram {

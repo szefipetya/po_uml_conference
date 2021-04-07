@@ -66,6 +66,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
 
     this.borderString_scale = `${this.editorService.clientModel.class_general.border_scaled}px gold solid`;
     this.onMouseUp(null);
+    this.lineCanvasComponent.zoom(this.editorService.clientModel.canvas.scale);
     this.updateCanvas();
   }
 
@@ -91,6 +92,10 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   xdiff: number;
   ydiff: number;
   clipDOM: any;
+  onKeyPress(e) {
+    console.log('KEY', e)
+    this.lineCanvasComponent.onKeyPress(e);
+  }
   updateClassSelection = () => {
     this.editorService.model.dgObjects.map((clas) => {
       this.findClassDOMbyId(clas.id).classList.remove('d-class-selected');
@@ -301,7 +306,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     }
     if (
       this.editorService.clientModel.canvas.posx +
-        this.editorService.clientModel.canvas.width <
+      this.editorService.clientModel.canvas.width <
       clip.width
     ) {
       this.editorService.clientModel.canvas.posx =
@@ -310,7 +315,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     }
     if (
       this.editorService.clientModel.canvas.posy +
-        this.editorService.clientModel.canvas.height <
+      this.editorService.clientModel.canvas.height <
       clip.height
     ) {
       this.editorService.clientModel.canvas.posy =
@@ -336,6 +341,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     private socket: EditorSocketControllerService
   ) {
     this.editorService = editorService;
+    this.editorService.canvasBox = this;
   }
   editBegin() {
     throw new Error('Method not implemented.');
@@ -371,9 +377,12 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     }
     // ha a 'canvas-ra kattintott, és úgy mozgat
     if (!this.dclass || e.target.className == 'edit-box') {
-      if (this.repositionCanvas(e)) return;
+      if (!this.lineCanvasComponent.isTransformingInprogress()) {
+        if (this.repositionCanvas(e)) return;
+      } else {
+      }
     }
-
+    this.lineCanvasComponent.onMouseMove(e);
     if (this.editorService.clientModel.canvas.drawMode == 'line')
       this.lineCanvasComponent.drawMove(e);
     // class újraméretezés//
@@ -424,10 +433,11 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       return;
     }
     // resize xr
+    //if (this.targetClass == undefined) return;
     if (
       this.setTargets(e) &&
       this.xdiff >=
-        this.targetClass.scaledModel.width_scaled - this.resizePadding &&
+      this.targetClass.scaledModel.width_scaled - this.resizePadding &&
       this.xdiff <= this.targetClass.scaledModel.width_scaled
     ) {
       document.getElementById('root').style.cursor = 'ew-resize';
@@ -485,7 +495,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     if (
       this.setTargets(e) &&
       this.ydiff >=
-        this.targetClass.scaledModel.height_scaled - this.resizePadding &&
+      this.targetClass.scaledModel.height_scaled - this.resizePadding &&
       this.ydiff <= this.targetClass.scaledModel.height_scaled
     ) {
       document.getElementById('root').style.cursor = 'ns-resize';
@@ -626,10 +636,11 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     return dom;
   }
   onClick(e) {
-    console.log(e);
-    if (e.target.className == 'attribute') {
+    console.log('CLICKKK');
+    /* if (e.target.className == 'attribute') {
       e.target.click();
-    }
+    }*/
+    this.lineCanvasComponent.onClick(e);
   }
   onMouseUp(e) {
     if (this.editorService.clientModel.canvas.drawMode == 'line') {
@@ -639,8 +650,18 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       this.drawedClassPositionSpecified = false;
       // this.drawedClass = undefined;
     }
+    this.lineCanvasComponent.onMouseUp(e);
+
     if (this.targetClass != null) {
       this.targetClass.viewModel.onMouseUp(e);
+    }
+    if (this.drawedClass != null) {
+      this.drawedClass.viewModel.onMouseUp(e);
+      let copy = {};
+
+      // console.log('MODEL', this.drawedClass);
+      //console.log('COPY', copy);
+      //this.drawedClass = null;
     }
     if (this.targetDOM != undefined)
       this.targetDOM.style.border = `${this.editorService.clientModel.class_general.border_scaled}px solid rgba(255, 255, 255, 0.19)`;
@@ -702,6 +723,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       );
       this.editorService.clientModel.canvas.selectedClassIds = [];
       this.updateClassSelection();
+      this.lineCanvasComponent.onMouseDown(e);
     }
     // CLASS//
     if (
@@ -762,6 +784,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       }
     }
   }
+
   drawClassMode(e) {
     const rect = e.target.closest('.edit-box')?.getBoundingClientRect();
     if (!rect) return;
@@ -829,9 +852,15 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     };
     this.editorService.createGlobalObject(newclass);
     //amikor létrejönnek a nézetek, akkor maguk küldenek külön kérést az id injekcióhoz.
-    this.sendDiagramObjectCreateMessage(newclass);
     this.targetClass = newclass;
     this.drawedClass = newclass;
+    this.sendDiagramObjectCreateMessage(this.drawedClass);
+    setTimeout(() => {
+      if (newclass.titleModel.viewModel) {
+        newclass.titleModel.viewModel.onClick(e);
+        newclass.viewModel.onSelect();
+      }
+    }, 50);
     this.drawedClassPositionSpecified = true;
   }
 
@@ -843,8 +872,8 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     this.socket.send(action);
   }
 
-  updateState(state: SessionState, action_id: string): void {}
-  updateItemWithOld(old_id: string, model: any) {}
+  updateState(state: SessionState, action_id: string): void { }
+  updateItemWithOld(old_id: string, model: any) { }
   createItem(model: DynamicSerialObject, extra?: any) {
     //  if(extra.global_type=='DiagramObject')
     //if(extra.global_type=='Line')

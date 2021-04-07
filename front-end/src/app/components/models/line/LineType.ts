@@ -9,9 +9,9 @@ export class LineType {
   endHead: LINE_HEAD;
   body: LINE_BODY;
   type: LINE_TYPE;
-  public constructor(t: LINE_TYPE, start: DiagramObject, end: DiagramObject) {
-    if (start instanceof SimpleClass && end instanceof SimpleClass)
-      this.body = LINE_BODY.SOLID;
+  public constructor(t: LINE_TYPE) {
+
+    this.body = LINE_BODY.SOLID;
     this.startHead = LINE_HEAD.NONE;
     this.type = t;
     switch (t) {
@@ -43,5 +43,6 @@ export class LineType {
         this.endHead = LINE_HEAD.NONE;
         break;
     }
+
   }
 }

@@ -12,6 +12,7 @@ import { TOKEN_TYPE } from '../InjectionToken_c';
 import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';
 import { GlobalEditorService } from '../../global-editor/global-editor.service';
 import { Pair } from '../../../Utils/utils';
+import { JsonpClientBackend } from '@angular/common/http';
 
 export class ActionSocket implements SocketWrapper {
   [x: string]: any;
@@ -38,8 +39,11 @@ export class ActionSocket implements SocketWrapper {
         case ACTION_TYPE.UPDATE:
           si = this.parent.getItem(resp.target_id);
           console.log(si);
+          if (si) { this.parent.service.triggerEvent('update'); }
           if (resp.action.user_id != this.parent.service.user.id) {
-            if (si) si.updateModel(load, resp.action.id);
+            if (si) {
+              si.updateModel(load, resp.action.id);
+            }
           } else
             console.log('UPDATE RECEIVED OWNER', this.parent.service.user.id);
           break;
@@ -95,7 +99,8 @@ export class ActionSocket implements SocketWrapper {
                     );
                   }
                   if (!this.parent.editorService.hasGlobalObject(load)) {
-                    if (load._type == 'SimpleClass')
+                    console.log('STATE INJECTION PUT IN');
+                    if (load?._type == 'SimpleClass')
                       this.parent.service.createGlobalObjectAndRequestStateInjectionForSimpleClass(
                         load
                       );
@@ -107,7 +112,11 @@ export class ActionSocket implements SocketWrapper {
           break;
         case ACTION_TYPE.CREATE:
           console.log('CREATE UZENET');
-          sc = this.parent.getContainer(resp.action.target.parent_id);
+          this.parent.service.containerViewModelMap.map(p => {
+            console.log(p.key + '   ' + p.value.getId())
+          })
+          // console.log('containers' + this.parent.service.containerViewModelMap);
+          sc = this.parent.service.containerViewModelMap.find(i => i.key == resp.action.target.parent_id)?.value;
           console.log(resp.action.target);
           console.log(sc);
           console.log(resp.target_user_id);
@@ -161,6 +170,7 @@ export class ActionSocket implements SocketWrapper {
           si?.deleteSelfFromParent();
           break;
       }
+      this.parent.service.triggerEvent('update');
     }, this.parent.service.test.ping);
   }
   onopen(m: any) {
@@ -184,7 +194,7 @@ export class ActionSocket implements SocketWrapper {
     else return null;
   }
 
-  onclose(m: any) {}
+  onclose(m: any) { }
   connect(source: string) {
     this.socket = new WebSocket(source);
     this.socket.parent = this;
@@ -199,7 +209,7 @@ export class ActionSocket implements SocketWrapper {
       this.socket.send(JSON.stringify(action));
     }, this.service.test.ping);
   }
-  disconnect() {}
+  disconnect() { }
   addToInjectionQueue(id, type: TOKEN_TYPE, target: TARGET_TYPE, data) {
     console.log('data', data);
     this.service.addToInjectionQ(type, id, target, data);

@@ -87,9 +87,11 @@ export class AttributeGroupComponent
   sessionState: SessionState;
 
   createItem(model: any, extra?: any) {
-    model.edit = false;
-    model.extra = extra;
-    this.model.attributes.push(model);
+    if (model) {
+      model.edit = false;
+      model.extra = extra;
+      this.model.attributes.push(model);
+    }
     console.log('attr created');
     this.sort();
   }

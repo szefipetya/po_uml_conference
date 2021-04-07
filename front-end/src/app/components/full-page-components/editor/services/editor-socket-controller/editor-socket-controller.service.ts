@@ -63,18 +63,25 @@ export class EditorSocketControllerService {
   futureCallbackInjectionQueue: InjectionToken_c[] = [];
 
   createGlobalObjectAndRequestStateInjectionForSimpleClass(model: SimpleClass) {
+    console.log('traceback waiting activated for' + model);
     model.groups.map((g) => {
       g.attributes.forEach((e) => {
-        if (this.getItem(e.id)) {
-          this.addToFutureCallbackInjectionQueue(
-            TOKEN_TYPE.SESSION_STATE,
-            e.id,
-            TARGET_TYPE.ITEM
-          );
-        }
+        console.log('item is ' + this.getItem(e.id));
+        // if (this.getItem(e.id)) {
+        this.addToFutureCallbackInjectionQueue(
+          TOKEN_TYPE.SESSION_STATE,
+          e.id,
+          TARGET_TYPE.ITEM
+        );
+        console.log('traceback waiting activated for' + e.id);
+        //}
       });
     });
-
+    this.addToFutureCallbackInjectionQueue(
+      TOKEN_TYPE.SESSION_STATE,
+      model.titleModel.id,
+      TARGET_TYPE.ITEM
+    );
     this.editorService.createGlobalObject(model);
   }
 
@@ -107,7 +114,7 @@ export class EditorSocketControllerService {
         let item: SessionInteractiveItem = self.itemViewModelMap.find(
           (i) => i.key == req_target_id
         )?.value;
-
+        console.log('future pop' + i);
         if (item) {
           if (i.type == type && type == TOKEN_TYPE.SESSION_STATE) {
             item.updateState(data.sessionState);
@@ -203,6 +210,18 @@ export class EditorSocketControllerService {
     if (p) return p.value;
     else return null;
   }
+  public triggerEvent(wich: string) {
 
+    this.editorService.triggerEvent(wich);
+
+
+
+  }
+
+
+
+  addListenerToEvent(target, fn, alias: string = '') {
+    this.editorService.addListenerToEvent(target, fn, alias);
+  }
   test: Test;
 }

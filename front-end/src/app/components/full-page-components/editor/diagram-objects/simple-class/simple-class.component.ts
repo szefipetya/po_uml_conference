@@ -21,6 +21,7 @@ import { CommonService } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
 import { DiagramObjectComponent } from '../diagram-object/diagram-object.component';
+import { AttributeComponent } from './attribute-group/attribute/attribute.component';
 
 @Component({
   selector: 'app-simple-class',
@@ -32,28 +33,41 @@ export class SimpleClassComponent
   implements OnInit, OnChanges, AfterContentInit, SessionInteractiveContainer {
   updateItemWithOld(old_id: string, model: any) {
     throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.');
   }
   updateModel(model: any, action_id: string, msg?: string): void {
-    //let vm = this.model.viewModel;
-    //  let tvm = this.model.titleModel.viewModel;
-    /*  let gvms = [];
-    this.model.groups.map((g) => {
+    let vm = this.model.viewModel;
+    let tvm = this.model.titleModel.viewModel;
+    let gvms = [];
+    /* this.model.groups.map((g) => {
       gvms.push(g.viewModel);
     });*/
     console.log('CLASS SIDE CUCC FUTOTT LE');
-    //  soft_copy(model, this.model, ['edit', 'viewModel', 'scaledModel']);
-
+    // soft_copy(model, this.model, ['viewModel']);
+    this.model.extra = model.extra;
     this.model.id = model.id;
-    /* this.model.groups.map((g, i) => {
+    /*  this.model.groups.map((g, i) => {
       this.model.groups[i].viewModel = gvms[i];
     });*/
 
-    // this.model.titleModel.viewModel = tvm;
-    //   this.model.viewModel = vm;
+    /* this.model.titleModel.viewModel = tvm;
+    this.model.viewModel = vm;*/
     //{
-    //if (this.sessionState.lockerUser_id != this.socket.user.id) {
 
+    (this.getTitleVm() as AttributeComponent).render();
+    console.log('users', this.sessionState?.lockerUser_id, this.socket.user.id);
+    console.log('DRAFT', this.model.extra);
     this.model.dimensionModel = model.dimensionModel;
+    if (
+      this.model.dimensionModel.width <
+      this.editorService.clientModel.class_general.min_width ||
+      this.model.dimensionModel.height <
+      this.editorService.clientModel.class_general.min_height
+    ) {
+      this.model.dimensionModel.width = this.editorService.clientModel.class_general.min_width;
+      this.model.dimensionModel.height = this.editorService.clientModel.class_general.min_height;
+    }
+    console.log('DIMENSION UPDATEFD');
     this.model.scaledModel.posy_scaled =
       this.model.dimensionModel.y * this.editorService.clientModel.canvas.scale;
     this.model.scaledModel.width_scaled =
@@ -64,7 +78,8 @@ export class SimpleClassComponent
       this.editorService.clientModel.canvas.scale;
     this.model.scaledModel.posx_scaled =
       this.model.dimensionModel.x * this.editorService.clientModel.canvas.scale;
-    // }
+    (this.getTitleVm() as AttributeComponent).render();
+    this.socket.triggerEvent('update');
   }
   createItem(model: DynamicSerialObject, extra?: any) {
     console.log('creating:', model);
@@ -80,6 +95,7 @@ export class SimpleClassComponent
       //title model
     }
   }
+
   getTitleVm() {
     return this.socket.getItem(this.model.titleModel.id);
   }
@@ -105,7 +121,8 @@ export class SimpleClassComponent
         a.viewModel?.render();
       });
     });
-    (this.getTitleVm() as InteractiveItemBase).render();
+
+    (this?.getTitleVm() as InteractiveItemBase)?.render();
   }
 
   disableEdit() {
@@ -120,7 +137,7 @@ export class SimpleClassComponent
         // this.editorService.clientModel.canvas.edit_classTitle_id = null;
       }
     let prev = this.model.titleModel.edit;
-    //   this.model.titleModel.edit = false;
+    this.model.titleModel.edit = false;
     (this.getTitleVm() as InteractiveItemBase).saveEvent(prev);
 
     this.model.groups.map((egroup) => {

@@ -24,6 +24,7 @@ export class SessionSocket implements SocketWrapper {
       console.log('SESSION MESSAGE', resp);
       let si: SessionInteractiveItem;
       let sc: SessionInteractiveContainer;
+
       switch (resp.target_type) {
         case 'CONTAINER':
           sc = this.parent.getContainer(resp.target_id);
@@ -48,6 +49,7 @@ export class SessionSocket implements SocketWrapper {
             { sessionState: resp.sessionState }
           );
       }
+      this.parent.service.triggerEvent('update');
     }, this.parent.service.test.ping);
   }
   onopen(m: any) {
