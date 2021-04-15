@@ -99,7 +99,7 @@ export class LineController extends InteractiveItemBase {
         }
         //draw default line
         //  console.log("lockers", this.sessionState?.lockerUser_id, " --- ", this.editorService.user.id)
-        if (this.sessionState?.lockerUser_id != '-' && this.sessionState?.lockerUser_id != this.editorService.user.id) {
+        if (this.sessionState?.lockerUser_id != '-' && this.sessionState?.lockerUser_id != this.editorService.getUser().id) {
           this.lineCanvasComponent.strike(
             "red",
             this.lineCanvasComponent.LINE_WIDTH * 3,
@@ -127,7 +127,7 @@ export class LineController extends InteractiveItemBase {
           ept
         );
       }//if locked
-      if (this.sessionState?.lockerUser_id != '-' && this.sessionState?.lockerUser_id != this.editorService.user.id) {
+      if (this.sessionState?.lockerUser_id != '-' && this.sessionState?.lockerUser_id != this.editorService.getUser().id) {
         this.lineCanvasComponent.strike(
           "red",
           this.lineCanvasComponent.LINE_WIDTH * 2,

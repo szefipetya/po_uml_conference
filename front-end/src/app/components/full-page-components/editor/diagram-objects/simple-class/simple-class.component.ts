@@ -16,7 +16,7 @@ import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
 import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
 import { EditorAction } from 'src/app/components/models/socket/EditorAction';
 import { SessionInteractiveContainer } from 'src/app/components/models/socket/interface/SessionInteractiveContainer';
-import { soft_copy } from 'src/app/components/utils/utils';
+import { soft_copy } from 'src/app/utils/utils';
 import { CommonService } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';

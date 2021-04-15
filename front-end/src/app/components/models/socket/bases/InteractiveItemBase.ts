@@ -3,7 +3,7 @@ import { SessionInteractiveItem } from '../interface/SessionInteractiveItem';
 import { SessionState } from '../SessionState';
 import { EditorAction } from '../EditorAction';
 import { EditorSocketControllerService } from '../../../full-page-components/editor/services/editor-socket-controller/editor-socket-controller.service';
-import { uniqId } from '../../../utils/utils';
+import { uniqId } from '../../../../utils/utils';
 import {
   CommonService,
   MSG_TYPE,
@@ -21,7 +21,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
   constructor(
     protected socket: EditorSocketControllerService,
     protected commonService: CommonService
-  ) {}
+  ) { }
   getId() {
     return this.model.id;
   }
@@ -114,7 +114,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     action.json = JSON.stringify(this.model);
     this.model.viewModel = vm;
   }*/
-  render(): void {}
+  render(): void { }
   //DML functions-v-v-v-v-v-v-v-v-v-v-
   deleteAsync(parent_id: string) {
     if (this.isEditLockedByMe()) {
@@ -170,8 +170,8 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
       if (this.sessionState?.lockerUser_id != this.socket.user.id) {
         this.log(
           "Object is locked (locker's id: " +
-            this.sessionState?.lockerUser_id +
-            ')',
+          this.sessionState?.lockerUser_id +
+          ')',
           MSG_TYPE.INFO
         );
       }

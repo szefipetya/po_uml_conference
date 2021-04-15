@@ -14,7 +14,7 @@ import { GlobalEditorService } from '../../../services/global-editor/global-edit
 import { SimpleClassComponent } from '../simple-class.component';
 import { SessionInteractiveContainer } from '../../../../../models/socket/interface/SessionInteractiveContainer';
 import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';
-import { soft_copy, uniqId } from 'src/app/components/utils/utils';
+import { soft_copy, uniqId } from 'src/app/utils/utils';
 import { EditorAction } from 'src/app/components/models/socket/EditorAction';
 import { Action } from 'rxjs/internal/scheduler/Action';
 import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
@@ -95,9 +95,9 @@ export class AttributeGroupComponent
     console.log('attr created');
     this.sort();
   }
-  restoreItem(item_id: string, model: DynamicSerialObject) {}
-  deleteItem(item_id: string) {}
-  msgPopup(msg: string) {}
+  restoreItem(item_id: string, model: DynamicSerialObject) { }
+  deleteItem(item_id: string) { }
+  msgPopup(msg: string) { }
 
   ngAfterContentInit(): void {
     if (this.inputDOM) this.inputDOM.focus();

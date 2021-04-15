@@ -13,7 +13,7 @@ import { EditorAction } from 'src/app/components/models/socket/EditorAction';
 import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
 import { SessionInteractiveItem } from 'src/app/components/models/socket/interface/SessionInteractiveItem';
 import { SessionState } from 'src/app/components/models/socket/SessionState';
-import { soft_copy } from 'src/app/components/utils/utils';
+import { soft_copy } from 'src/app/utils/utils';
 import { CommonService } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
@@ -81,9 +81,9 @@ export class DiagramObjectComponent
   getId() {
     return this.model.id;
   }
-  saveEvent(wastrue: any): void {}
+  saveEvent(wastrue: any): void { }
 
-  onSelect() {}
+  onSelect() { }
   editBegin() {
     if (!this.isAccessible()) return;
     let action = new EditorAction(this.model.id, this.model._type, '');
@@ -136,8 +136,8 @@ export class DiagramObjectComponent
   }
   sessionState: SessionState;
 
-  updateScales(scale): void {}
-  update(): void {}
+  updateScales(scale): void { }
+  update(): void { }
   disableEdit(): void {
     this.model.edit = false;
     console.log('base.disableedit');

@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { GlobalEditorService } from '../services/global-editor/global-editor.service';
-import { round, unFocus } from '../Utils/utils';
+import { round, unFocus } from '../../../../utils/utils';
 import { LineCanvasComponent } from './line-canvas/line-canvas.component';
 import { GROUP_SYNTAX } from 'src/app/components/models/DiagramObjects/GROUP_SYNTAX';
 import { DiagramObjectComponent } from '../diagram-objects/diagram-object/diagram-object.component';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
 import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
-import { soft_copy, uniqId } from 'src/app/components/utils/utils';
+import { soft_copy, uniqId } from 'src/app/utils/utils';
 import { renderFlagCheckIfStmt } from '@angular/compiler/src/render3/view/template';
 import { SimpleClassComponent } from '../diagram-objects/simple-class/simple-class.component';
 import { EditorSocketControllerService } from '../services/editor-socket-controller/editor-socket-controller.service';

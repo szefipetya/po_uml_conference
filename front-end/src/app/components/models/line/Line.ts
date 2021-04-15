@@ -5,7 +5,7 @@ import { LINE_TYPE } from './LINE_TYPE';
 import { BreakPoint } from './BreakPoint';
 import { DiagramObject } from '../DiagramObjects/DiagramObject';
 import { DynamicSerialObject } from '../common/DynamicSerialObject';
-import { uniqId } from '../../utils/utils';
+import { uniqId } from '../../../utils/utils';
 export class Line extends DynamicSerialObject {
   static sortBreakPoints(l: Line) {
     l.breaks = l.breaks.sort((a, b) => a.index - b.index);

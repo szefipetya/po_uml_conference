@@ -24,7 +24,7 @@ import { AttributeGroupComponent } from '../attribute-group.component';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { SimpleClassComponent } from '../../simple-class.component';
 import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
-import { uniqId } from 'src/app/components/utils/utils';
+import { uniqId } from 'src/app/utils/utils';
 import { SessionInteractiveContainer } from 'src/app/components/models/socket/interface/SessionInteractiveContainer';
 import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
 import { LogInteractive_I } from 'src/app/components/models/socket/interface/LogInteractive_I';
@@ -36,11 +36,11 @@ import { LogInteractive_I } from 'src/app/components/models/socket/interface/Log
 export class AttributeComponent
   extends InteractiveItemBase
   implements
-    OnInit,
-    OnChanges,
-    AfterContentInit,
-    SessionInteractiveItem,
-    LogInteractive_I {
+  OnInit,
+  OnChanges,
+  AfterContentInit,
+  SessionInteractiveItem,
+  LogInteractive_I {
   getParentId(): string {
     return this.getParentContainer().getId();
   }
@@ -292,7 +292,7 @@ export class AttributeComponent
             this.parent.model.scaledModel.width_scaled -
             (this.parent.general.padding_scaled +
               this.parent.general.border_scaled) *
-              2;
+            2;
           this.inputWidth = Math.max(val1, val2);
           //old width: `${(strfull.length + 1) * (this.state.parent.parent.clientModel.class_general.fontsize_scaled / this.titleScale)}px`
         } else {
@@ -305,13 +305,13 @@ export class AttributeComponent
             this.parent.model.scaledModel.width_scaled -
             (this.parent.general.padding_scaled +
               this.parent.general.border_scaled) *
-              2;
+            2;
           let l = false;
 
           this.showedText = this.model.name.substr(
             0,
             this.model.name.length -
-              Math.round(((textwidth - width) / charwidth) * 1.1 + 1.5)
+            Math.round(((textwidth - width) / charwidth) * 1.1 + 1.5)
           );
           if (textwidth > width) {
             l = true;
@@ -337,7 +337,7 @@ export class AttributeComponent
             this.parent.parent.model.scaledModel.width_scaled -
             (this.parent.parent.general.padding_scaled +
               this.parent.parent.general.border_scaled) *
-              2;
+            2;
           this.inputWidth = Math.max(val1, val2);
         } else {
           //ATTRIBUTE
@@ -352,7 +352,7 @@ export class AttributeComponent
             this.parent.parent.model.scaledModel.width_scaled -
             (this.parent.parent.general.padding_scaled +
               this.parent.parent.general.border_scaled) *
-              2;
+            2;
           if (textwidth > width) {
             this.showedText = strfull.substr(
               0,

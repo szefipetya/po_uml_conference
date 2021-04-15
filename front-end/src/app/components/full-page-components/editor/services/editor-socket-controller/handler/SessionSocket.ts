@@ -6,7 +6,7 @@ import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TY
 import { EditorSocketControllerService } from '../editor-socket-controller.service';
 import { TOKEN_TYPE } from '../InjectionToken_c';
 import { SocketWrapper } from './SocketWrapper_I';
-import { Pair } from '../../../Utils/utils';
+import { Pair } from '../../../../../../utils/utils';
 
 export class SessionSocket implements SocketWrapper {
   [x: string]: any;

@@ -1,0 +1,49 @@
+<div class="container">
+  <div class="col">
+    <div class="row">
+      <div class="col-md-6 offset-md-3 mt-4">
+        <h3>Login</h3>
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+          <div class="form-group">
+            <label for="loginUsername">Username</label>
+            <input
+              ngModel
+              required
+              #first="ngModel"
+              type="text"
+              name="username"
+              class="form-control"
+              id="loginUsername"
+              placeholder="Enter username"
+            />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input
+              type="password"
+              ngModel
+              required
+              #first="ngModel"
+              name="password"
+              class="form-control"
+              id="loginPassword"
+              placeholder="Password"
+            />
+          </div>
+          <div class="form-group form-check">
+            <a [routerLink]="['/reset-password']">Forgot Password</a>
+          </div>
+
+          <button type="submit" class="btn-load btn btn-primary mt-2">
+            <div class="submit-text">Login</div>
+            <div class="lds-hourglass" *ngIf="this.isLoading"></div>
+            <i class="fas fa-sign-in-alt"></i>
+          </button>
+        </form>
+        <div class="errors">
+          {{ this.responseMsg }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

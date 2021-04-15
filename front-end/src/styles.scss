@@ -1,40 +1,40 @@
 /* You can add global styles to this file, and also import other style files */
-$grey_light:#555;
-$grey_light_input:#bbb;
-$grey_dark:#232323;
-$selected:rgb(111, 173, 236);
-$hover:rgb(42, 115, 187);
+$grey_light: #555;
+$grey_light_input: #bbb;
+$grey_dark: #232323;
+$selected: rgb(111, 173, 236);
+$purple: rgb(164, 90, 207);
+$purple-dark: rgb(113, 56, 146);
+$hover: rgb(42, 115, 187);
 body {
   background-color: $grey_light;
 }
-
 
 body {
   padding: 0;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
 /*EGYENLŐRE ÍGY MARAD. MAJD SZÉTSZEDEM*/
 ::-webkit-scrollbar {
   width: 0px;
   height: 0px;
 }
-textarea{
+textarea {
   background: $grey_light_input;
   color: black;
   resize: none;
   font-weight: bold;
-
-
 }
-.note-box-content{
-  white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
-  white-space: -webkit-pre-wrap;          /* Chrome & Safari */
-  white-space: -pre-wrap;                 /* Opera 4-6 */
-  white-space: -o-pre-wrap;               /* Opera 7 */
-  white-space: pre-wrap;                  /* CSS3 */
-  word-wrap: break-word;                  /* Internet Explorer 5.5+ */
-  word-break:normal;
+.note-box-content {
+  white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+  white-space: -webkit-pre-wrap; /* Chrome & Safari */
+  white-space: -pre-wrap; /* Opera 4-6 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  white-space: pre-wrap; /* CSS3 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
+  word-break: normal;
   white-space: normal;
 }
 /* Optional: show position indicator in red */
@@ -42,10 +42,10 @@ input {
   font-size: inherit;
   font-family: "Roboto Mono", monospace;
   background: $grey_light_input;
-  color: black!important;
+  color: black !important;
 }
-input:hover{
-  box-shadow: none!important;
+input:hover {
+  box-shadow: none !important;
 }
 body {
   background: rgb(139, 77, 15);
@@ -118,11 +118,11 @@ body {
 }
 
 .d-class-selected {
-  border:$selected 0.095em solid !important;
+  border: $selected 0.095em solid !important;
 }
 
 .d-class-selected .class-title {
-  color:$selected;
+  color: $selected;
   font-weight: bold;
 }
 
@@ -346,4 +346,324 @@ input {
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 
 @media only screen and (min-width: 1200px) {
+}
+
+.icon {
+  border-radius: 50%;
+
+  width: 60px;
+  height: 60px;
+  transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.icon-square {
+  border-radius: 10%;
+
+  width: 50px;
+  height: 50px;
+  transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.icon-square:hover {
+  border: $purple solid 2px;
+  transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  transform: scale(1.2, 1.2);
+}
+.icon:hover {
+  border: $purple solid 2px;
+  transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  transform: scale(1.2, 1.2);
+}
+//icons
+
+.glow-on-hover {
+  padding: 5px 30px;
+  height: 50px;
+  border: none;
+  outline: none;
+  color: #fff;
+  background: #111;
+  cursor: pointer;
+  position: relative;
+  z-index: 0;
+  border-radius: 10px;
+}
+
+.glow-on-hover:before {
+  content: "";
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #02b6ce,
+    #002bff,
+    #7a00ff,
+    #d900ff,
+    #ff0000
+  );
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  background-size: 400%;
+  z-index: -1;
+  filter: blur(5px);
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  animation: glowing 20s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 10px;
+}
+
+.glow-on-hover:active {
+  color: black;
+  font-weight: bold;
+  text-shadow: white 0px 0px 5px;
+}
+
+.glow-on-hover:active:after {
+  background: transparent;
+}
+
+.glow-on-hover:hover:before {
+  opacity: 1;
+}
+
+.glow-on-hover:after {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #222;
+  left: 0;
+  top: 0;
+  border-radius: 10px;
+}
+
+@keyframes glowing {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+//thin link
+.link-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+}
+a {
+  color: white !important;
+  border-bottom: 3px solid $purple;
+  // font-size: 3em;
+  transition: all 0.25s linear;
+  position: relative;
+  padding: 0px;
+  text-decoration: none !important;
+  font-weight: normal !important;
+}
+
+a:before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: #61a3ff;
+  position: absolute;
+
+  left: 0;
+  bottom: -3px; /* this is to match where the border is */
+  transform-origin: left;
+  transform: scale(0);
+  transition: transform 0.25s linear;
+  /*   will-change: transform; */
+}
+a:active {
+  color: $selected !important;
+
+  // text-shadow: white 0px 0px 5px;
+  transition: none;
+}
+a:hover:before {
+  transform: scale(1);
+}
+
+//bootstrap customization####################
+.btn-primary {
+  background-color: $purple !important;
+}
+.btn-primary:hover {
+  background-color: $purple-dark !important;
+}
+
+//animated primary button#####################
+$base: #0f1923;
+$white: #ece8e1;
+$pink: #ff4655;
+$height: 54px;
+$transition: 0.3s ease-out all;
+.btn-animated {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+  flex-flow: column;
+  & a {
+    width: 100%;
+    max-width: 240px;
+    height: $height;
+    padding: 8px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: $pink;
+    text-align: center;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 0 0 0 1px inset rgba($white, 0.3);
+    position: relative;
+    margin: 10px 0;
+    &.white:hover > p {
+      color: $white;
+    }
+    &.white > p {
+      background: $white;
+      color: $base;
+      & span.base {
+        border: 1px solid transparent;
+      }
+    }
+    &.transparent:hover > p {
+      color: $white;
+      & span.text {
+        box-shadow: 0 0 0 1px $white;
+      }
+    }
+    &.transparent > p {
+      background: $base;
+      color: $white;
+      & span.base {
+        border: 1px solid $white;
+      }
+    }
+    &:after,
+    &:before {
+      content: "";
+      width: 1px;
+      position: absolute;
+      height: 8px;
+      background: $base;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    &:before {
+      right: 0;
+      left: initial;
+    }
+    & p {
+      margin: 0;
+      height: $height;
+      line-height: $height;
+      box-sizing: border-box;
+      z-index: 1;
+      left: 0;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      & span.base {
+        box-sizing: border-box;
+        position: absolute;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        border: 1px solid $pink;
+        &:before {
+          content: "";
+          width: 2px;
+          height: 2px;
+          left: -1px;
+          top: -1px;
+          background: $base;
+          position: absolute;
+          transition: $transition;
+        }
+      }
+      & span.bg {
+        left: -5%;
+        position: absolute;
+        background: $pink;
+        width: 0;
+        height: 100%;
+        z-index: 3;
+        transition: $transition;
+        transform: skewX(-10deg);
+      }
+      & span.text {
+        z-index: 4;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        &:after {
+          content: "";
+          width: 4px;
+          height: 4px;
+          right: 0;
+          bottom: 0;
+          background: $base;
+          position: absolute;
+          transition: $transition;
+          z-index: 5;
+        }
+      }
+    }
+    &:hover {
+      color: $white;
+      & span.bg {
+        width: 110%;
+      }
+      & span.text:after {
+        background: $white;
+      }
+    }
+  }
+}
+
+//loader #####
+.lds-hourglass {
+  display: inline-block;
+  position: relative;
+}
+.lds-hourglass:after {
+  content: " ";
+  display: block;
+  border-radius: 50%;
+  width: 0;
+  height: 0;
+  margin: 0 0 0 7px;
+  box-sizing: border-box;
+  border: 12px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: lds-hourglass 1.2s infinite;
+}
+@keyframes lds-hourglass {
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
 }

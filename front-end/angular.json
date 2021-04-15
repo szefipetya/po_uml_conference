@@ -29,12 +29,12 @@
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.scss"
+              "src/styles.scss","src/app/js/bootstrap5/css/bootstrap.css"
             ],
             "scripts": ["src/app/js/webjars/jquery.min.js",
               "src/app/js/webjars/sockjs.min.js",
               "src/app/js/webjars/stomp.min.js",
-              "src/app/js/webjars/stomp.js"]
+              "src/app/js/webjars/stomp.js",  "src/app/js/bootstrap5/js/bootstrap.js"]
           },
           "configurations": {
             "production": {
@@ -97,12 +97,16 @@
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.scss"
+              "src/styles.scss","src/app/js/bootstrap5/css/bootstrap.css"
+
             ],
             "scripts": ["src/app/js/webjars/jquery.min.js",
               "src/app/js/webjars/sockjs.min.js",
               "src/app/js/webjars/stomp.min.js",
-              "src/app/js/webjars/stomp.js"]
+              "src/app/js/webjars/stomp.js",
+              "src/app/js/bootstrap5/js/bootstrap.js"
+
+            ]
           }
         },
         "lint": {

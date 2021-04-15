@@ -15,7 +15,6 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 //custom source
 import { MainComponent } from './components/main/main.component';
 import { TopMenuComponent } from './components/top-menu/top-menu.component';
-import { LeftSideMenuComponent } from './components/left-side-menu/left-side-menu.component';
 import { EditorComponent } from './components/full-page-components/editor/editor.component';
 import { CanvasBoxComponent } from './components/full-page-components/editor/canvas-box/canvas-box.component';
 import { AttributeGroupComponent } from './components/full-page-components/editor/diagram-objects/simple-class/attribute-group/attribute-group.component';
@@ -32,13 +31,15 @@ import { SocketCommunicationWindowComponent } from './components/windows/windowe
 import { NoteBoxComponent } from './components/full-page-components/editor/diagram-objects/note-box/note-box.component';
 import { DiagramObjectComponent } from './components/full-page-components/editor/diagram-objects/diagram-object/diagram-object.component';
 import { SessionMessageWindowComponent } from './components/windows/windowed-components/_instances/editor/session-message-window/session-message-window.component';
+import { LeftPanelComponentComponent } from './components/left-panel-component/left-panel-component.component';
+import { AuthModule } from "src/app/auth/auth.module";
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainComponent,
     TopMenuComponent,
-    LeftSideMenuComponent,
     EditorComponent,
     CanvasBoxComponent,
     AttributeGroupComponent,
@@ -55,6 +56,7 @@ import { SessionMessageWindowComponent } from './components/windows/windowed-com
     NoteBoxComponent,
     DiagramObjectComponent,
     SessionMessageWindowComponent,
+    LeftPanelComponentComponent,
   ],
   imports: [
     //Angular core
@@ -66,8 +68,10 @@ import { SessionMessageWindowComponent } from './components/windows/windowed-com
     MatToolbarModule,
     MatIconModule,
     MatSidenavModule,
+    //Custom
+    AuthModule, RouterModule
   ],
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

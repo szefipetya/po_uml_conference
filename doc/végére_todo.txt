@@ -1,1 +1,5 @@
-class létrehozásnál össze ugrik amikor választ kapunk.
+
+- class létrehozásnál össze ugrik amikor választ kapunk kis bug,
+canvas-box
+- a vonal breakpointok ugorjanak össze, ha közel vannak
+- canvas méretet backend-en dinamikusan növelni

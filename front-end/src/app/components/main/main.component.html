@@ -1,9 +1,68 @@
-<!-- <mat-drawer-container class="root">
-  <mat-drawer mode="side" opened>Drawer content</mat-drawer>
-  <mat-drawer-content>
+<div class="page-root">
+  <div class="side-nav">
+    <button type="button" mat-button (click)="drawer.toggle()">
+      Toggle sidenav
+    </button>
+
+    <div>
+      <span>
+        <img
+          class="icon"
+          src="../../../assets/svg/home.svg"
+          alt="folder_icon"
+          srcset=""
+        />
+      </span>
+    </div>
+    <div (click)="drawer.toggle()">
+      <span>
+        <img
+          class="icon"
+          src="../../../assets/svg/folder.svg"
+          alt="folder_icon"
+          srcset=""
+        />
+      </span>
+    </div>
+    <div>
+      <span>
+        <img
+          class="icon"
+          src="../../../assets/svg/group.svg"
+          alt="folder_icon"
+          srcset=""
+        />
+      </span>
+    </div>
+    <div>
+      <span>
+        <img
+          class="icon"
+          src="../../../assets/svg/tool-box.svg"
+          alt="folder_icon"
+          srcset=""
+        />
+      </span>
+    </div>
+    <div>
+      <span>
+        <img
+          class="icon"
+          src="../../../assets/svg/log.svg"
+          alt="folder_icon"
+          srcset=""
+        />
+      </span>
+    </div>
+  </div>
+
+  <mat-drawer-container class="example-container" autosize>
+    <mat-drawer #drawer class="example-sidenav" mode="over" opened="false">
+      <app-left-panel-component> </app-left-panel-component>
+    </mat-drawer>
     <app-top-menu> </app-top-menu>
-    <router-outlet> </router-outlet>
-  </mat-drawer-content>
-</mat-drawer-container> -->
-<!-- <router-outlet> </router-outlet> -->
-<app-window-manager> </app-window-manager>
+    <div class="example-sidenav-content">
+      <router-outlet> </router-outlet>
+    </div>
+  </mat-drawer-container>
+</div>

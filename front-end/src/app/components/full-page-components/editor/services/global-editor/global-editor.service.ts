@@ -17,8 +17,11 @@ import { ClientModel } from 'src/app/components/models/Diagram/ClientModel';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { User } from 'src/app/components/models/User';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
-import { Pair } from '../../Utils/utils';
+import { Pair } from '../../../../../utils/utils';
 import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
+import { environment } from 'src/environments/environment';
+import { getCookie } from 'src/app/utils/cookieUtils';
+import { User_PublicDto } from 'src/app/auth/models/User_PublicDto';
 @Injectable({
   providedIn: 'root',
 })
@@ -40,22 +43,26 @@ export class GlobalEditorService {
   }
   model: Diagram;
   alignment;
-  // url_pre = 'http://84.2.193.197:8101/';
-  url_pre = 'http://localhost:8101/';
+  // url_pre = 'http://86.59.222.116:8101/';
+  url_pre = environment.api_url_http;
   url_pre_test = 'https://jsonplaceholder.typicode.com/posts';
   url_get_diagram = 'get/dg';
   clientModel: ClientModel;
 
-  user: User = {
-    id: new Date().getUTCMilliseconds().toString(),
+  user_fix: User_PublicDto = {
+    id: new Date().getUTCMilliseconds(),
     email: 'email',
-    username: 'username',
+    userName: 'username',
     name: 'name',
   };
+  getUser() {
+    return JSON.parse(getCookie("user"));
+  }
   constructor(private http: HttpClient) {
     this.model = new Diagram();
-
-    console.log('id ', this.user.id);
+    this.model.dgObjects = [];
+    this.model.lines = [];
+    console.log('id ', this.getUser().id);
     this.alignment = {
       left_dock: {
         width: 100,
@@ -120,24 +127,27 @@ export class GlobalEditorService {
     console.log(response);
 
     console.log({ ...response });
-    this.model = { ...response };
-    this.model.dgObjects.map((dg) => {
-      dg.scaledModel = new DiagramObject_Scaled();
-      dg.scaledModel.posx_scaled = dg.dimensionModel.x;
-      dg.scaledModel.posy_scaled = dg.dimensionModel.y;
-      dg.scaledModel.width_scaled = dg.dimensionModel.width;
-      dg.scaledModel.height_scaled = dg.dimensionModel.height;
-      dg.scaledModel.min_height_scaled = this.clientModel.class_general.min_height_scaled;
-    });
-    console.log(JSON.stringify(this.model));
-    this.afterDgFetchFunctions.map((p) => {
-      p.value(p.key.value);
-    });
-
+    if (response.dgObjects) {
+      this.model = { ...response };
+      this.model.dgObjects.map((dg) => {
+        dg.scaledModel = new DiagramObject_Scaled();
+        dg.scaledModel.posx_scaled = dg.dimensionModel.x;
+        dg.scaledModel.posy_scaled = dg.dimensionModel.y;
+        dg.scaledModel.width_scaled = dg.dimensionModel.width;
+        dg.scaledModel.height_scaled = dg.dimensionModel.height;
+        dg.scaledModel.min_height_scaled = this.clientModel.class_general.min_height_scaled;
+      });
+      console.log(JSON.stringify(this.model));
+      this.afterDgFetchFunctions.map((p) => {
+        p.value(p.key.value);
+      });
+    }
   }
   getDiagramFromServer(id: string): Promise<Diagram> {
     return this.http
-      .get<Diagram>(this.url_pre + this.url_get_diagram + '/' + id)
+      .get<Diagram>(this.url_pre + this.url_get_diagram + '/' + id, {
+        headers: { 'Authorization': 'Bearer ' + getCookie("jwt_token") }
+      })
       .pipe(catchError(this.handleError<Diagram>('getDiagram', new Diagram())))
       .toPromise();
   }

@@ -2,7 +2,7 @@ import { InteractivityChecker } from '@angular/cdk/a11y';
 import { Line } from '../../../../models/line/Line';
 import { Vector } from '../../../../models/line/Vector';
 import { LineCanvas } from '../../../../models/line/LineCanvas';
-import { clone1, Pair } from '../../Utils/utils';
+import { clone1, Pair } from '../../../../../utils/utils';
 import {
   AfterContentInit,
   Component,
@@ -25,7 +25,7 @@ import { LineController } from 'src/app/components/models/line/LineController';
 import { BreakPoint } from 'src/app/components/models/line/BreakPoint';
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
 import { EditorAction } from 'src/app/components/models/socket/EditorAction';
-import { uniqId } from 'src/app/components/utils/utils';
+import { uniqId } from 'src/app/utils/utils';
 import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
 import { SessionInteractiveContainer } from 'src/app/components/models/socket/interface/SessionInteractiveContainer';
 import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';

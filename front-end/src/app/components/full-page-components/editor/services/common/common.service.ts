@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LogInteractive_I } from 'src/app/components/models/socket/interface/LogInteractive_I';
-import { soft_copy } from 'src/app/components/utils/utils';
+import { soft_copy } from 'src/app/utils/utils';
 import { SessionMessageWindowComponent } from 'src/app/components/windows/windowed-components/_instances/editor/session-message-window/session-message-window.component';
 export enum MSG_TYPE {
   INFO = 'INFO',

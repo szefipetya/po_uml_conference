@@ -1,0 +1,6 @@
+Tesztelésnél mennyire kell mélyre menni? -> serivce-ket letesztelném meg néhány http rest kérés az összetettebb endpointokhoz, ami nem annyit csinál csak, hogy felszól egy szervíznek?
+
+service meg néhány rest endpointra, ahol több a logika
+
+Mentés, Diagram, baj-e az, ha a Diagram-ot json-ként lementem? esetleg becsomagolva, egy custom Converterrel?
+

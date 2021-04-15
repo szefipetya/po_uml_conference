@@ -1,27 +1,22 @@
 <p>
-  <mat-toolbar color="primary">
-    <button
-      mat-icon-button
-      class="example-icon"
-      aria-label="Example icon-button with menu icon"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
-    <span>My App</span>
-    <span class="example-spacer"></span>
-    <button
-      mat-icon-button
-      class="example-icon favorite-icon"
-      aria-label="Example icon-button with heart icon"
-    >
-      <mat-icon>favorite</mat-icon>
-    </button>
-    <button
-      mat-icon-button
-      class="example-icon"
-      aria-label="Example icon-button with share icon"
-    >
-      <mat-icon>share</mat-icon>
-    </button>
+  <mat-toolbar class="toolbar">
+    <div class="nav-box">
+      <button [routerLink]="['editor']" class="glow-on-hover" type="button">
+        Editor
+      </button>
+    </div>
+    <div class="auth-box" *ngIf="!isLoggedIn()">
+      <button class="glow-on-hover" [routerLink]="['login']" type="button">
+        Login
+      </button>
+      <div class="link-box">
+        <a [routerLink]="['register']">Register</a>
+      </div>
+    </div>
+    <div class="profile" *ngIf="isLoggedIn()">
+      <div class="link-box">
+        <a (click)="logOut()">Logout</a>
+      </div>
+    </div>
   </mat-toolbar>
 </p>

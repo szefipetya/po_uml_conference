@@ -1,0 +1,2 @@
+blacklist -> jwt expiration> database trigger, auto kitörlés
+miért nem jol küldi el a logoutot az angular??????

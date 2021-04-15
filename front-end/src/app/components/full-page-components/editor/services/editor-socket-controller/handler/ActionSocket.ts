@@ -11,7 +11,7 @@ import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TY
 import { TOKEN_TYPE } from '../InjectionToken_c';
 import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';
 import { GlobalEditorService } from '../../global-editor/global-editor.service';
-import { Pair } from '../../../Utils/utils';
+import { Pair } from '../../../../../../utils/utils';
 import { JsonpClientBackend } from '@angular/common/http';
 
 export class ActionSocket implements SocketWrapper {
