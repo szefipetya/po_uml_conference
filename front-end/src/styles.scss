@@ -8,8 +8,14 @@ $purple-dark: rgb(113, 56, 146);
 $hover: rgb(42, 115, 187);
 body {
   background-color: $grey_light;
+  color: white !important;
 }
-
+.mat-drawer-container {
+  color: white;
+}
+.mat-drawer {
+  color: white;
+}
 body {
   padding: 0;
   margin: 0;
@@ -459,6 +465,7 @@ input {
   padding: 5px;
 }
 a {
+  cursor: pointer;
   color: white !important;
   border-bottom: 3px solid $purple;
   // font-size: 3em;
@@ -666,4 +673,14 @@ $transition: 0.3s ease-out all;
   100% {
     transform: rotate(1800deg);
   }
+}
+
+//UNAUTHORIZED
+.unauthorized-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60%;
+  color: white;
+  font-size: 1.4em;
 }

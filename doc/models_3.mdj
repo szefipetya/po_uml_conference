@@ -11669,7 +11669,7 @@
 											"top": 155,
 											"width": 334,
 											"height": 18,
-											"text": "+password_hash: string",
+											"text": "+password: string",
 											"horizontalAlignment": 0
 										},
 										{
@@ -16787,7 +16787,7 @@
 							"_parent": {
 								"$ref": "AAAAAAF3xZxC9pmyebw="
 							},
-							"name": "password_hash",
+							"name": "password",
 							"type": "string"
 						},
 						{
@@ -17470,7 +17470,8 @@
 							"_parent": {
 								"$ref": "AAAAAAF4sWzS3zq0FI8="
 							},
-							"name": "..."
+							"name": "...",
+							"type": ""
 						}
 					]
 				},
@@ -17914,7 +17915,7 @@
 											"top": 443,
 											"width": 366,
 											"height": 18,
-											"text": "FolderE",
+											"text": "FolderEntity",
 											"wordWrap": true
 										},
 										{
@@ -17987,7 +17988,7 @@
 											"top": 471,
 											"width": 366,
 											"height": 18,
-											"text": "+contents: List<string> ...File id stringek",
+											"text": "+contents: List<File> ...File id stringek",
 											"horizontalAlignment": 0
 										},
 										{
@@ -18341,7 +18342,7 @@
 											"top": 307,
 											"width": 254.6015625,
 											"height": 18,
-											"text": "FileE"
+											"text": "File_c"
 										},
 										{
 											"_type": "LabelView",
@@ -18447,7 +18448,7 @@
 											"top": 375,
 											"width": 254.6015625,
 											"height": 18,
-											"text": "+parent_folder_id: long",
+											"text": "+parent_folder_id: string",
 											"horizontalAlignment": 0
 										},
 										{
@@ -18478,7 +18479,7 @@
 											},
 											"font": "Arial;18;0",
 											"left": 753,
-											"top": 435,
+											"top": 415,
 											"width": 254.6015625,
 											"height": 18,
 											"text": "+permissions: List<Permission>",
@@ -18495,10 +18496,27 @@
 											},
 											"font": "Arial;18;0",
 											"left": 753,
-											"top": 455,
+											"top": 435,
 											"width": 254.6015625,
 											"height": 18,
 											"text": "+date: Date",
+											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLAttributeView",
+											"_id": "AAAAAAF421ieR7uG+nU=",
+											"_parent": {
+												"$ref": "AAAAAAF4u0qY2trUZ2I="
+											},
+											"model": {
+												"$ref": "AAAAAAF4u5+zj/Mq000="
+											},
+											"font": "Arial;18;0",
+											"left": 753,
+											"top": 455,
+											"width": 254.6015625,
+											"height": 18,
+											"text": "+icon: ICON",
 											"horizontalAlignment": 0
 										}
 									],
@@ -19991,7 +20009,7 @@
 											},
 											"font": "Arial;18;0",
 											"left": 129,
-											"top": 879,
+											"top": 859,
 											"width": 390.673828125,
 											"height": 18,
 											"text": "+is_root: boolean",
@@ -20002,7 +20020,7 @@
 									"left": 124,
 									"top": 834,
 									"width": 400.673828125,
-									"height": 68
+									"height": 48
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -20015,7 +20033,7 @@
 									},
 									"font": "Arial;18;0",
 									"left": 124,
-									"top": 902,
+									"top": 882,
 									"width": 400.673828125,
 									"height": 10
 								},
@@ -21011,7 +21029,7 @@
 											"top": 623,
 											"width": 366,
 											"height": 18,
-											"text": "FolderE",
+											"text": "FolderEntity",
 											"wordWrap": true
 										},
 										{
@@ -21084,7 +21102,7 @@
 											"top": 651,
 											"width": 366,
 											"height": 18,
-											"text": "+contents: List<string> ...File id stringek",
+											"text": "+contents: List<File> ...File id stringek",
 											"horizontalAlignment": 0
 										},
 										{
@@ -29038,18 +29056,18 @@
 												"$ref": "AAAAAAF4NWOPkyo3vQw="
 											},
 											"font": "Arial;18;0",
-											"left": 355.9599609375,
+											"left": 362.0595703125,
 											"top": 77,
-											"width": 70.0400390625,
+											"width": 63.9404296875,
 											"height": 18,
 											"text": "Interface",
 											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;18;0",
-									"left": 350.9599609375,
+									"left": 357.0595703125,
 									"top": 72,
-									"width": 80.0400390625,
+									"width": 73.9404296875,
 									"height": 28
 								}
 							],
@@ -32066,7 +32084,7 @@
 									"font": "Arial;18;0",
 									"left": 1035,
 									"top": 1016.5,
-									"width": 167.0341796875,
+									"width": 166,
 									"height": 30,
 									"stereotypeLabel": {
 										"$ref": "AAAAAAF4NhQ/1WxVscc="
@@ -33076,7 +33094,7 @@
 									"font": "Arial;18;0",
 									"left": 1371,
 									"top": 924.5,
-									"width": 129.0302734375,
+									"width": 128,
 									"height": 30,
 									"stereotypeLabel": {
 										"$ref": "AAAAAAF4NhZTrXMWD+o="
@@ -34859,7 +34877,7 @@
 									"font": "Arial;18;0",
 									"left": 1093,
 									"top": 1186.5,
-									"width": 138.0390625,
+									"width": 137,
 									"height": 48,
 									"stereotypeLabel": {
 										"$ref": "AAAAAAF4Nf6HZmSbGUM="
@@ -35891,7 +35909,7 @@
 									"font": "Arial;18;0",
 									"left": 1553,
 									"top": 1000.5,
-									"width": 234,
+									"width": 235.017578125,
 									"height": 30,
 									"stereotypeLabel": {
 										"$ref": "AAAAAAF4NirfKqWh4PE="
@@ -38262,9 +38280,9 @@
 												"$ref": "AAAAAAF4TzaUWXn9K/A="
 											},
 											"font": "Arial;18;0",
-											"left": 272.021484375,
+											"left": 266.994140625,
 											"top": 181,
-											"width": 150.37890625,
+											"width": 137.0283203125,
 											"height": 18,
 											"text": "User Wants to Edit"
 										},
@@ -38277,7 +38295,7 @@
 											"font": "Arial;18;1",
 											"left": 237,
 											"top": 181,
-											"width": 30.021484375,
+											"width": 24.994140625,
 											"height": 18,
 											"text": "seq"
 										},
@@ -38310,7 +38328,7 @@
 															"font": "Arial;18;0",
 															"left": 252,
 															"top": 219,
-															"width": 215.138671875,
+															"width": 200.9619140625,
 															"height": 18,
 															"text": "[not Locked on Client Side]"
 														}
@@ -38343,7 +38361,7 @@
 															"font": "Arial;18;0",
 															"left": 252,
 															"top": 992,
-															"width": 185.115234375,
+															"width": 173.4609375,
 															"height": 18,
 															"text": "[Locked on Client Side]"
 														}
@@ -38762,9 +38780,9 @@
 												"$ref": "AAAAAAF4T0HXD3rvqYA="
 											},
 											"font": "Arial;18;0",
-											"left": 296.021484375,
+											"left": 290.994140625,
 											"top": 517,
-											"width": 365.1748046875,
+											"width": 333.3671875,
 											"height": 18,
 											"text": "[Async] Locks Are checked on the server side"
 										},
@@ -38777,7 +38795,7 @@
 											"font": "Arial;18;1",
 											"left": 261,
 											"top": 517,
-											"width": 30.021484375,
+											"width": 24.994140625,
 											"height": 18,
 											"text": "seq"
 										},
@@ -38810,7 +38828,7 @@
 															"font": "Arial;18;0",
 															"left": 276,
 															"top": 555,
-															"width": 176.080078125,
+															"width": 166.447265625,
 															"height": 18,
 															"text": "[Object is Not Locked]"
 														}
@@ -38843,7 +38861,7 @@
 															"font": "Arial;18;0",
 															"left": 276,
 															"top": 696,
-															"width": 162.73828125,
+															"width": 157.5966796875,
 															"height": 18,
 															"text": "[Locks Are Different]"
 														}
@@ -42731,7 +42749,7 @@
 											},
 											"font": "Arial;18;0",
 											"left": -32,
-											"top": 219,
+											"top": 199,
 											"width": 334,
 											"height": 18,
 											"text": "+id: string",
@@ -42742,7 +42760,7 @@
 									"left": -37,
 									"top": 114,
 									"width": 344,
-									"height": 148
+									"height": 108
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -42755,9 +42773,9 @@
 									},
 									"font": "Arial;18;0",
 									"left": -37,
-									"top": 262,
+									"top": 222,
 									"width": 344,
-									"height": 28
+									"height": 10
 								},
 								{
 									"_type": "UMLReceptionCompartmentView",
@@ -42857,7 +42875,7 @@
 											"top": 379,
 											"width": 366,
 											"height": 18,
-											"text": "FolderE",
+											"text": "FolderEntity",
 											"wordWrap": true
 										},
 										{
@@ -42930,7 +42948,7 @@
 											"top": 407,
 											"width": 366,
 											"height": 18,
-											"text": "+contents: List<string> ...File id stringek",
+											"text": "+contents: List<File> ...File id stringek",
 											"horizontalAlignment": 0
 										},
 										{
@@ -43284,7 +43302,7 @@
 											"top": 243,
 											"width": 254.6015625,
 											"height": 18,
-											"text": "FileE"
+											"text": "File_c"
 										},
 										{
 											"_type": "LabelView",
@@ -43390,7 +43408,7 @@
 											"top": 311,
 											"width": 254.6015625,
 											"height": 18,
-											"text": "+parent_folder_id: long",
+											"text": "+parent_folder_id: string",
 											"horizontalAlignment": 0
 										},
 										{
@@ -43421,7 +43439,7 @@
 											},
 											"font": "Arial;18;0",
 											"left": 432,
-											"top": 371,
+											"top": 351,
 											"width": 254.6015625,
 											"height": 18,
 											"text": "+permissions: List<Permission>",
@@ -43438,10 +43456,27 @@
 											},
 											"font": "Arial;18;0",
 											"left": 432,
-											"top": 391,
+											"top": 371,
 											"width": 254.6015625,
 											"height": 18,
 											"text": "+date: Date",
+											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLAttributeView",
+											"_id": "AAAAAAF421ieoru2xos=",
+											"_parent": {
+												"$ref": "AAAAAAF4u0/7y+PaTUA="
+											},
+											"model": {
+												"$ref": "AAAAAAF4u5+zj/Mq000="
+											},
+											"font": "Arial;18;0",
+											"left": 432,
+											"top": 391,
+											"width": 254.6015625,
+											"height": 18,
+											"text": "+icon: ICON",
 											"horizontalAlignment": 0
 										}
 									],
@@ -44934,7 +44969,7 @@
 											},
 											"font": "Arial;18;0",
 											"left": -192,
-											"top": 815,
+											"top": 795,
 											"width": 390.673828125,
 											"height": 18,
 											"text": "+is_root: boolean",
@@ -44945,7 +44980,7 @@
 									"left": -197,
 									"top": 770,
 									"width": 400.673828125,
-									"height": 68
+									"height": 48
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -44958,7 +44993,7 @@
 									},
 									"font": "Arial;18;0",
 									"left": -197,
-									"top": 838,
+									"top": 818,
 									"width": 400.673828125,
 									"height": 10
 								},
@@ -45954,7 +45989,7 @@
 											"top": 559,
 											"width": 366,
 											"height": 18,
-											"text": "FolderE",
+											"text": "FolderEntity",
 											"wordWrap": true
 										},
 										{
@@ -46027,7 +46062,7 @@
 											"top": 587,
 											"width": 366,
 											"height": 18,
-											"text": "+contents: List<string> ...File id stringek",
+											"text": "+contents: List<File> ...File id stringek",
 											"horizontalAlignment": 0
 										},
 										{

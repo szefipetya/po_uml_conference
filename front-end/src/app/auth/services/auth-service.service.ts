@@ -1,8 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { eraseCookie, getCookie } from 'src/app/utils/cookieUtils';
 import { environment } from 'src/environments/environment';
+import { AuthModule } from '../auth.module';
 import { LogoutResponse } from "../models/LogoutResponse";
 @Injectable({
   providedIn: 'root'
@@ -10,7 +13,7 @@ import { LogoutResponse } from "../models/LogoutResponse";
 export class AuthServiceService {
 
   constructor(private http: HttpClient, private _snackBar: MatSnackBar) {
-    environment.api_url_http
+
   }
 
 
@@ -21,13 +24,19 @@ export class AuthServiceService {
     });
   }
   logOut() {
-    console.log(environment.api_url_http + 'logout')
 
+    let url = environment.api_url_http + 'log_me_out'
+    console.log(url)//http://localhost:8101/logout
+    //GET http://localhost:8101/login?logout //WTFFFF rossz helyre küldi.
     this.http
-      .post<LogoutResponse>(environment.api_url_http + 'logout', getCookie("jwt_token"), {
-        headers: { 'Authorization': 'Bearer ' + getCookie("jwt_token") }
-      }).subscribe((resp) => {
-        if (resp.success) { this.openSnackBar("Logout Succesful"); }
+      .post<LogoutResponse>(url, { jwt_token: getCookie("jwt_token") },
+        {
+          headers: { 'Authorization': 'Bearer ' + getCookie("jwt_token") }
+        })
+      .pipe(catchError(this.handleError<LogoutResponse>(this, 'Logout', new LogoutResponse())))
+
+      .subscribe((resp: any) => {
+        if (resp?.success) { this.openSnackBar("Logout Succesful"); }
         else { this.openSnackBar(resp.msg); }
       })
 
@@ -36,5 +45,19 @@ export class AuthServiceService {
     eraseCookie("jwt_token");
     eraseCookie("user");
 
+  }
+
+
+  private handleError<T>(service: AuthServiceService, operation = 'operation', result?: T) {
+    return (error: HttpErrorResponse): Observable<T> => {
+      // TODO: send the error to remote logging infrastructure
+      console.error(error); // log to console instead
+
+      // TODO: better job of transforming error for user consumption
+      //  console.log(`${operation} failed: ${error.message}`);
+      this.openSnackBar(`Error (code: ${error.status}) ${operation} failed: ${error.message}`);
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
   }
 }

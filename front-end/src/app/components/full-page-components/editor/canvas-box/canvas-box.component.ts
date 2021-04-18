@@ -334,6 +334,30 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   };
   ngOnInit(): void {
     this.socket.registerContainer(this.getId(), this);
+    this.setup();
+  }
+  fullWidth: number;
+  fullHeight: number;
+  setup() {
+    // console.log('ITEMS', this.socket.itemViewModelMap = [])
+    const p = new Promise(async (resolve, reject) => {
+      await this.editorService.initFromServer();
+      await resolve('success');
+    });
+    p.then((o) => {
+      console.log('ITEMS AFTER', this.socket.itemViewModelMap)
+
+      console.log(o);
+      this.fullWidth = document.querySelector('html').clientWidth;
+      this.fullHeight = document.querySelector('html').clientHeight;
+      this.editorService.clientModel.canvas.clip.width =
+        this.fullWidth -
+        this.editorService.alignment.left_dock.width -
+        this.editorService.alignment.right_dock.width;
+      this.editorService.clientModel.canvas.clip.height =
+        this.fullHeight - this.editorService.alignment.bottom_dock.height;
+
+    });
   }
   editorService: GlobalEditorService;
   constructor(
@@ -342,6 +366,8 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   ) {
     this.editorService = editorService;
     this.editorService.canvasBox = this;
+
+
   }
   editBegin() {
     throw new Error('Method not implemented.');

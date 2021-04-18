@@ -98,7 +98,7 @@ export class LineController extends InteractiveItemBase {
           ctx.stroke();
         }
         //draw default line
-        //  console.log("lockers", this.sessionState?.lockerUser_id, " --- ", this.editorService.user.id)
+        //  console.log("lockers", this.sessionState?.lockerUser_id, " --- ", this.editorservice.getUser().id)
         if (this.sessionState?.lockerUser_id != '-' && this.sessionState?.lockerUser_id != this.editorService.getUser().id) {
           this.lineCanvasComponent.strike(
             "red",

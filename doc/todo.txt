@@ -1,2 +1,3 @@
 blacklist -> jwt expiration> database trigger, auto kitörlés
-miért nem jol küldi el a logoutot az angular??????
+miért nem jol küldi el a logoutot az angular??????-> mert a security bezavart
+Vissza gomb fent nagy. ekkor kilép ac aktuális projektből,(minden file tartalmazza a project_id-t)

@@ -7,8 +7,12 @@ package com.szefi.uml_conference.model.entity.management;
 
 import com.szefi.uml_conference.model.common.management.ACTION_TYPE;
 import java.io.Serializable;
+import java.util.List;
+import javax.annotation.Generated;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 /**
@@ -18,18 +22,21 @@ import javax.persistence.ManyToOne;
 @Entity
 public class PermissionEntity implements Serializable {
     @Id
-     String perm_tag;
+    @GeneratedValue
+     Integer id;
     ACTION_TYPE action_level;
-    @ManyToOne
-    File_cEntity file;
+    @ManyToMany
+     List<File_cEntity> files;
 
-    protected String getPerm_tag() {
-        return perm_tag;
+    public Integer getId() {
+        return id;
     }
 
-    public void setPerm_tag(String perm_tag) {
-        this.perm_tag = perm_tag;
+    public void setId(Integer id) {
+        this.id = id;
     }
+
+  
 
     public ACTION_TYPE getAction_level() {
         return action_level;
@@ -39,11 +46,13 @@ public class PermissionEntity implements Serializable {
         this.action_level = action_level;
     }
 
-    public File_cEntity getFile() {
-        return file;
+    public List<File_cEntity> getFiles() {
+        return files;
     }
 
-    public void setFile(File_cEntity file) {
-        this.file = file;
+    public void setFiles(List<File_cEntity> files) {
+        this.files = files;
     }
+
+ 
 }

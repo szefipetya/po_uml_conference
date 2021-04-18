@@ -22,7 +22,7 @@ export abstract class InterActiveContainerBase
   constructor(
     protected socket: EditorSocketControllerService,
     protected commonService: CommonService
-  ) {}
+  ) { }
   createItem(model: DynamicSerialObject, extra?: any) {
     throw new Error('Method not implemented.');
   }
@@ -63,7 +63,7 @@ export abstract class InterActiveContainerBase
       this.sendAction(action);
     }
 
-    if (state.lockerUser_id != this.socket.user.id) {
+    if (state.lockerUser_id != this.socket.getUser().id) {
       this.model.edit = false;
     } else {
       //we are the owner
@@ -87,7 +87,7 @@ export abstract class InterActiveContainerBase
     this.render();
   }
   isEditLockedByMe(): boolean {
-    return this.sessionState?.lockerUser_id == this.socket.user.id;
+    return this.sessionState?.lockerUser_id == this.socket.getUser().id;
   }
 
   //_Session Functions---------------------------------
@@ -126,7 +126,7 @@ export abstract class InterActiveContainerBase
     action.json = JSON.stringify(this.model);
     this.model.viewModel = vm;
   }*/
-  render(): void {}
+  render(): void { }
   //DML functions-v-v-v-v-v-v-v-v-v-v-
   deleteAsync(parent_id: string) {
     if (this.isEditLockedByMe()) {
@@ -177,13 +177,13 @@ export abstract class InterActiveContainerBase
     }
     if (
       this.sessionState.locks.length > 0 &&
-      this.socket.user.id != this.sessionState.lockerUser_id
+      this.socket.getUser().id != this.sessionState.lockerUser_id
     ) {
-      if (this.sessionState.lockerUser_id != this.socket.user.id) {
+      if (this.sessionState.lockerUser_id != this.socket.getUser().id) {
         this.log(
           "Object is locked (locker's id: " +
-            this.sessionState.lockerUser_id +
-            ')',
+          this.sessionState.lockerUser_id +
+          ')',
           MSG_TYPE.INFO
         );
       }

@@ -1,4 +1,7 @@
-
+DB
+- a blacklisted jwtket törölni ha lejárnak (DB trigger)
+SimpleClass 
+- NoteBox létrehozása
 - class létrehozásnál össze ugrik amikor választ kapunk kis bug,
 canvas-box
 - a vonal breakpointok ugorjanak össze, ha közel vannak

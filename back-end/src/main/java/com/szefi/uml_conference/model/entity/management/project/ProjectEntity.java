@@ -6,7 +6,14 @@
 package com.szefi.uml_conference.model.entity.management.project;
 
 import com.szefi.uml_conference.model.entity.management.File_cEntity;
+import com.szefi.uml_conference.model.entity.management.FolderEntity;
+import com.szefi.uml_conference.security.model.UserEntity;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 /**
@@ -14,18 +21,65 @@ import javax.persistence.OneToOne;
  * @author h9pbcl
  */
 
-//@Entity
-public class ProjectEntity /*extends File_cEntity*/{
+@Entity
+public class ProjectEntity extends File_cEntity{
     
-    
-    // @OneToOne(mappedBy="project")
+    @OneToMany(mappedBy="project",cascade = CascadeType.ALL)
+    private List<ProjectFileEntity> files;//root files
+
+      @OneToMany(mappedBy="relatedProject",cascade = CascadeType.ALL)
+    private List<ProjectFileEntity> relatedFiles;
+
+    public List<ProjectFileEntity> getRelatedFiles() {
+        return relatedFiles;
+    }
+
+    public void setRelatedFiles(List<ProjectFileEntity> relatedFiles) {
+        this.relatedFiles = relatedFiles;
+    }
+ 
+    @OneToOne(mappedBy="project",cascade = CascadeType.REMOVE)
     private ProjectFolderEntity rootFolder;
 
     public ProjectFolderEntity getRootFolder() {
         return rootFolder;
     }
 
+    public ProjectEntity() {
+        super();
+        files=new ArrayList<>();
+           rootFolder=new ProjectFolderEntity();
+           
+        rootFolder.setDate(new Date());
+        rootFolder.setIs_projectRoot(true);
+        rootFolder.setName("~");
+        rootFolder.setRelatedProject(this);
+        rootFolder.setProject(this);
+        this.files.add(rootFolder);
+    }
+    public ProjectEntity(UserEntity owner){
+         super();
+        files=new ArrayList<>();
+           rootFolder=new ProjectFolderEntity();
+           rootFolder.setOwner(owner);
+           this.setOwner(owner);
+        rootFolder.setDate(new Date());
+        rootFolder.setIs_projectRoot(true);
+        rootFolder.setName("~");
+         rootFolder.setProject(this);
+        rootFolder.setRelatedProject(this);
+        this.files.add(rootFolder);
+    }
+
     public void setRootFolder(ProjectFolderEntity rootFolder) {
         this.rootFolder = rootFolder;
     }
+       public List<ProjectFileEntity> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<ProjectFileEntity> files) {
+        this.files = files;
+    }
+    
 }

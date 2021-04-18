@@ -1,6 +1,9 @@
 <div class="commander-container">
-  <div class="commander-tools">
-    <div class="tool">
+  <div
+    class="commander-tools"
+    *ngIf="this.actualFolder?._type == 'FolderDto'; else project_tools"
+  >
+    <div class="tool" (click)="onCreateFolderClick()">
       <span>
         <img
           class="icon-square"
@@ -10,17 +13,17 @@
         />
       </span>
     </div>
-    <div class="tool">
+    <div class="tool" (click)="onCreateProjectClick()">
       <span>
         <img
           class="icon-square"
-          src="../../../assets/svg/flow-chart.svg"
+          src="../../../assets/svg/add-project.svg"
           alt="folder_icon"
           srcset=""
         />
       </span>
     </div>
-    <div class="tool">
+    <div class="tool" (click)="onDeleteClick()">
       <span>
         <img
           class="icon-square"
@@ -31,5 +34,72 @@
       </span>
     </div>
   </div>
-  <div class="commander-main">asdasda</div>
+  <ng-template #project_tools>
+    <div class="commander-tools">
+      <div class="tool" (click)="onCreateFolderClick()">
+        <span>
+          <img
+            class="icon-square"
+            src="../../../assets/svg/folder+.svg"
+            alt="folder_icon"
+            srcset=""
+          />
+        </span>
+      </div>
+
+      <div class="tool" (click)="onDeleteClick()">
+        <span>
+          <img
+            class="icon-square"
+            src="../../../assets/svg/trash.svg"
+            alt="folder_icon"
+            srcset=""
+          />
+        </span>
+      </div>
+    </div>
+  </ng-template>
+  <div class="path">
+    <span
+      class="pathElement"
+      (click)="fileDblClick(file)"
+      *ngFor="let file of this.actualPath"
+    >
+      <app-file [model]="file" [renderMode]="'path'"> </app-file>
+    </span>
+  </div>
+  <div class="commander-main" *ngIf="this.actualFolder; else errors">
+    <div
+      (click)="fileGoBack()"
+      class="back"
+      *ngIf="this.actualFolder.parentFolder_id"
+    >
+      back
+    </div>
+    <div
+      (dblclick)="fileDblClick(file)"
+      (click)="fileClick(file)"
+      class="file"
+      *ngFor="let file of this.actualFolder.files"
+    >
+      <app-file
+        [model]="file"
+        (focusEvent)="fileFocusEventHandler($event)"
+        (destroyEvent)="fileDestroyHandler($event)"
+      >
+      </app-file>
+    </div>
+  </div>
+  <ng-template class="error" #errors>
+    <!--   {{ this.errorMsg }} -->
+  </ng-template>
+  <div class="unauthorized-overlay" *ngIf="!this.isAuthenticated()">
+    <div class="m-3">
+      <a [routerLink]="['/login']" (click)="clickEvent.emit('close')"
+        >Log in
+      </a>
+
+      to access This function
+    </div>
+  </div>
 </div>

@@ -21,4 +21,5 @@ export class TopMenuComponent implements OnInit {
     this.service.logOut();
   }
 
+
 }

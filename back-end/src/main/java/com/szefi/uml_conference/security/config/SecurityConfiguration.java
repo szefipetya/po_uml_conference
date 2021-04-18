@@ -45,6 +45,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/user").hasAnyRole("ADMIN", "USER","ROLE_USER")
+                .antMatchers("/log_me_out").hasAnyRole("ADMIN", "USER","ROLE_USER")
+                .antMatchers("/test").permitAll()
                 .antMatchers("/get/**").hasAnyRole("ADMIN", "USER","ROLE_USER")
                 .antMatchers("/").permitAll()
                 .antMatchers("/state").permitAll()
@@ -56,6 +58,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 						anyRequest().authenticated().and().
 						exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        
         http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class);
 	http.addFilterBefore(jwtAuthRequestFilter, UsernamePasswordAuthenticationFilter.class);
 

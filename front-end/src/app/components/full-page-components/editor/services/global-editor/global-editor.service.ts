@@ -58,11 +58,11 @@ export class GlobalEditorService {
   getUser() {
     return JSON.parse(getCookie("user"));
   }
-  constructor(private http: HttpClient) {
+  init_first() {
     this.model = new Diagram();
     this.model.dgObjects = [];
     this.model.lines = [];
-    console.log('id ', this.getUser().id);
+    console.log('id ', this.getUser()?.id);
     this.alignment = {
       left_dock: {
         width: 100,
@@ -116,6 +116,9 @@ export class GlobalEditorService {
       },
     };
 
+  }
+  constructor(private http: HttpClient) {
+    this.init_first();
     //this.init();
   }
   namespace(str, scope) {
@@ -123,6 +126,9 @@ export class GlobalEditorService {
   }
 
   public async initFromServer() {
+    this.init_first();
+    await this.triggerEvent('pre_setup');
+    this.model = new Diagram();
     let response = await this.getDiagramFromServer('001');
     console.log(response);
 

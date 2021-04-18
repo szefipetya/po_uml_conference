@@ -1,0 +1,189 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.szefi.uml_conference.management.controller;
+
+import com.szefi.uml_conference._exceptions.JwtException;
+import com.szefi.uml_conference._exceptions.UnAuthorizedActionException;
+import com.szefi.uml_conference._exceptions.management.FileNotFoundException;
+import com.szefi.uml_conference._exceptions.management.FileTypeConversionException;
+import com.szefi.uml_conference._exceptions.management.IllegalDmlActionException;
+import com.szefi.uml_conference._exceptions.management.UnstatisfiedNameException;
+import com.szefi.uml_conference.management.services.ManagementService;
+import com.szefi.uml_conference.management.services.ProjectManagementService;
+import com.szefi.uml_conference.model.dto.management.FolderDto;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.PathParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ *
+ * @author h9pbcl
+ */
+@RestController
+@RequestMapping("/management")
+public class ManagementController {
+
+    @Autowired
+    ManagementService service;
+    @Autowired
+    ProjectManagementService projectService;
+
+
+    @GetMapping("user_root_folder")
+    public ResponseEntity<?> getUserRootFolder(
+            @RequestHeader(value = "Authorization") String authHeader
+    ) {
+        try {
+            return ResponseEntity.ok(service.getUserRootFolder(authHeader.substring(7)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("folder/{id}")
+    public ResponseEntity<?> getFolder(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id
+    ) {
+        try {
+            return ResponseEntity.ok(service.getFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileTypeConversionException | FileNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+      @DeleteMapping("folder/{id}")
+    public ResponseEntity<?> deleteFolder(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id
+    ) {
+        try {
+            return ResponseEntity.ok(service.deleteFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileTypeConversionException | FileNotFoundException |IllegalDmlActionException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } 
+    }
+
+    @DeleteMapping("FolderDto/{id}")//INTERNAL REDIRECT
+    public ResponseEntity<?> deleteFolder2(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id, HttpServletResponse httpResponse
+    ) throws IOException {
+
+        httpResponse.sendRedirect("/management/folder/" + folder_id);
+        return null;
+
+    }
+       @GetMapping("FolderDto/{id}")//INTERNAL REDIRECT
+    public ResponseEntity<?> getFolder2(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id, HttpServletResponse httpResponse
+    ) throws IOException {
+
+        httpResponse.sendRedirect("/management/folder/" + folder_id);
+        return null;
+
+    }
+     @GetMapping("projectFolderDto/{id}")//INTERNAL REDIRECT
+    public ResponseEntity<?> getProjectFolder2(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id, HttpServletResponse httpResponse
+    ) throws IOException {
+
+        httpResponse.sendRedirect("/management/projectFolder/" + folder_id);
+        return null;
+
+    }
+     
+     
+
+    @GetMapping("create_folder/{id}")//create a folder with a parent_id given in param
+    public ResponseEntity<?> createFolder(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String parent_id,
+            @RequestParam(value = "name") String name
+    ) {
+        try {
+            return ResponseEntity.ok(service.createFolder(authHeader.substring(7), Integer.valueOf(parent_id),name));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException | UnAuthorizedActionException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (UnstatisfiedNameException | FileTypeConversionException ex) {
+          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+    
+ @RequestMapping(value="project/{id}" ,method = RequestMethod.GET)//create a projectfolder with a parent_id given in param
+    public ResponseEntity<?> getProject(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String parent_id
+    ) {
+        try {
+            return ResponseEntity.ok(projectService.getProject(authHeader.substring(7), Integer.valueOf(parent_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException | UnAuthorizedActionException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileNotFoundException | FileTypeConversionException ex) {
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } 
+         
+    }
+
+//PROJECT
+
+  @GetMapping("projectFolder/{id}")
+    public ResponseEntity<?> getProjectFolder(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id
+    ) {
+        try {
+            return ResponseEntity.ok(projectService.getProjectFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileTypeConversionException | FileNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }    
+    
+        @DeleteMapping("projectFolder/{id}")
+    public ResponseEntity<?> deleteProjectFolder(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id
+    ) {
+        try {
+            return ResponseEntity.ok(projectService.deleteProjectFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileTypeConversionException | FileNotFoundException |IllegalDmlActionException | UnAuthorizedActionException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } 
+    }
+    //projectFolderDto
+   
+}

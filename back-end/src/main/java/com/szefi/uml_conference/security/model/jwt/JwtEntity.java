@@ -9,12 +9,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  *
  * @author h9pbcl
  */
 @Entity
+@Table(name="black_jwt")
 public class JwtEntity {
     @GeneratedValue
     @Id
@@ -22,7 +24,7 @@ public class JwtEntity {
     @ManyToOne
     BlackListedJwtCollectorEntity collector;
 
-    private String token;
+    private String token="";
 
     public BlackListedJwtCollectorEntity getCollector() {
         return collector;
@@ -39,6 +41,9 @@ public class JwtEntity {
     public void setToken(String token) {
         this.token = token;
     }
+     public JwtEntity() {
+       
+    }
     public JwtEntity(String token) {
         this.token=token;
     }
@@ -48,6 +53,17 @@ public class JwtEntity {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof JwtEntity){
+            return ((JwtEntity)obj).getToken().equals(this.token);
+        }
+        else if(obj instanceof String){
+            return ((String)obj).equals(this.token);
+        }
+        return false;
     }
     
 }

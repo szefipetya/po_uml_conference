@@ -54,7 +54,7 @@ export class SessionSocket implements SocketWrapper {
   }
   onopen(m: any) {
     console.log('Connected: ' + m);
-    setTimeout(() => this.send(this.parent.service.user.id), 50);
+    setTimeout(() => this.send(this.parent.service.getUser().id), 50);
   }
   oninitmessage(e: any) {
     let responses: SessionStateResponse[] = JSON.parse(e.data);

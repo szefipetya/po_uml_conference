@@ -1,7 +1,9 @@
 package com.szefi.uml_conference.controller;
 
 import com.szefi.uml_conference.model.dto.diagram.Diagram;
+import com.szefi.uml_conference.model.dto.management.FolderDto;
 import com.szefi.uml_conference.security.model.auth.AuthRequest;
+import com.szefi.uml_conference.security.model.auth.LogoutRequest;
 import com.szefi.uml_conference.security.service.JwtAuthRequestHandlerService;
 
 import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,10 +55,14 @@ public class ApiController {
     public Diagram getOne(@PathParam("id") String id) {
         return eService.getDummyDiagram();
     }
-    
+     
         @GetMapping("/")
     public String home() {
         return ("<h1>Welcome</h1>");
+    }
+       @PostMapping("/test")
+    public String test() {
+        return ("<h1>Welcome test</h1>");
     }
 
     @GetMapping("/user")
@@ -68,6 +75,7 @@ public class ApiController {
         return ("<h1>Welcome Admin</h1>");
     }
     
+    
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationJwt(@RequestBody AuthRequest req) throws Exception {
        try{
@@ -76,13 +84,14 @@ public class ApiController {
            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
        }
     }
-     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ResponseEntity<?> logoutWithJwt(@RequestBody String token) throws Exception {
-       try{
-            return ResponseEntity.ok( jwtAuthService.jwtLogout(token));
+     @PostMapping("/log_me_out")//angular miatt van ez, bugos
+    public ResponseEntity<?> logoutWithJwt(@RequestBody LogoutRequest token) throws Exception {
+      try{
+            return ResponseEntity.ok( jwtAuthService.jwtLogout(token.getJwt_token()));
        }catch(BadCredentialsException ex){
            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
        }
+    
     }
 /*
     @DELETE

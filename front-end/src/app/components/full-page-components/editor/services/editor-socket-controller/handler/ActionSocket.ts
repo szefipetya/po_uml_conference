@@ -32,7 +32,7 @@ export class ActionSocket implements SocketWrapper {
       console.log(
         'ACTION MESSAGE',
         JSON.parse(e.data).action,
-        this.parent.service.user.id,
+        this.parent.service.getUser().id,
         resp.action.user_id
       );
       switch (resp.action.action) {
@@ -40,12 +40,12 @@ export class ActionSocket implements SocketWrapper {
           si = this.parent.getItem(resp.target_id);
           console.log(si);
           if (si) { this.parent.service.triggerEvent('update'); }
-          if (resp.action.user_id != this.parent.service.user.id) {
+          if (resp.action.user_id != this.parent.service.getUser().id) {
             if (si) {
               si.updateModel(load, resp.action.id);
             }
           } else
-            console.log('UPDATE RECEIVED OWNER', this.parent.service.user.id);
+            console.log('UPDATE RECEIVED OWNER', this.parent.service.getUser().id);
           break;
         case ACTION_TYPE.RESTORE:
           if (resp.target_type == TARGET_TYPE.CONTAINER) {
@@ -59,7 +59,7 @@ export class ActionSocket implements SocketWrapper {
             } else {
               //user have deleted it, item not found
               sc = this.parent.getContainer(resp.action.target.parent_id);
-              if (resp.target_user_id == this.parent.service.user.id) {
+              if (resp.target_user_id == this.parent.service.getUser().id) {
                 if (sc) {
                   //we are the owner of the object
                   // load.edit = true;
@@ -120,8 +120,8 @@ export class ActionSocket implements SocketWrapper {
           console.log(resp.action.target);
           console.log(sc);
           console.log(resp.target_user_id);
-          console.log(this.parent.service.user.id);
-          if (resp.target_user_id == this.parent.service.user.id) {
+          console.log(this.parent.service.getUser().id);
+          if (resp.target_user_id == this.parent.service.getUser().id) {
             //we are the owner of the object
             load.edit = true;
             //we need to replace the old id with the new one
@@ -175,7 +175,7 @@ export class ActionSocket implements SocketWrapper {
   }
   onopen(m: any) {
     console.log('Connected: ' + m);
-    setTimeout(() => this.parent.socket.send(this.parent.service.user.id), 50);
+    setTimeout(() => this.parent.socket.send(this.parent.service.getUser().id), 50);
   }
   getItem(id) {
     let p: Pair<
@@ -203,7 +203,7 @@ export class ActionSocket implements SocketWrapper {
     this.socket.onclose = this.onclose;
   }
   send(action: EditorAction) {
-    action.user_id = this.service.user.id;
+    action.user_id = this.service.getUser().id;
     console.log('sending', action);
     setTimeout(() => {
       this.socket.send(JSON.stringify(action));

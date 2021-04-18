@@ -9,7 +9,7 @@ package com.szefi.uml_conference._exceptions;
  *
  * @author h9pbcl
  */
-public class JwtParseException extends Exception{
+public class JwtParseException extends JwtException{
     public JwtParseException(String msg){
         super(msg);
     }

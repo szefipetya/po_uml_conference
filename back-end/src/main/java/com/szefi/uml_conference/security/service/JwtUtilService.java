@@ -8,6 +8,7 @@ package com.szefi.uml_conference.security.service;
 import com.szefi.uml_conference._exceptions.JwtParseException;
 import com.szefi.uml_conference.security.model.jwt.BlackListedJwtCollectorEntity;
 import com.szefi.uml_conference.security.model.jwt.JwtEntity;
+import com.szefi.uml_conference.security.repository.BlackJwtRepository;
 import com.szefi.uml_conference.security.repository.BlackListedJwtCollectorEntityRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -17,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +31,10 @@ import org.springframework.stereotype.Service;
 public class JwtUtilService {
       private String SECRET_KEY = "lmao_nice_secret";
 
-      @Autowired
-      BlackListedJwtCollectorEntityRepository blackListRepo;
+    //  @Autowired
+     // BlackListedJwtCollectorEntityRepository blackListRepo;
+        @Autowired
+        BlackJwtRepository blackJwtsRepo;
       
     public String extractUsername(String token) throws JwtParseException {
         try{
@@ -63,7 +68,7 @@ public class JwtUtilService {
         
     }
 
-    private Boolean isTokenExpired(String token) throws JwtParseException {
+    public Boolean isTokenExpired(String token) throws JwtParseException {
         try{
         return extractExpiration(token).before(new Date());
          }catch(Exception ex){
@@ -85,9 +90,8 @@ public class JwtUtilService {
     
     public Boolean blackListToken(String token) throws JwtParseException{
         if(!isTokenExpired(token)){
-        BlackListedJwtCollectorEntity collection=blackListRepo.getBlackList();
-        collection.getJwts().add(new JwtEntity(token));
-         blackListRepo.save(collection);
+            JwtEntity ent=new JwtEntity(token);
+         blackJwtsRepo.save(ent);
          return true;
         }
        
@@ -96,7 +100,13 @@ public class JwtUtilService {
     }
     public Boolean validateToken(String token, UserDetails userDetails) throws JwtParseException {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+          JwtEntity ent=blackJwtsRepo.findToken(token);
+          //equals felül van írva String-re
+        return (ent==null&&username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+       @EventListener(ApplicationReadyEvent.class)
+    private void init(){
+       // blackListRepo.save(new BlackListedJwtCollectorEntity() );
     }
     
 }

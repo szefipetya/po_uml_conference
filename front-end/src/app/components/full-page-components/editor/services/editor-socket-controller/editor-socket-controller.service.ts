@@ -45,7 +45,7 @@ export class EditorSocketControllerService {
   constructor(private editorService: GlobalEditorService) {
     this.itemViewModelMap = [];
     this.waitingForResponse_queue = [];
-    this.user = editorService.getUser();
+    // this.user = editorService.getUser();
     this.test = new Test();
     this.editorService.addListenerAfterDgFetch(
       this,
@@ -54,6 +54,13 @@ export class EditorSocketControllerService {
       },
       'init'
     );
+    this.addListenerToEvent(this, (target) => {
+      target.injectionQueue = [];
+      target.itemViewModelMap = [];
+      target.containerViewModelMap = [];
+      target.disconnect();
+      console.log("megvan az init");
+    }, 'pre_setup')
   }
 
   //the data exists. we just need to wait for the view
@@ -194,15 +201,18 @@ export class EditorSocketControllerService {
     this.actionSocket.connect(this.url_pre + 'action');
   }
   public disconnect() {
-    this.sessionSocket.socket.close();
-    this.actionSocket.socket.close();
+    this.sessionSocket?.socket?.close();
+    this.actionSocket?.socket?.close();
   }
 
   public send(action: EditorAction) {
     // this.waitingForResponse_queue.push(new Pair(action, sender));
-    action.user_id = this.user.id;
+    action.user_id = this.getUser().id;
     console.log('sent', action);
     this.actionSocket.send(action);
+  }
+  public getUser() {
+    return this.editorService.getUser();
   }
   getItem(id) {
     let p: Pair<String, SessionInteractiveItem> = this.itemViewModelMap.find(

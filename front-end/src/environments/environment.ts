@@ -5,8 +5,15 @@
 export const environment = {
   production: false,
   api_url_http: 'http://localhost:8101/',
-  api_url_raw: 'localhost:8101/'
+  api_url_raw: 'localhost:8101/',
 };
+export enum endP {
+  management = 'management/',
+  project_management = 'project_management/',
+  project = 'project/',
+  create_project = 'create_project/',
+  user_root_folder = 'user_root_folder/', create_folder = 'create_folder/', folder = 'folder/'
+}
 
 /*
  * For easier debugging in development mode, you can import the following file

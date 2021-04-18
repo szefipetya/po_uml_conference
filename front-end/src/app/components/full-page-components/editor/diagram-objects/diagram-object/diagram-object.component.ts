@@ -115,7 +115,7 @@ export class DiagramObjectComponent
   }
   isLocked(): string {
     if (this.sessionState == undefined) return 'null';
-    if (this.sessionState.lockerUser_id == this.socket.user.id)
+    if (this.sessionState.lockerUser_id == this.socket.getUser().id)
       return 'editing';
     if (this.sessionState.locks.length > 0)
       return 'locked:' + this.sessionState.lockerUser_id;

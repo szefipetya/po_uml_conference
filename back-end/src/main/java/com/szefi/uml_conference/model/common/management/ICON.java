@@ -10,5 +10,6 @@ package com.szefi.uml_conference.model.common.management;
  * @author h9pbcl
  */
 public enum ICON {
-    PLACEHOLDER,PROJECT,DIAGRAM,FOLDER,FOLDER_SHARED
+    PLACEHOLDER,PROJECT,PROJECT_FOLDER,PROJECT_FILE
+    ,DIAGRAM,FOLDER,FOLDER_SHARED,FILE
 }

@@ -34,6 +34,7 @@ import { SessionMessageWindowComponent } from './components/windows/windowed-com
 import { LeftPanelComponentComponent } from './components/left-panel-component/left-panel-component.component';
 import { AuthModule } from "src/app/auth/auth.module";
 import { RouterModule } from '@angular/router';
+import { FileComponent } from './components/left-panel-component/file/file.component';
 
 @NgModule({
   declarations: [
@@ -57,6 +58,7 @@ import { RouterModule } from '@angular/router';
     DiagramObjectComponent,
     SessionMessageWindowComponent,
     LeftPanelComponentComponent,
+    FileComponent,
   ],
   imports: [
     //Angular core

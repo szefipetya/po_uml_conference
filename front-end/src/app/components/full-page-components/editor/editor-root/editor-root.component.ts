@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterContentInit, Component, OnInit } from '@angular/core';
 import { Diagram } from 'src/app/components/models/Diagram/Diagram';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { NoteBox } from 'src/app/components/models/DiagramObjects/NoteBox';
@@ -11,39 +11,24 @@ import { GlobalEditorService } from '../services/global-editor/global-editor.ser
   templateUrl: './editor-root.component.html',
   styleUrls: ['./editor-root.component.scss'],
 })
-export class EditorRootComponent implements OnInit {
+export class EditorRootComponent implements OnInit, AfterContentInit {
   editorService: GlobalEditorService;
   toolBoxWidth = 300;
   menuBarHeight = 80;
-  fullWidth: number;
-  fullHeight: number;
+
   //
 
   constructor(editorService: GlobalEditorService) {
     this.editorService = editorService;
     console.log('setup is running');
-    this.setup();
-  }
 
+  }
+  ngAfterContentInit() {
+
+  }
   ngOnInit(): void { }
-  setup() {
-    const p = new Promise(async (resolve, reject) => {
-      await this.editorService.initFromServer();
-      await resolve('success');
-    });
-    p.then((o) => {
-      console.log(o);
-      this.fullWidth = document.querySelector('html').clientWidth;
-      this.fullHeight = document.querySelector('html').clientHeight;
-      this.editorService.clientModel.canvas.clip.width =
-        this.fullWidth -
-        this.editorService.alignment.left_dock.width -
-        this.editorService.alignment.right_dock.width;
-      this.editorService.clientModel.canvas.clip.height =
-        this.fullHeight - this.editorService.alignment.bottom_dock.height;
 
-    });
-  }
+
   newButton;
   newButtonTransition;
   newButtonFontSize;
@@ -72,15 +57,7 @@ export class EditorRootComponent implements OnInit {
       this.editorService.model.dgObjects.map((clas: DiagramObject) => {
         //  console.log(clas);
         clas.viewModel.disableEdit();
-        /* if (clas._type == 'SimpleClass') {
-          ((clas as SimpleClass)
-            .viewModel as SimpleClassComponent).disableEdit();
-        }
-        if (clas._type == 'NoteBox') {
-          (clas as NoteBox).viewModel.disableEdit();
-        }
 
-        console.log('edit is false on' + clas.id);*/
       });
       this.inputDOM = undefined;
     } else if (e.target.id == '#editor-input') this.inputDOM = e.target;

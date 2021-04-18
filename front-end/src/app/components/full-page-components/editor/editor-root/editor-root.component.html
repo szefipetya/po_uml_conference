@@ -1,4 +1,5 @@
 <div
+  *ngIf="this.editorService.getUser(); else login_pls"
   id="app"
   tabIndex="0"
   (mousemove)="this.onMouseMove($event)"
@@ -13,3 +14,12 @@
     <app-canvas-box> </app-canvas-box>
   </div>
 </div>
+<ng-template #login_pls>
+  <div class="unauthorized-overlay">
+    <div>
+      <a [routerLink]="['/login']">Log in</a>
+
+      to access This function
+    </div>
+  </div>
+</ng-template>

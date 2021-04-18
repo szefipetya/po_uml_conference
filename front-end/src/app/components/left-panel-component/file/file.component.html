@@ -1,0 +1,41 @@
+<div *ngIf="this.model.clientModel?.edit; else normal">
+  <input
+    #input
+    type="text"
+    value=""
+    (focusout)="onfocusOut($event)"
+    (keypress)="onKeyPress($event)"
+  />
+</div>
+<ng-template #normal>
+  <a *ngIf="this.renderMode == 'path'; else normalrender">
+    {{ model.name }}/
+  </a>
+  <ng-template #normalrender>
+    <div
+      class="file selected"
+      *ngIf="this.model.clientModel?.selected; else unselected"
+    >
+      <span>
+        <img
+          class="file-icon"
+          src="{{ this.iconLink }}"
+          alt="folder_icon"
+          srcset=""
+      /></span>
+      {{ model.name }}
+    </div>
+    <ng-template #unselected>
+      <div class="file">
+        <span>
+          <img
+            class="file-icon"
+            src="{{ this.iconLink }}"
+            alt="folder_icon"
+            srcset=""
+        /></span>
+        {{ model.name }}
+      </div>
+    </ng-template>
+  </ng-template>
+</ng-template>

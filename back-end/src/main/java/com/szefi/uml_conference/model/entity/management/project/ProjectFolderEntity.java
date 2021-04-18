@@ -6,17 +6,24 @@
 package com.szefi.uml_conference.model.entity.management.project;
 
 import com.szefi.uml_conference.model.entity.management.File_cEntity;
+import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 /**
  *
  * @author h9pbcl
  */
-//@Entity
+@Entity
 public class ProjectFolderEntity extends ProjectFileEntity {
-
+    
+ @OneToMany(mappedBy = "parentProjectFolder" ,cascade = CascadeType.REMOVE)
+   List<ProjectFileEntity> files;
+   boolean is_projectRoot;
+   
     public List<ProjectFileEntity> getFiles() {
         return files;
     }
@@ -25,14 +32,27 @@ public class ProjectFolderEntity extends ProjectFileEntity {
         this.files = files;
     }
 
-    public boolean isIs_root() {
-        return is_root;
+    public ProjectFolderEntity() {
+        
+            super();
+            files=new ArrayList<>();
     }
 
-    public void setIs_root(boolean is_root) {
-        this.is_root = is_root;
+    public boolean isIs_projectRoot() {
+        return is_projectRoot;
     }
-   // @OneToMany(mappedBy = )
-       List<ProjectFileEntity> files;
-   boolean is_root;
+
+    public void setIs_projectRoot(boolean is_projectRoot) {
+        this.is_projectRoot = is_projectRoot;
+    }
+
+     public boolean addFile(ProjectFileEntity ent){
+        ent.setParentProjectFolder(this);
+        ent.setOwner(this.getOwner());
+        ent.setRelatedProject(this.relatedProject);
+    //    ent.setPermissions(this.getPermissions());
+        return this.getFiles().add(ent);
+    }
+
+
 }

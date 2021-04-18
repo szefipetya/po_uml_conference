@@ -55,7 +55,7 @@ export class SimpleClassComponent
     //{
 
     (this.getTitleVm() as AttributeComponent).render();
-    console.log('users', this.sessionState?.lockerUser_id, this.socket.user.id);
+    console.log('users', this.sessionState?.lockerUser_id, this.socket.getUser().id);
     console.log('DRAFT', this.model.extra);
     this.model.dimensionModel = model.dimensionModel;
     if (

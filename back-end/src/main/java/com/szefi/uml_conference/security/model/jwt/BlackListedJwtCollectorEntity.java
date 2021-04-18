@@ -5,6 +5,7 @@
  */
 package com.szefi.uml_conference.security.model.jwt;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -24,8 +25,9 @@ public class BlackListedJwtCollectorEntity {
     @Id
     Integer id;
     @OneToMany(mappedBy = "collector",cascade = CascadeType.ALL)
-    List<JwtEntity> blackListedJwts;
+    List<JwtEntity> blackListedJwts=new ArrayList<>();
 
+    public BlackListedJwtCollectorEntity(){}
     public Integer getId() {
         return id;
     }

@@ -49,7 +49,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
       this.sendAction(action);
     }
 
-    if (state.lockerUser_id != this.socket.user.id) {
+    if (state.lockerUser_id != this.socket.getUser().id) {
       this.model.edit = false;
     } else {
       //we are the owner
@@ -73,7 +73,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     this.render();
   }
   isEditLockedByMe(): boolean {
-    return this.sessionState?.lockerUser_id == this.socket.user.id;
+    return this.sessionState?.lockerUser_id == this.socket.getUser().id;
   }
 
   //_Session Functions---------------------------------
@@ -165,9 +165,9 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     }
     if (
       this.sessionState?.locks.length > 0 &&
-      this.socket.user.id != this.sessionState?.lockerUser_id
+      this.socket.getUser().id != this.sessionState?.lockerUser_id
     ) {
-      if (this.sessionState?.lockerUser_id != this.socket.user.id) {
+      if (this.sessionState?.lockerUser_id != this.socket.getUser().id) {
         this.log(
           "Object is locked (locker's id: " +
           this.sessionState?.lockerUser_id +

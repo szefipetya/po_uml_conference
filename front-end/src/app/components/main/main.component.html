@@ -1,9 +1,5 @@
 <div class="page-root">
   <div class="side-nav">
-    <button type="button" mat-button (click)="drawer.toggle()">
-      Toggle sidenav
-    </button>
-
     <div>
       <span>
         <img
@@ -14,7 +10,7 @@
         />
       </span>
     </div>
-    <div (click)="drawer.toggle()">
+    <div (click)="toggle()">
       <span>
         <img
           class="icon"
@@ -57,8 +53,23 @@
   </div>
 
   <mat-drawer-container class="example-container" autosize>
-    <mat-drawer #drawer class="example-sidenav" mode="over" opened="false">
-      <app-left-panel-component> </app-left-panel-component>
+    <mat-drawer
+      #drawer
+      class="example-sidenav"
+      mode="over"
+      opened="false"
+      (click)="panelClick($event)"
+      (keyup)="onKeyUp($event)"
+      (keydown)="onKeyDown($event)"
+    >
+      <div>
+        <app-left-panel-component
+          [events]="eventsSubject.asObservable()"
+          (clickEvent)="clickHandler($event)"
+        >
+          >
+        </app-left-panel-component>
+      </div>
     </mat-drawer>
     <app-top-menu> </app-top-menu>
     <div class="example-sidenav-content">

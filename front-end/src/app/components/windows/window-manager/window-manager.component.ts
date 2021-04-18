@@ -96,10 +96,10 @@ export class WindowManagerComponent implements OnInit {
   onDockMouseEnter(e, side) {
     //  console.log(e, side);
   }
-  onClick(e) {}
+  onClick(e) { }
 
   //event handlers
-  onToolSelected(tool) {}
+  onToolSelected(tool) { }
 
   createElementFromHTML(htmlString, model) {
     var div = document.createElement('div');
@@ -107,7 +107,7 @@ export class WindowManagerComponent implements OnInit {
     // Change this to div.childNodes to support multiple top-level nodes
     return div.firstChild;
   }
-  ngOnInit(): void {}
+  ngOnInit(): void { }
   draggedWindowDOM: any;
   windows: Window_c[];
 }

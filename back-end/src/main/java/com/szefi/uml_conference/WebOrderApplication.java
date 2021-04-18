@@ -18,7 +18,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableAutoConfiguration
 @EntityScan({"com.szefi.uml_conference"})
 @ComponentScan({"com.szefi.uml_conference"})
-@EnableJpaRepositories({"com.szefi.uml_conference.security"})
+@EnableJpaRepositories({"com.szefi.uml_conference"})
 public class WebOrderApplication {
     @Autowired
      static ApplicatoinStartupRunner runner;

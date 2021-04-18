@@ -5,7 +5,9 @@
  */
 package com.szefi.uml_conference.model.entity.management;
 
+import com.szefi.uml_conference.model.common.management.ICON;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
@@ -17,9 +19,23 @@ import javax.persistence.OneToMany;
 @Entity
 public class FolderEntity extends File_cEntity {
     
-    @OneToMany(mappedBy = "parentFolder")
+    @OneToMany(mappedBy = "parentFolder" ,cascade = CascadeType.REMOVE)
    List<File_cEntity> files;
    boolean is_root;
+
+    public FolderEntity() {
+        super();
+        this.setName("New Folder");
+        this.setIcon(ICON.FOLDER);
+        this.is_root=false;
+        
+    }
+    public boolean addFile(File_cEntity ent){
+        ent.setParentFolder(this);
+        ent.setOwner(this.getOwner());
+    //    ent.setPermissions(this.getPermissions());
+        return this.getFiles().add(ent);
+    }
 
     public List<File_cEntity> getFiles() {
         return files;

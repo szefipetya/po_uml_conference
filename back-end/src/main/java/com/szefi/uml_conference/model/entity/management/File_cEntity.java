@@ -14,37 +14,50 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  *
  * @author h9pbcl
  */
 @Entity
+@Table(name="files")
+@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public class File_cEntity implements Serializable {
+  //   @GenericGenerator(name = "client_id", strategy = "com.szefi.uml_conference.model.generator.IdGenerator")
+  //  @GeneratedValue(generator = "client_id")  
     @GeneratedValue
     @Id
-        private String id;
+        private Integer id;
     private String name;
-    @ManyToOne
-    private FolderEntity parentFolder ;
     @OneToOne
+    private FolderEntity parentFolder ;
+    @ManyToOne
     private UserEntity owner;
-    @OneToMany(mappedBy = "file")
+    @ManyToMany(mappedBy = "files")
     private List<PermissionEntity> permissions;
     private Date date;
     private ICON icon ;  
 
-    protected File_cEntity(){}
+    public File_cEntity(){
+        this.date=new Date();
+        this.icon=ICON.FILE;
+        this.name="New file";
+      
+    }
     
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -56,12 +69,12 @@ public class File_cEntity implements Serializable {
         this.name = name;
     }
 
-    public FolderEntity getParent_folder() {
+    public FolderEntity getParentFolder() {
         return parentFolder;
     }
 
-    public void setParent_folder(FolderEntity parent_folder) {
-        this.parentFolder = parent_folder;
+    public void setParentFolder(FolderEntity parentFolder) {
+        this.parentFolder = parentFolder;
     }
 
     public UserEntity getOwner() {

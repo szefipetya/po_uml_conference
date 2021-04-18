@@ -134,7 +134,7 @@ export class AttributeComponent
   //view needs this to represent lock state
   isLocked(): string {
     if (this.sessionState == undefined) return 'null';
-    if (this.sessionState.lockerUser_id == this.socket.user.id)
+    if (this.sessionState.lockerUser_id == this.socket.getUser().id)
       return 'editing';
     if (this.sessionState.locks.length > 0)
       return 'locked:' + this.sessionState.lockerUser_id;
@@ -260,7 +260,7 @@ export class AttributeComponent
     if (this.model) {
       if (
         this.sessionState &&
-        this.sessionState.lockerUser_id == this.socket.user.id
+        this.sessionState.lockerUser_id == this.socket.getUser().id
       ) {
         this.model.edit = true;
       }
