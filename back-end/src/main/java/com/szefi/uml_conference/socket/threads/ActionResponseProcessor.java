@@ -2,12 +2,12 @@ package com.szefi.uml_conference.socket.threads;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.model.dto.socket.EditorAction;
-import com.szefi.uml_conference.model.dto.socket.Response.EditorActionResponse;
-import com.szefi.uml_conference.model.dto.socket.Response.RESPONSE_SCOPE;
-import com.szefi.uml_conference.model.dto.socket.Response.SessionStateResponse;
-import com.szefi.uml_conference.model.dto.socket.SessionState;
-import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.editor.model.socket.EditorAction;
+import com.szefi.uml_conference.editor.model.socket.Response.EditorActionResponse;
+import com.szefi.uml_conference.editor.model.socket.Response.RESPONSE_SCOPE;
+import com.szefi.uml_conference.editor.model.socket.Response.SessionStateResponse;
+import com.szefi.uml_conference.editor.model.socket.SessionState;
+import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

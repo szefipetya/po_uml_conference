@@ -7,6 +7,8 @@ import { EditorSocketControllerService } from '../editor-socket-controller.servi
 import { TOKEN_TYPE } from '../InjectionToken_c';
 import { SocketWrapper } from './SocketWrapper_I';
 import { Pair } from '../../../../../../utils/utils';
+import { SocketAuthenticationRequest } from 'src/app/components/models/socket/security/SocketAuthenticationRequest';
+import { getCookie } from 'src/app/utils/cookieUtils';
 
 export class SessionSocket implements SocketWrapper {
   [x: string]: any;
@@ -54,7 +56,7 @@ export class SessionSocket implements SocketWrapper {
   }
   onopen(m: any) {
     console.log('Connected: ' + m);
-    setTimeout(() => this.send(this.parent.service.getUser().id), 50);
+    setTimeout(() => this.parent.socket.send(new SocketAuthenticationRequest(getCookie("jwt_token"), 1000), 50));
   }
   oninitmessage(e: any) {
     let responses: SessionStateResponse[] = JSON.parse(e.data);

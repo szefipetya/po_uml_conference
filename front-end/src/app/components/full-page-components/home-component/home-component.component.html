@@ -1,0 +1,16 @@
+<div *ngIf="this.isLoggedIn(); else unauthenticated">
+  <p>Welcome {{ this.getUser_Name() }}</p>
+</div>
+<ng-template #unauthenticated>
+  <h2>Welcome to the UML Conference application.</h2>
+  <h3>
+    Please,
+    <a [routerLink]="['/login']">Login </a>
+
+    or
+
+    <a [routerLink]="['/register']">Register </a>
+
+    to access full functionality
+  </h3>
+</ng-template>

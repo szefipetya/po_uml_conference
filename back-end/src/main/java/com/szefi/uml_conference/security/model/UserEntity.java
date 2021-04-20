@@ -5,6 +5,7 @@
  */
 package com.szefi.uml_conference.security.model;
 
+import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.model.entity.management.File_cEntity;
 import com.szefi.uml_conference.model.entity.management.FolderEntity;
 import com.szefi.uml_conference.security.converter.RoleListConverter;
@@ -36,7 +37,19 @@ public class UserEntity {
     private String password;
     private String name;
     
+   /* @OneToMany(mappedBy = "owner")
+    private List<DiagramEntity> diagrams;*/
     
+    
+    
+   /* public List<DiagramEntity> getDiagrams() {
+        return diagrams;
+    }
+
+    public void setDiagrams(List<DiagramEntity> diagrams) {
+        this.diagrams = diagrams;
+    }
+    */
     @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
     private List<File_cEntity> files;
 

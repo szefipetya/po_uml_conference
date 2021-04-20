@@ -104,6 +104,9 @@ public class JwtUtilService {
           //equals felül van írva String-re
         return (ent==null&&username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+    
+    
+       
        @EventListener(ApplicationReadyEvent.class)
     private void init(){
        // blackListRepo.save(new BlackListedJwtCollectorEntity() );

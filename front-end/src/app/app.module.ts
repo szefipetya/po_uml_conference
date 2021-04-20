@@ -35,6 +35,7 @@ import { LeftPanelComponentComponent } from './components/left-panel-component/l
 import { AuthModule } from "src/app/auth/auth.module";
 import { RouterModule } from '@angular/router';
 import { FileComponent } from './components/left-panel-component/file/file.component';
+import { HomeComponentComponent } from './components/full-page-components/home-component/home-component.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { FileComponent } from './components/left-panel-component/file/file.compo
     SessionMessageWindowComponent,
     LeftPanelComponentComponent,
     FileComponent,
+    HomeComponentComponent,
   ],
   imports: [
     //Angular core

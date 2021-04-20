@@ -7,9 +7,11 @@ package com.szefi.uml_conference.socket.handler;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.model.dto.diagram.Diagram;
-import com.szefi.uml_conference.model.dto.socket.EditorAction;
-import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.editor.model.diagram.Diagram;
+import com.szefi.uml_conference.editor.model.socket.EditorAction;
+import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.socket.security.SocketSecurityService;
+import com.szefi.uml_conference.socket.security.model.SocketAuthenticationRequest;
 import com.szefi.uml_conference.socket.threads.SocketThreadManager;
 import com.szefi.uml_conference.socket.threads.service.SOCKET;
 import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
@@ -43,6 +45,8 @@ public class EditorActionHandler extends TextWebSocketHandler {
     @Autowired
     SocketSessionService sessionService;
     
+    @Autowired SocketSecurityService socketSecutiryService;
+    
     @Autowired SocketThreadManager threadManager;
     Map<WebSocketSession,Integer> initMap=new HashMap<>();
     ObjectMapper mapper ;
@@ -69,7 +73,12 @@ public class EditorActionHandler extends TextWebSocketHandler {
         if(initMap.get(session)==0){
           for(UserWebSocket u:sessionService.getSockets(SOCKET.ACTION)){
               if(u.getSocket()==session){
-                  u.setUser_id(message.getPayload());
+                  SocketAuthenticationRequest req=mapper.readValue(message.getPayload(), SocketAuthenticationRequest.class);
+                if(socketSecutiryService.authenticateRequest(req)){
+                    //get the session from the service, andi inject the user.
+                }
+
+//  u.setUser_id(message.getPayload());
                    System.out.println(initMap.get(session));
              System.out.println("action msg"+message.getPayload());
               }

@@ -13,7 +13,8 @@ import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSer
 import { GlobalEditorService } from '../../global-editor/global-editor.service';
 import { Pair } from '../../../../../../utils/utils';
 import { JsonpClientBackend } from '@angular/common/http';
-
+import { SocketAuthenticationRequest } from '../../../../../models/socket/security/SocketAuthenticationRequest'
+import { getCookie } from 'src/app/utils/cookieUtils';
 export class ActionSocket implements SocketWrapper {
   [x: string]: any;
   socket: any;
@@ -175,7 +176,7 @@ export class ActionSocket implements SocketWrapper {
   }
   onopen(m: any) {
     console.log('Connected: ' + m);
-    setTimeout(() => this.parent.socket.send(this.parent.service.getUser().id), 50);
+    setTimeout(() => this.parent.socket.send(new SocketAuthenticationRequest(getCookie("jwt_token"), 1000), 50));
   }
   getItem(id) {
     let p: Pair<

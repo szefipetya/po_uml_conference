@@ -8,17 +8,17 @@ package com.szefi.uml_conference.socket.threads.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.model.dto.do_related.AttributeElement;
-import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
-import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
-import com.szefi.uml_conference.model.dto.socket.ACTION_TYPE;
-import com.szefi.uml_conference.model.dto.socket.EditorAction;
-import com.szefi.uml_conference.model.dto.socket.LOCK_TYPE;
-import com.szefi.uml_conference.model.dto.socket.Response.EditorActionResponse;
-import com.szefi.uml_conference.model.dto.socket.Response.RESPONSE_SCOPE;
-import com.szefi.uml_conference.model.dto.socket.Response.SessionStateResponse;
-import com.szefi.uml_conference.model.dto.socket.Response.TARGET_TYPE;
-import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
+import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
+import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
+import com.szefi.uml_conference.editor.model.do_related.SimpleClassElementGroup;
+import com.szefi.uml_conference.editor.model.socket.ACTION_TYPE;
+import com.szefi.uml_conference.editor.model.socket.EditorAction;
+import com.szefi.uml_conference.editor.model.socket.LOCK_TYPE;
+import com.szefi.uml_conference.editor.model.socket.Response.EditorActionResponse;
+import com.szefi.uml_conference.editor.model.socket.Response.RESPONSE_SCOPE;
+import com.szefi.uml_conference.editor.model.socket.Response.SessionStateResponse;
+import com.szefi.uml_conference.editor.model.socket.Response.TARGET_TYPE;
+import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import com.szefi.uml_conference.socket.threads.ActionResponseProcessor;
 import com.szefi.uml_conference.socket.threads.CustomProcessor;
 import com.szefi.uml_conference.socket.threads.EditorActionProcessor;
@@ -110,11 +110,11 @@ public class NestedEditorActionProcessor extends CustomProcessor {
             }
         }
     }
-      protected String getLockerIdIfexists(String target_id) {
+      protected Integer getLockerIdIfexists(Integer target_id) {
         if (service.getSessionStateById(target_id) != null && service.getSessionStateById(target_id).getLockerUser_id() != null) {
             return service.getSessionStateById(target_id).getLockerUser_id();
         }
-        return "null";
+        return null;
     }
 
    protected void sendAll(EditorAction action, Q queue) {
@@ -174,7 +174,7 @@ public class NestedEditorActionProcessor extends CustomProcessor {
         System.out.println("object restoration is sent");
     }
 
-    protected void sendCustomMessage(String target_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
+    protected void sendCustomMessage(Integer target_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
 
         switch (queue) {
             case ACTION:

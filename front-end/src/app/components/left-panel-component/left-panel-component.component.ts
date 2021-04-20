@@ -230,7 +230,7 @@ export class LeftPanelComponentComponent implements OnInit {
 
   fileGoBack() {
     if (this.actualFolder && this.actualFolder.parentFolder_id != null) {
-      if (this.actualFolder._type == 'projectFolder' && this.actualFolder.is_projectRoot) {
+      if (this.actualFolder._type == 'projectFolder') {
         this.getFile(this.actualFolder.parentFolder_id, 'folder');
       } else
         this.getFile(this.actualFolder.parentFolder_id, this.actualFolder._type);

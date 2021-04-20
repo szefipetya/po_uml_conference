@@ -1,14 +1,16 @@
 <div class="page-root">
   <div class="side-nav">
     <div>
-      <span>
-        <img
-          class="icon"
-          src="../../../assets/svg/home.svg"
-          alt="folder_icon"
-          srcset=""
-        />
-      </span>
+      <a style="border: none">
+        <span [routerLink]="['/home']">
+          <img
+            class="icon"
+            src="../../../assets/svg/home.svg"
+            alt="folder_icon"
+            srcset=""
+          />
+        </span>
+      </a>
     </div>
     <div (click)="toggle()">
       <span>

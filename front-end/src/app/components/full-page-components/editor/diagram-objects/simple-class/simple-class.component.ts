@@ -89,7 +89,7 @@ export class SimpleClassComponent
     }
     let vm = this.model.viewModel;
 
-    if (model._type == 'Element_c') {
+    if (model._type == 'TitleElement') {
       this.getTitleVm().updateModel(model, '', '');
       console.log(this.model.titleModel);
       //title model

@@ -5,9 +5,9 @@
  */
 package com.szefi.uml_conference.socket.threads.service;
 
-import com.szefi.uml_conference.model.dto.socket.EditorAction;
-import com.szefi.uml_conference.model.dto.socket.Response.EditorActionResponse;
-import com.szefi.uml_conference.model.dto.socket.Response.SessionStateResponse;
+import com.szefi.uml_conference.editor.model.socket.EditorAction;
+import com.szefi.uml_conference.editor.model.socket.Response.EditorActionResponse;
+import com.szefi.uml_conference.editor.model.socket.Response.SessionStateResponse;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.springframework.context.annotation.Bean;

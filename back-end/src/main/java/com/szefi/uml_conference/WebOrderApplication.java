@@ -13,12 +13,19 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableAutoConfiguration
 @EntityScan({"com.szefi.uml_conference"})
 @ComponentScan({"com.szefi.uml_conference"})
 @EnableJpaRepositories({"com.szefi.uml_conference"})
+
+/*@EnableAutoConfiguration
+@ComponentScan(basePackages={""})
+@EnableJpaRepositories(basePackages="") 
+//@EnableTransactionManagement
+@EntityScan(basePackages="")*/
 public class WebOrderApplication {
     @Autowired
      static ApplicatoinStartupRunner runner;

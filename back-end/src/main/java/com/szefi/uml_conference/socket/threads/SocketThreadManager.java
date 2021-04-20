@@ -5,9 +5,9 @@
  */
 package com.szefi.uml_conference.socket.threads;
 
-import com.szefi.uml_conference.model.dto.socket.EditorAction;
-import com.szefi.uml_conference.model.dto.socket.Response.SessionStateResponse;
-import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.editor.model.socket.EditorAction;
+import com.szefi.uml_conference.editor.model.socket.Response.SessionStateResponse;
+import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
 import com.szefi.uml_conference.socket.threads.service.NestedEditorActionProcessor;
 import com.szefi.uml_conference.socket.threads.service.QueueManager;
 import com.szefi.uml_conference.socket.threads.service.SOCKET;

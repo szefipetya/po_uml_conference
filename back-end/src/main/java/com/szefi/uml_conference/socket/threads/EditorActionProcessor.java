@@ -8,20 +8,20 @@ package com.szefi.uml_conference.socket.threads;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.model.dto.do_related.AttributeElement;
-import com.szefi.uml_conference.model.dto.do_related.Element_c;
-import com.szefi.uml_conference.model.dto.do_related.SimpleClass;
-import com.szefi.uml_conference.model.dto.do_related.SimpleClassElementGroup;
-import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
+import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
+import com.szefi.uml_conference.editor.model.do_related.Element_c;
+import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
+import com.szefi.uml_conference.editor.model.do_related.SimpleClassElementGroup;
+import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import com.szefi.uml_conference.socket.threads.ActionResponseProcessor;
-import com.szefi.uml_conference.model.dto.socket.ACTION_TYPE;
-import com.szefi.uml_conference.model.dto.socket.EditorAction;
-import com.szefi.uml_conference.model.dto.socket.LOCK_TYPE;
-import com.szefi.uml_conference.model.dto.socket.Response.EditorActionResponse;
-import com.szefi.uml_conference.model.dto.socket.Response.RESPONSE_SCOPE;
-import com.szefi.uml_conference.model.dto.socket.Response.SessionStateResponse;
-import com.szefi.uml_conference.model.dto.socket.Response.TARGET_TYPE;
-import com.szefi.uml_conference.model.dto.socket.SessionState;
+import com.szefi.uml_conference.editor.model.socket.ACTION_TYPE;
+import com.szefi.uml_conference.editor.model.socket.EditorAction;
+import com.szefi.uml_conference.editor.model.socket.LOCK_TYPE;
+import com.szefi.uml_conference.editor.model.socket.Response.EditorActionResponse;
+import com.szefi.uml_conference.editor.model.socket.Response.RESPONSE_SCOPE;
+import com.szefi.uml_conference.editor.model.socket.Response.SessionStateResponse;
+import com.szefi.uml_conference.editor.model.socket.Response.TARGET_TYPE;
+import com.szefi.uml_conference.editor.model.socket.SessionState;
 import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
 import java.util.HashMap;
 import java.util.List;
@@ -181,7 +181,7 @@ public class EditorActionProcessor extends CustomProcessor {
                                 action.getExtra().put("sessionState",
                                         mapper.writeValueAsString(service.getSessionStateById(obj.getId())));
                                 action.getExtra().put("old_id",
-                                        action.getTarget().getTarget_id());
+                                        action.getTarget().getTarget_id().toString());
                                 EditorActionResponse resp2 = new EditorActionResponse(action);
                                 resp2.setTarget_id(action.getTarget().getTarget_id());
                                 resp2.setTarget_type(TARGET_TYPE.ITEM);
@@ -205,7 +205,7 @@ public class EditorActionProcessor extends CustomProcessor {
                                  action1.getExtra().put("old_id", casted.getExtra().get("old_id")); 
                                //  action.getExtra().put("old_parent_id", this.)
                                action1.setJson(mapper.writeValueAsString(casted));
-                                 action1.getTarget().setParent_id("root");
+                                 action1.getTarget().setParent_id(SocketSessionService.ROOT_ID);
                                  action1.setAction(ACTION_TYPE.CREATE);
                                     action1.getExtra().put("sessionState",
                                         mapper.writeValueAsString(service.getContainerSessionStateById(obj.getId())));
@@ -304,15 +304,15 @@ public class EditorActionProcessor extends CustomProcessor {
                 //SERVER_SIDE ACTIONS ////////////////////////////////////////////
                 case S_USER_DISCONNECT:
                     //delete draft elements, send message about them
-                    List<String> deleted = service.deleteDraftsByUser(action.getUser_id());
-                    for (String id : deleted) {
+                    List<Integer> deleted = service.deleteDraftsByUser(action.getUser_id());
+                    for (Integer id : deleted) {
                         action.setAction(ACTION_TYPE.DELETE);
                         EditorActionResponse resp2 = new EditorActionResponse(action);
                         resp2.setTarget_id(id);
                         actionResponseQueue.add(resp2);
                     }
-                    List<String> unlocked = service.deleteLocksRelatedToUser(action.getUser_id());
-                    for (String id : unlocked) {
+                    List<Integer> unlocked = service.deleteLocksRelatedToUser(action.getUser_id());
+                    for (Integer id : unlocked) {
                         SessionStateResponse resp = new SessionStateResponse(service.getSessionStateById(id), "");
 
                         resp.setTarget_user_id(action.getUser_id());
@@ -331,11 +331,11 @@ public class EditorActionProcessor extends CustomProcessor {
         }
     }
 
-   protected String getLockerIdIfexists(String target_id) {
+   protected Integer getLockerIdIfexists(Integer target_id) {
         if (service.getSessionStateById(target_id) != null && service.getSessionStateById(target_id).getLockerUser_id() != null) {
             return service.getSessionStateById(target_id).getLockerUser_id();
         }
-        return "null";
+        return null;
     }
 
    protected void sendAll(EditorAction action, Q queue) {
@@ -395,7 +395,7 @@ public class EditorActionProcessor extends CustomProcessor {
         System.out.println("object restoration is sent");
     }
 
-    protected void sendCustomMessage(String target_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
+    protected void sendCustomMessage(Integer target_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
 
         switch (queue) {
             case ACTION:

@@ -45,6 +45,7 @@ public class MyUserDetailsService implements UserDetailsService {
         System.out.println("user "+newUser.getName()+" has been registered");
         return user;
     }
+ 
      @EventListener(ApplicationReadyEvent.class)
     public void init(){
           UserEntity user=new UserEntity();

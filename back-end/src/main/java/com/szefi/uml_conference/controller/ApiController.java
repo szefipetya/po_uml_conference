@@ -1,6 +1,7 @@
 package com.szefi.uml_conference.controller;
 
-import com.szefi.uml_conference.model.dto.diagram.Diagram;
+import com.szefi.uml_conference.editor.model.diagram.Diagram;
+import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.model.dto.management.FolderDto;
 import com.szefi.uml_conference.security.model.auth.AuthRequest;
 import com.szefi.uml_conference.security.model.auth.LogoutRequest;
@@ -52,7 +53,7 @@ public class ApiController {
     SocketSessionService eService;
     
     @GetMapping("get/dg/{id}")
-    public Diagram getOne(@PathParam("id") String id) {
+    public DiagramEntity getOne(@PathParam("id") String id) {
         return eService.getDummyDiagram();
     }
      

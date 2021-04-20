@@ -7,13 +7,15 @@ package com.szefi.uml_conference.socket.handler;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.model.dto.top.DynamicSerialObject;
-import com.szefi.uml_conference.model.dto.diagram.Diagram;
-import com.szefi.uml_conference.model.dto.socket.ACTION_TYPE;
-import com.szefi.uml_conference.model.dto.socket.EditorAction;
-import com.szefi.uml_conference.model.dto.socket.Response.SessionStateResponse;
-import com.szefi.uml_conference.model.dto.socket.SessionState;
-import com.szefi.uml_conference.model.dto.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
+import com.szefi.uml_conference.editor.model.diagram.Diagram;
+import com.szefi.uml_conference.editor.model.socket.ACTION_TYPE;
+import com.szefi.uml_conference.editor.model.socket.EditorAction;
+import com.szefi.uml_conference.editor.model.socket.Response.SessionStateResponse;
+import com.szefi.uml_conference.editor.model.socket.SessionState;
+import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.socket.security.SocketSecurityService;
+import com.szefi.uml_conference.socket.security.model.SocketAuthenticationRequest;
 import com.szefi.uml_conference.socket.threads.SocketThreadManager;
 import com.szefi.uml_conference.socket.threads.service.SOCKET;
 import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
@@ -50,6 +52,7 @@ public class SessionStateHandler extends TextWebSocketHandler {
     SocketThreadManager threadManager;
     Map<WebSocketSession, Integer> initMap = new HashMap<>();
     ObjectMapper mapper;
+      @Autowired SocketSecurityService socketSecutiryService;
 
     public SessionStateHandler() {
         mapper = new ObjectMapper();
@@ -82,7 +85,11 @@ public class SessionStateHandler extends TextWebSocketHandler {
         if (initMap.get(session) == 0) {
             for (UserWebSocket u : service.getSockets(SOCKET.STATE)) {
                 if (u.getSocket() == session) {
-                    u.setUser_id(message.getPayload());
+                     SocketAuthenticationRequest req=mapper.readValue(message.getPayload(), SocketAuthenticationRequest.class);
+                if(socketSecutiryService.authenticateRequest(req)){
+                    //get the session from the service, andi inject the user.
+                }
+                  //  u.setUser_id(message.getPayload());
                     System.out.println(initMap.get(session));
                     System.out.println("session msg" + message.getPayload());
                 }
@@ -101,9 +108,9 @@ public class SessionStateHandler extends TextWebSocketHandler {
         service.getSockets(SOCKET.STATE).add(s);
         initMap.put(s.getSocket(), 0);
 
-        Map<String, Pair<SessionState, DynamicSerialObject>> a = service.getSessionItemMap();
+        Map<Integer, Pair<SessionState, DynamicSerialObject>> a = service.getSessionItemMap();
         List<SessionStateResponse> responses = new ArrayList<>();
-        for (Map.Entry<String, Pair<SessionState, DynamicSerialObject>> entry : a.entrySet()) {
+        for (Map.Entry<Integer, Pair<SessionState, DynamicSerialObject>> entry : a.entrySet()) {
             SessionStateResponse r = new SessionStateResponse(entry.getValue().getFirst(), "no action");
             r.setTarget_id(entry.getKey());
             //  System.out.println(entry.getValue().getFirst().getLocks().length);
