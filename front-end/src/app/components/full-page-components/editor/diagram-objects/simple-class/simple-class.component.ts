@@ -112,7 +112,7 @@ export class SimpleClassComponent
     throw new Error('Method not implemented.');
   }
   getParentId(): string {
-    return 'root';
+    return GlobalEditorService.ROOT_ID;
   }
 
   update(): void {

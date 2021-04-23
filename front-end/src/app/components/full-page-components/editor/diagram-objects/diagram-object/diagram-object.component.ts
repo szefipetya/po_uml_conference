@@ -27,7 +27,7 @@ export class DiagramObjectComponent
   extends InteractiveItemBase
   implements OnInit, SessionInteractiveItem {
   getParentId(): string {
-    return 'root';
+    return GlobalEditorService.ROOT_ID;
   }
   onMouseDown(e) {
     this.editBegin();

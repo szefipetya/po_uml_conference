@@ -13,6 +13,7 @@ import com.szefi.uml_conference.editor.model.do_related.NoteBox;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClassElementGroup;
+import com.szefi.uml_conference.editor.model.do_related.TitleElement;
 import com.szefi.uml_conference.editor.model.do_related.line.BreakPoint;
 import com.szefi.uml_conference.editor.model.do_related.line.Line;
 import com.szefi.uml_conference.editor.model.do_related.line.Point;
@@ -43,6 +44,7 @@ import org.springframework.data.util.Pair;
         @JsonSubTypes.Type(value=Element_c.class, name="Element_c"),
         @JsonSubTypes.Type(value=Line.class, name="Line"),
         @JsonSubTypes.Type(value=AttributeElement.class, name="AttributeElement"),
+        @JsonSubTypes.Type(value=TitleElement.class, name="TitleElement"),
         @JsonSubTypes.Type(value=BreakPoint.class, name="BreakPoint"),
       /*  @JsonSubTypes.Type(value=Point.class, name="Point"),*/
         @JsonSubTypes.Type(value=SimpleClassElementGroup.class, name="SimpleClassElementGroup"), 

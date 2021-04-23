@@ -20,11 +20,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EntityScan({"com.szefi.uml_conference"})
 @ComponentScan({"com.szefi.uml_conference"})
 @EnableJpaRepositories({"com.szefi.uml_conference"})
-
+@EnableTransactionManagement
 /*@EnableAutoConfiguration
 @ComponentScan(basePackages={""})
 @EnableJpaRepositories(basePackages="") 
-//@EnableTransactionManagement
+
 @EntityScan(basePackages="")*/
 public class WebOrderApplication {
     @Autowired

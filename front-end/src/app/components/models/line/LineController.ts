@@ -50,7 +50,7 @@ export class LineController extends InteractiveItemBase {
     this.lineCanvasComponent.update();
   }
   getParentId(): string {
-    return 'l_root';
+    return GlobalEditorService.L_ROOT_ID;
   }
   deleteSelfFromParent(): void {
 

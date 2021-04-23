@@ -17,6 +17,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.util.Pair;
 
 /**
@@ -27,6 +29,7 @@ import org.springframework.data.util.Pair;
 @JsonTypeName(value = "SimpleClass")
 @Entity
 public class SimpleClass extends DiagramObject implements DynamicSerialContainer_I<SimpleClassElementGroup>{
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy="parent",cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH})
    private List<SimpleClassElementGroup> groups=new ArrayList<>();
    @OneToOne(mappedBy = "parent",cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH})

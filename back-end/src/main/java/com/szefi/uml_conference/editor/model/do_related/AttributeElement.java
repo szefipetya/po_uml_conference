@@ -56,6 +56,7 @@ public class AttributeElement extends Element_c  {
     }
     @Override
     public void update(DynamicSerialObject obj){
+        super.update(obj);
          if(obj instanceof AttributeElement){
             AttributeElement casted=(AttributeElement)obj;
         this.attr_type=casted.attr_type;

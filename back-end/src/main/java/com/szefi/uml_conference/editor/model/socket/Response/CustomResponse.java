@@ -5,6 +5,11 @@
  */
 package com.szefi.uml_conference.editor.model.socket.Response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author h9pbcl
@@ -14,6 +19,20 @@ public class CustomResponse {
     protected  Integer target_user_id;
     protected String response_msg;
     protected Integer target_id;
+        List<UserWebSocket> targetsUsers;
+
+    public CustomResponse() {
+        targetsUsers=new ArrayList<>();
+    }
+    @JsonIgnore
+    public List<UserWebSocket> getTargetsUsers() {
+        return targetsUsers;
+    }
+
+    public void setTargetsUsers(List<UserWebSocket> targetsUsers) {
+        this.targetsUsers = targetsUsers;
+    }
+
 
     public TARGET_TYPE getTarget_type() {
         return target_type;

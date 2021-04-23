@@ -5,6 +5,7 @@
  */
 package com.szefi.uml_conference.security.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.model.entity.management.File_cEntity;
 import com.szefi.uml_conference.model.entity.management.FolderEntity;
@@ -13,15 +14,20 @@ import com.szefi.uml_conference.security.model.ROLE;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 /**
  *
@@ -37,19 +43,34 @@ public class UserEntity {
     private String password;
     private String name;
     
-   /* @OneToMany(mappedBy = "owner")
-    private List<DiagramEntity> diagrams;*/
+    @OneToMany(mappedBy = "owner")
+    private List<DiagramEntity> diagrams;
+    
+    @ManyToMany
+    @JoinTable(
+  name = "diagram_share_table", 
+  joinColumns = @JoinColumn(name = "user_id"), 
+  inverseJoinColumns = @JoinColumn(name = "diagram_id"))
+        @LazyCollection(LazyCollectionOption.FALSE)
+    private Set<DiagramEntity> sharedDiagramsWithMe;
+    @JsonIgnore
+    public Set<DiagramEntity> getSharedDiagramsWithMe() {
+        return sharedDiagramsWithMe;
+    }
+
+    public void setSharedDiagramsWithMe(Set<DiagramEntity> sharedDiagramsWithMe) {
+        this.sharedDiagramsWithMe = sharedDiagramsWithMe;
+    }
     
     
-    
-   /* public List<DiagramEntity> getDiagrams() {
+    public List<DiagramEntity> getDiagrams() {
         return diagrams;
     }
 
     public void setDiagrams(List<DiagramEntity> diagrams) {
         this.diagrams = diagrams;
     }
-    */
+    
     @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
     private List<File_cEntity> files;
 
@@ -60,11 +81,12 @@ public class UserEntity {
     public void setFiles(List<File_cEntity> files) {
         this.files = files;
     }
-   // @ManyToMany//(cascade=CascadeType.PERSIST)
+ 
     @Convert(converter = RoleListConverter.class)
     private List<ROLE> roles;
 
     public UserEntity() {
+        diagrams=new ArrayList<>();
         files=new ArrayList<>();
        FolderEntity rootFolder=new FolderEntity();
         rootFolder.setOwner(this);

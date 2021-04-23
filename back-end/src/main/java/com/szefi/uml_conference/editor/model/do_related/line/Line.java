@@ -22,6 +22,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.util.Pair;
 
 /**
@@ -34,8 +36,9 @@ public class Line extends DynamicSerialObject implements AutoSessionInjectable_I
    
     @OneToOne(mappedBy = "line",cascade = CascadeType.ALL)
  private LineType lineType;
- private String object_start_id;
- private String object_end_id;
+ private Integer object_start_id;
+ private Integer object_end_id;
+ @LazyCollection(LazyCollectionOption.FALSE)
  @OneToMany(mappedBy = "line",cascade=CascadeType.ALL)
  private List<BreakPoint> breaks;
  
@@ -69,19 +72,19 @@ DiagramEntity diagram;
         this.lineType = lineType;
     }
 
-    public String getObject_start_id() {
+    public Integer getObject_start_id() {
         return object_start_id;
     }
 
-    public void setObject_start_id(String object_start_id) {
+    public void setObject_start_id(Integer object_start_id) {
         this.object_start_id = object_start_id;
     }
 
-    public String getObject_end_id() {
+    public Integer getObject_end_id() {
         return object_end_id;
     }
 
-    public void setObject_end_id(String object_end_id) {
+    public void setObject_end_id(Integer object_end_id) {
         this.object_end_id = object_end_id;
     }
 

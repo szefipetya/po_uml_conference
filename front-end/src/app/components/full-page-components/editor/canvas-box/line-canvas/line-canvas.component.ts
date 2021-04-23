@@ -76,7 +76,7 @@ export class LineCanvasComponent
     throw new Error('Method not implemented.');
   }
   getId(): string {
-    return 'l_root';
+    return GlobalEditorService.L_ROOT_ID;
   }
   updateState(state: SessionState, m?: any): void {
     throw new Error('Method not implemented.');
@@ -244,7 +244,7 @@ export class LineCanvasComponent
 
 
   sendLineCreated(l: Line) {
-    let action: EditorAction = new EditorAction(l.id, 'Line', 'l_root');
+    let action: EditorAction = new EditorAction(l.id, 'Line', GlobalEditorService.L_ROOT_ID);
     action.action = ACTION_TYPE.CREATE;
     action.extra = { create_method: 'individual' };
     let save = { vm: l.viewModel };
@@ -750,7 +750,7 @@ export class LineCanvasComponent
   }
 
   ngOnInit(): void {
-    this.socket.registerContainer('l_root', this);
+    this.socket.registerContainer(GlobalEditorService.L_ROOT_ID, this);
     this.socket.addListenerToEvent(this, (t) => {
       t.update();
     }, 'update');

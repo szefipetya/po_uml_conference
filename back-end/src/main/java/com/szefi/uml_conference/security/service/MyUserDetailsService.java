@@ -57,5 +57,15 @@ public class MyUserDetailsService implements UserDetailsService {
                 add(ROLE.ROLE_USER);
            }});
            registerUser(user);
+           
+             UserEntity user2=new UserEntity();
+           user2.setName("User2");
+           user2.setUserName("user2");
+           user2.setPassword("pass");
+         
+           user2.setRoles(new ArrayList<ROLE>() {{
+                add(ROLE.ROLE_USER);
+           }});
+           registerUser(user2);
     }
 }

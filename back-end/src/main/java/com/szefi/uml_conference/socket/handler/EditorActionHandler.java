@@ -7,6 +7,7 @@ package com.szefi.uml_conference.socket.handler;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.szefi.uml_conference.D;
 import com.szefi.uml_conference.editor.model.diagram.Diagram;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
@@ -58,25 +59,36 @@ public class EditorActionHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        for(UserWebSocket s:sessionService.getSockets(SOCKET.ACTION)){
+       
+       /*for(UserWebSocket s:sessionService.getSockets(SOCKET.ACTION)){
           
             if(s.getSocket()==null||s.getSocket().equals(session)) { 
                 
                 sessionService.getSockets(SOCKET.ACTION).remove(s);
             break;
             }
-        }
+        }*/
     }
+    
+    /*
+    Az action socketen authentikálja magát a user. megkapja a session jwt-t. ezt a jwt-t elküldi a user a session socketre. Majd a statesockettel kiegészíti az EditorSessin-ban a usert.
+    */
+    List<UserWebSocket>tempSockets=new ArrayList<>();
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
      //init step to identify the session
         if(initMap.get(session)==0){
-          for(UserWebSocket u:sessionService.getSockets(SOCKET.ACTION)){
-              if(u.getSocket()==session){
+          for(UserWebSocket u:this.tempSockets){
+              if(u.getActionSocket().equals(session)){
+                 D.log("user authenticating with "+message.getPayload(),this.getClass());
                   SocketAuthenticationRequest req=mapper.readValue(message.getPayload(), SocketAuthenticationRequest.class);
-                if(socketSecutiryService.authenticateRequest(req)){
+              this.sessionService.autoProcessRequest(socketSecutiryService.authenticateRequest(req),u,req);
+              //session_id is now inserted, send it back
+              u.getActionSocket().sendMessage(new TextMessage(u.getSession_jwt()));
+           
+                    System.out.println("user authenticated");
                     //get the session from the service, andi inject the user.
-                }
+                
 
 //  u.setUser_id(message.getPayload());
                    System.out.println(initMap.get(session));
@@ -94,9 +106,11 @@ public class EditorActionHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        UserWebSocket s=new UserWebSocket(session);
-        sessionService.getSockets(SOCKET.ACTION).add(s);
-        initMap.put(s.getSocket(), 0);
+        UserWebSocket s=new UserWebSocket();
+        
+        s.setActionSocket(session);
+        tempSockets.add(s);
+        initMap.put(s.getActionSocket(), 0);
     }
   
 

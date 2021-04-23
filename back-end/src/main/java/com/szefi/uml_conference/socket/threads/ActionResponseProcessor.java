@@ -37,13 +37,13 @@ ObjectMapper mapper;
             @Qualifier("actionSockets") List<UserWebSocket> actionSessions,
              @Qualifier("actionResponseQueue") BlockingQueue<EditorActionResponse> actionResponseQueue) {
       this.actionResponseQueue=actionResponseQueue;
-        this.actionSessions=actionSessions;
+       // this.actionSessions=actionSessions;
             mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);      
     }
 
     BlockingQueue<EditorActionResponse> actionResponseQueue;
-     private final List<UserWebSocket> actionSessions;
+   //  private final List<UserWebSocket> actionSessions;
 @Override
     public void run() {
         while(!isClosed){
@@ -60,12 +60,12 @@ ObjectMapper mapper;
            // System.out.println(response.getSessionState().getLockerUser_id());
             System.out.println("----");
            
-            for(UserWebSocket s:actionSessions){
+            for(UserWebSocket s:response.getTargetsUsers()){
                 System.out.println(s.getUser_id());
                 if(response.getScope()==RESPONSE_SCOPE.PUBLIC||s.getUser_id().equals(response.getTarget_user_id())){
                     try {
-                         if(s.getSocket().isOpen()){
-                        s.getSocket().sendMessage(new TextMessage(mapper.writeValueAsString(response)));
+                         if(s.getActionSocket().isOpen()){
+                        s.getActionSocket().sendMessage(new TextMessage(mapper.writeValueAsString(response)));
                         System.out.println("action response sent to user "+s.getUser_id());
                            if(response.getScope()==RESPONSE_SCOPE.PRIVATE) break;
                          }

@@ -53,8 +53,8 @@ public class ApiController {
     SocketSessionService eService;
     
     @GetMapping("get/dg/{id}")
-    public DiagramEntity getOne(@PathParam("id") String id) {
-        return eService.getDummyDiagram();
+    public DiagramEntity getOne(@PathVariable("id") String id) {
+        return eService.getDiagramById(Integer.valueOf(id));
     }
      
         @GetMapping("/")

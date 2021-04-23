@@ -96,7 +96,9 @@ private int  z;
     public void update(DynamicSerialObject obj) {
         System.out.println("update diagram on backend");
         if(obj instanceof DiagramObject){
+            DiagramObject ob=this.dimensionModel.getDgObject();
            this.dimensionModel= ((DiagramObject) obj).getDimensionModel();
+           this.dimensionModel.setDgObject(ob);
         }
       
     }

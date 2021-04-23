@@ -6,6 +6,7 @@
 package com.szefi.uml_conference.editor.model.socket.Response;
 
 import com.szefi.uml_conference.editor.model.socket.SessionState;
+import java.util.List;
 
 /**
  *
@@ -14,10 +15,10 @@ import com.szefi.uml_conference.editor.model.socket.SessionState;
 public class SessionStateResponse extends CustomResponse {
     private SessionState sessionState;
     private String action_id;
-    
 
     
     public SessionStateResponse(SessionState sessionState, String action_id, Integer target_id, Integer target_user_id) {
+        super();
         this.sessionState = sessionState;
         this.action_id = action_id;
         this.target_id = target_id;
@@ -31,14 +32,14 @@ public class SessionStateResponse extends CustomResponse {
    
 
 
-    public SessionStateResponse(SessionState sessionState, String action_id) {
+    public SessionStateResponse(SessionState sessionState, String action_id) {  super();
         this.sessionState = sessionState;
         this.action_id = action_id;
         scope=RESPONSE_SCOPE.PUBLIC;
         this.target_type=TARGET_TYPE.ITEM;
     }
 
-    public SessionStateResponse(SessionState sessionState, String action_id, RESPONSE_SCOPE scope) {
+    public SessionStateResponse(SessionState sessionState, String action_id, RESPONSE_SCOPE scope) {  super();
         this.sessionState = sessionState;
         this.action_id = action_id;
         this.scope = scope;

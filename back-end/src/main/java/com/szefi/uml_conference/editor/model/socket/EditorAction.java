@@ -19,6 +19,15 @@ private String id;
 private String json;
 private ACTION_TYPE action;
 private ActionTarget target;
+private String session_jwt;
+
+    public String getSession_jwt() {
+        return session_jwt;
+    }
+
+    public void setSession_jwt(String session_jwt) {
+        this.session_jwt = session_jwt;
+    }
 
     public Map<String, String> getExtra() {
         return extra;

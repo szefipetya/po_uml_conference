@@ -11,12 +11,16 @@ import com.szefi.uml_conference.security.model.jwt.JwtEntity;
 import com.szefi.uml_conference.security.repository.BlackJwtRepository;
 import com.szefi.uml_conference.security.repository.BlackListedJwtCollectorEntityRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -59,25 +63,33 @@ public class JwtUtilService {
             throw new JwtParseException("jwt parse error");
         }
     }
-    private Claims extractAllClaims(String token) throws JwtParseException {
-        try{
-            return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-        }catch(Exception ex){
-            throw new JwtParseException("jwt parse error");
-        }
-        
+    public Claims extractAllClaims(String token) throws JwtParseException {
+     
+            Jws<Claims> claims = Jwts.parser()
+                    .setSigningKey(this.SECRET_KEY)
+                    .parseClaimsJws(token);
+            return claims.getBody();
+                  
+                        
+                       // return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+                   
+                    
+     
+   
     }
 
     public Boolean isTokenExpired(String token) throws JwtParseException {
-        try{
+     
         return extractExpiration(token).before(new Date());
-         }catch(Exception ex){
-            throw new JwtParseException("jwt parse error");
-        }
+       
     }
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, userDetails.getUsername());
+    }
+     public String generateToken( Map<String, Object> claims,UserDetails userDetails) {
+       
         return createToken(claims, userDetails.getUsername());
     }
 

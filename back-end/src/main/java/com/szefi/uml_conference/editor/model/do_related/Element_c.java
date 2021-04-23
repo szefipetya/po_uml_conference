@@ -12,6 +12,8 @@ import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import java.util.Map;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import org.springframework.data.util.Pair;
 
 /**
@@ -43,6 +45,8 @@ protected String name;
 
     @Override
     public void update(DynamicSerialObject obj) {
+        
+         super.update(obj);
         if(obj instanceof Element_c){
             Element_c casted=(Element_c)obj;
             this.name=casted.name; 

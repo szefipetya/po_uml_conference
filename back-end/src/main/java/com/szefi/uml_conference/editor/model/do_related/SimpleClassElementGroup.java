@@ -20,6 +20,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.util.Pair;
 
 /**
@@ -37,7 +39,8 @@ public class SimpleClassElementGroup extends DynamicSerialObject
     private String group_name;
      @Enumerated(EnumType.ORDINAL)
     private GROUP_SYNTAX group_syntax;
-    @OneToMany(mappedBy = "group",cascade = CascadeType.ALL)
+     @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "group",cascade =CascadeType.PERSIST)
      private List<AttributeElement> attributes=new ArrayList<>();
     
     

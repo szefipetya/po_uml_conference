@@ -48,6 +48,8 @@ export class GlobalEditorService {
   url_pre_test = 'https://jsonplaceholder.typicode.com/posts';
   url_get_diagram = 'get/dg';
   clientModel: ClientModel;
+  public static ROOT_ID = '-1';
+  public static L_ROOT_ID = '-2';
 
   user_fix: User_PublicDto = {
     id: new Date().getUTCMilliseconds(),
@@ -129,13 +131,12 @@ export class GlobalEditorService {
     this.init_first();
     await this.triggerEvent('pre_setup');
     this.model = new Diagram();
-    let response = await this.getDiagramFromServer('001');
-    console.log(response);
+    let response = await this.getDiagramFromServer(environment.testdg_id);
+    console.log('response:', response);
 
     console.log({ ...response });
     if (response.dgObjects) {
-      this.model = { ...response };
-      this.model.dgObjects.map((dg) => {
+      response.dgObjects.map((dg) => {
         dg.scaledModel = new DiagramObject_Scaled();
         dg.scaledModel.posx_scaled = dg.dimensionModel.x;
         dg.scaledModel.posy_scaled = dg.dimensionModel.y;
@@ -143,7 +144,11 @@ export class GlobalEditorService {
         dg.scaledModel.height_scaled = dg.dimensionModel.height;
         dg.scaledModel.min_height_scaled = this.clientModel.class_general.min_height_scaled;
       });
-      console.log(JSON.stringify(this.model));
+      this.model.dgObjects = response.dgObjects;
+      this.model.lines = response.lines;
+      console.log('diagram is', JSON.stringify(this.model));
+
+
       this.afterDgFetchFunctions.map((p) => {
         p.value(p.key.value);
       });

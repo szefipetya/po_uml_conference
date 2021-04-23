@@ -14,7 +14,8 @@ import { GlobalEditorService } from '../../global-editor/global-editor.service';
 import { Pair } from '../../../../../../utils/utils';
 import { JsonpClientBackend } from '@angular/common/http';
 import { SocketAuthenticationRequest } from '../../../../../models/socket/security/SocketAuthenticationRequest'
-import { getCookie } from 'src/app/utils/cookieUtils';
+import { getCookie, setCookie } from 'src/app/utils/cookieUtils';
+import { environment } from 'src/environments/environment';
 export class ActionSocket implements SocketWrapper {
   [x: string]: any;
   socket: any;
@@ -22,9 +23,15 @@ export class ActionSocket implements SocketWrapper {
   constructor(service, private editorService: GlobalEditorService) {
     this.service = service;
   }
-
+  initDone: boolean = false;
   onmessage(e: any) {
     setTimeout(() => {
+      if (!this.parent.initDone) {
+        setCookie("session_jwt", e.data, 10);
+        this.parent.initDone = true;
+        this.parent.service.initSessionSocket();
+        return;
+      }
       let resp: EditorActionResponse;
       resp = JSON.parse(e.data);
       let load = JSON.parse(resp.action.json);
@@ -176,7 +183,7 @@ export class ActionSocket implements SocketWrapper {
   }
   onopen(m: any) {
     console.log('Connected: ' + m);
-    setTimeout(() => this.parent.socket.send(new SocketAuthenticationRequest(getCookie("jwt_token"), 1000), 50));
+    setTimeout(() => this.parent.socket.send(JSON.stringify(new SocketAuthenticationRequest(getCookie("jwt_token"), environment.testdg_id)), 50));
   }
   getItem(id) {
     let p: Pair<

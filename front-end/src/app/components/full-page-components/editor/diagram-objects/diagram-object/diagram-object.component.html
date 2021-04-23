@@ -1,5 +1,5 @@
 <div
-  id="{{ this.model.id }}"
+  [attr.data-id]="this.model.id"
   [style.fontSize]="this.general.fontsize_scaled + 'px'"
   [style.top]="this.model.scaledModel.posy_scaled + 'px'"
   [style.left]="this.model.scaledModel.posx_scaled + 'px'"

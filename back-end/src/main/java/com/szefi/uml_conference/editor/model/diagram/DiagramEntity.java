@@ -16,12 +16,17 @@ import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.model.User_PublicDto;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 /**
  *
@@ -34,20 +39,33 @@ public class DiagramEntity implements Serializable{
     @Id
     @GeneratedValue
     private Integer id;
-/*@ManyToOne
-private UserEntity owner;*/
-@OneToMany(mappedBy = "diagram",cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH})
+@ManyToOne
+private UserEntity owner;
+@LazyCollection(LazyCollectionOption.FALSE)
+@OneToMany(mappedBy = "diagram",cascade = {CascadeType.ALL})
 private List<DiagramObject> dgObjects;
-@OneToMany(mappedBy = "diagram",cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH})
+@LazyCollection(LazyCollectionOption.FALSE)
+@OneToMany(mappedBy = "diagram",cascade = {CascadeType.ALL})
 private List<Line> lines;
-    /*@JsonIgnore
+@ManyToMany(mappedBy="sharedDiagramsWithMe")
+        @LazyCollection(LazyCollectionOption.FALSE)
+        Set<UserEntity> usersIamSaredWith;
+    @JsonIgnore
    public UserEntity getOwner() {
         return owner;
+    }
+   @JsonIgnore
+    public Set<UserEntity> getUsersIamSaredWith() {
+        return usersIamSaredWith;
+    }
+
+    public void setUsersIamSaredWith(Set<UserEntity> usersIamSaredWith) {
+        this.usersIamSaredWith = usersIamSaredWith;
     }
 
     public void setOwner(UserEntity owner) {
         this.owner = owner;
-    }*/
+    }
 
     public List<DiagramObject> getDgObjects() {
         return dgObjects;

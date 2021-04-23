@@ -38,7 +38,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   }
 
   zoom(event) {
-    console.log('zoom');
+
     event.preventDefault();
     let scale = 1;
 
@@ -73,7 +73,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   drawedClassX: number;
   drawedClassY: number;
   getNewClassId = () => {
-    return uniqId('c');
+    return uniqId('');
   };
   getHighestClassZIndex = () => {
     let max = 0;
@@ -93,7 +93,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   ydiff: number;
   clipDOM: any;
   onKeyPress(e) {
-    console.log('KEY', e)
+
     this.lineCanvasComponent.onKeyPress(e);
   }
   updateClassSelection = () => {
@@ -114,7 +114,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     }
     if (dclass) {
       if (e.target.className != 'edit-box' && e.target.nodeName != 'INPUT') {
-        this.targetClass = this.findClassById(dclass.id);
+        this.targetClass = this.findClassById(dclass.dataset.id);
         this.targetRect = dclass.parentNode.getBoundingClientRect();
         this.targetInner = dclass.getBoundingClientRect();
       }
@@ -137,7 +137,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       const dclass = e.target.closest('.d-class');
       if (dclass) {
         this.dclass = dclass;
-        this.targetObject_stored = this.findClassById(dclass.id);
+        this.targetObject_stored = this.findClassById(dclass.dataset.id);
         this.targetWidth_stored = this.targetObject_stored.scaledModel.width_scaled;
         this.targetHeight_stored = this.targetObject_stored.scaledModel.height_scaled;
         this.targetRect_stored = dclass.parentNode.getBoundingClientRect();
@@ -339,15 +339,11 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   fullWidth: number;
   fullHeight: number;
   setup() {
-    // console.log('ITEMS', this.socket.itemViewModelMap = [])
     const p = new Promise(async (resolve, reject) => {
       await this.editorService.initFromServer();
       await resolve('success');
     });
     p.then((o) => {
-      console.log('ITEMS AFTER', this.socket.itemViewModelMap)
-
-      console.log(o);
       this.fullWidth = document.querySelector('html').clientWidth;
       this.fullHeight = document.querySelector('html').clientHeight;
       this.editorService.clientModel.canvas.clip.width =
@@ -657,7 +653,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   };
   drawedClass: DiagramObject;
   findClassDOMbyId(id): any {
-    let dom = document.querySelector('.edit-box').querySelector('#' + id);
+    let dom = document.querySelector('.edit-box').querySelector("[data-id='" + id + "']");
     //console.log(dom);
     return dom;
   }
@@ -818,10 +814,10 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     const y = e.clientY - rect.top;
     this.drawedClassX = x;
     this.drawedClassY = y;
-    this.drawedClassId = `c${this.getNewClassId()}`;
+    this.drawedClassId = this.getNewClassId();
     let newclass: SimpleClass;
-    let g1_id = 'g' + uniqId() + '1104234';
-    let g2_id = 'g' + uniqId();
+    let g1_id = uniqId() + '1104234';
+    let g2_id = uniqId();
     newclass = {
       doc: '',
       _type: 'SimpleClass',
@@ -891,7 +887,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   }
 
   sendDiagramObjectCreateMessage(obj: DiagramObject) {
-    let action: EditorAction = new EditorAction(obj.id, obj._type, 'root');
+    let action: EditorAction = new EditorAction(obj.id, obj._type, GlobalEditorService.ROOT_ID);
     action.extra = { old_id: obj.id, create_method: 'nested' };
     action.action = ACTION_TYPE.CREATE;
     action.json = JSON.stringify(obj);
@@ -919,6 +915,6 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     throw new Error('Method not implemented.');
   }
   getId(): string {
-    return 'root';
+    return GlobalEditorService.ROOT_ID;
   }
 }

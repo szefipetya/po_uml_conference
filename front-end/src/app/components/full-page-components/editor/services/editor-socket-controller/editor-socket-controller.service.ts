@@ -25,6 +25,7 @@ import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramO
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { Pair } from '../../../../../utils/utils';
 import { environment } from 'src/environments/environment';
+import { getCookie } from 'src/app/utils/cookieUtils';
 declare var SockJS: any;
 declare var Stomp: any;
 class Test {
@@ -42,6 +43,11 @@ export class EditorSocketControllerService {
 
   url_pre = 'ws://' + environment.api_url_raw;
   // url_pre = 'ws://localhost:8101/';
+  initSessionSocket() {
+    this.sessionSocket = new SessionSocket(this);
+
+    this.sessionSocket.connect(this.url_pre + 'state');
+  }
   constructor(private editorService: GlobalEditorService) {
     this.itemViewModelMap = [];
     this.waitingForResponse_queue = [];
@@ -194,9 +200,7 @@ export class EditorSocketControllerService {
 
   public connect() {
     this.actionSocket = new ActionSocket(this, this.editorService);
-    this.sessionSocket = new SessionSocket(this);
 
-    this.sessionSocket.connect(this.url_pre + 'state');
 
     this.actionSocket.connect(this.url_pre + 'action');
   }
@@ -208,6 +212,8 @@ export class EditorSocketControllerService {
   public send(action: EditorAction) {
     // this.waitingForResponse_queue.push(new Pair(action, sender));
     action.user_id = this.getUser().id;
+    console.log(getCookie("session_jwt"))
+    action.session_jwt = getCookie("session_jwt");
     console.log('sent', action);
     this.actionSocket.send(action);
   }

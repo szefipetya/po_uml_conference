@@ -114,7 +114,12 @@ function eraseCookie(name) {
   document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 export function uniqId(prefix = '', postfix = ''): string {
-  return Math.floor(Date.now() + Math.random() * 1000000).toString();
+  return getRandomInt(-2147483647, 2147483647);
+}
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 /*('use strict');
 export function soft_copy(source, target, keys) {

@@ -8,6 +8,8 @@ package com.szefi.uml_conference.socket.threads;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.szefi.uml_conference._exceptions.JwtException;
+import com.szefi.uml_conference._exceptions.JwtParseException;
 import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
 import com.szefi.uml_conference.editor.model.do_related.Element_c;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
@@ -66,7 +68,7 @@ public class EditorActionProcessor extends CustomProcessor {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     }
-
+public EditorActionProcessor(){}
     private BlockingQueue<EditorActionResponse> actionResponseQueue = null;
     private BlockingQueue<SessionStateResponse> sessionStateResponseQueue = null;
 
@@ -88,7 +90,7 @@ public class EditorActionProcessor extends CustomProcessor {
                 case SELECT:    //---------------------------------------------------
                         try {
                     //ha az első feltétel nem teljesül, akkor a lusta kiértékelés miatt a feltétel le se fut
-                    if (service.lockObjectById(action.getTarget().getTarget_id(), action.getUser_id(),
+                    if (service.tokenToSession(action.getSession_jwt()).lockObjectById(action.getTarget().getTarget_id(), action.getUser_id(),
                             new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE})) {
                         //the object is free
                         sendAll(action, Q.STATE);
@@ -97,31 +99,38 @@ public class EditorActionProcessor extends CustomProcessor {
                     } else {
                         //rákattintott, de mégsem szerkeszthető
                         System.out.println("object is locked");
-                        sendRestoreMessage(action, "user " + service.getSessionStateById(action.getTarget().getTarget_id()).getLockerUser_id() + " has lock on this.\n Object restored.");
+                        sendRestoreMessage(action, "user " + service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()).getLockerUser_id() + " has lock on this.\n Object restored.");
                     }
-                } catch (JsonProcessingException e) {
-                    System.out.println(action.getTarget().getTarget_id());
                 } catch (NullPointerException ex) {
                     try {
                         sendRestoreMessage(action, "[lock error] the object does not exists");
                     } catch (JsonProcessingException ex1) {
                         Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
+                    } catch (JwtParseException ex1) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
+                }
 
+                } catch (JwtParseException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (JsonProcessingException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+
+
+
                 case UPDATE://-------------------------------------------------------------------
                          try {
-                    if (service.updateObjectAndUnlock(mapper.readValue(action.getJson(), DynamicSerialObject.class), action.getUser_id()) != null) {
+                    if (service.tokenToSession(action.getSession_jwt()).updateObjectAndUnlock(mapper.readValue(action.getJson(), DynamicSerialObject.class), action.getUser_id()) != null) {
                         //send a session state update to all
 
                         SessionState s;
                         try {
-                            s = service.getSessionStateById(action.getTarget().getTarget_id());
+                            s = service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id());
                             if (s != null) {
-                                if (service.getSessionStateById(action.getTarget().getTarget_id()).isDraft()) {
+                                if (service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()).isDraft()) {
                                     s.getExtra().remove("placeholder");
-                                    service.getSessionStateById(action.getTarget().getTarget_id()).setDraft(false);
+                                    service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()).setDraft(false);
 
                                 }
                             }
@@ -135,17 +144,20 @@ public class EditorActionProcessor extends CustomProcessor {
 
                     } else {
                         //Can not update
-                        sendRestoreMessage(action, "[lock error] (locker's id: " + this.getLockerIdIfexists(action.getTarget().getTarget_id()) + ").\n [Object RESTORED]");
+                        sendRestoreMessage(action, "[lock error] (locker's id: " + this.getLockerIdIfexists(action,action.getTarget().getTarget_id()) + ").\n [Object RESTORED]");
 
 //+service.getSessionStateById(action.getTarget().getTarget_id()).getLockerUser_id()+" has lock on this.\n object restored.");
                     }
                 } catch (JsonProcessingException ex) {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (JwtParseException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+
                 case DIMENSION_UPDATE: {
                     try {
-                        if (service.updateObjectAndHoldLock(mapper.readValue(action.getJson(), DynamicSerialObject.class), action.getUser_id()) != null) {
+                        if (service.tokenToSession(action.getSession_jwt()).updateObjectAndHoldLock(mapper.readValue(action.getJson(), DynamicSerialObject.class), action.getUser_id()) != null) {
                             // sendAll(action, Q.STATE);
                             action.setAction(ACTION_TYPE.UPDATE);//átállítom update-ra, hogy a kliens oldal ugyan úgy kezelje
                             sendAll(action, Q.ACTION);
@@ -156,7 +168,9 @@ public class EditorActionProcessor extends CustomProcessor {
                         }
                     } catch (JsonProcessingException ex) {
                         Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    } catch (JwtParseException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 }
 
                 break;
@@ -168,31 +182,31 @@ public class EditorActionProcessor extends CustomProcessor {
                     if (action.getExtra().containsKey("create_method")) {
                         System.out.println(action.getExtra().get("create_method"));
                         if (action.getExtra().get("create_method").equals("individual")) {
-                            DynamicSerialObject obj = service.createItemForContainer(action.getUser_id(), action.getTarget().getParent_id(),
+                            DynamicSerialObject obj = service.tokenToSession(action.getSession_jwt()).createItemForContainer(action.getUser_id(), action.getTarget().getParent_id(),
                                     mapper.readValue(action.getJson(), DynamicSerialObject.class));
                             if (obj != null) {
                                 //DynamicSerialObject  originalObj=   mapper.readValue(action.getJson(), DynamicSerialObject.class);
                                     
                                 action.setJson(mapper.writeValueAsString(obj));
-                                service.getSessionStateById(obj.getId()).setExtra(new HashMap<String, String>());
-                                service.getSessionStateById(obj.getId()).setDraft(true);
-                                service.getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:" + action.getUser_id());
+                                service.tokenToSession(action.getSession_jwt()).getSessionStateById(obj.getId()).setExtra(new HashMap<String, String>());
+                                service.tokenToSession(action.getSession_jwt()).getSessionStateById(obj.getId()).setDraft(true);
+                                service.tokenToSession(action.getSession_jwt()).getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:" + action.getUser_id());
 
                                 action.getExtra().put("sessionState",
-                                        mapper.writeValueAsString(service.getSessionStateById(obj.getId())));
+                                        mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getSessionStateById(obj.getId())));
                                 action.getExtra().put("old_id",
                                         action.getTarget().getTarget_id().toString());
                                 EditorActionResponse resp2 = new EditorActionResponse(action);
                                 resp2.setTarget_id(action.getTarget().getTarget_id());
                                 resp2.setTarget_type(TARGET_TYPE.ITEM);
                                 resp2.setTarget_user_id(action.getUser_id());
-
+                                resp2.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                                 actionResponseQueue.add(resp2);
                                 System.out.println("object created and sent back with json" + mapper.writeValueAsString(obj));
 
                             }
                         } if (action.getExtra().get("create_method").equals("nested")) {
-                            DynamicSerialObject obj = service.createItemForContainer(action.getUser_id(), action.getTarget().getParent_id(),
+                            DynamicSerialObject obj = service.tokenToSession(action.getSession_jwt()).createItemForContainer(action.getUser_id(), action.getTarget().getParent_id(),
                                     mapper.readValue(action.getJson(), DynamicSerialObject.class));
                             
                             
@@ -208,7 +222,7 @@ public class EditorActionProcessor extends CustomProcessor {
                                  action1.getTarget().setParent_id(SocketSessionService.ROOT_ID);
                                  action1.setAction(ACTION_TYPE.CREATE);
                                     action1.getExtra().put("sessionState",
-                                        mapper.writeValueAsString(service.getContainerSessionStateById(obj.getId())));
+                                        mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getContainerSessionStateById(obj.getId())));
                                  this.sendCustomMessage(casted.getId(), action1, Q.ACTION, TARGET_TYPE.CONTAINER, RESPONSE_SCOPE.PUBLIC, "");
 
                                  //title model
@@ -220,7 +234,7 @@ public class EditorActionProcessor extends CustomProcessor {
                                  action2.getTarget().setParent_id(casted.getId());
                                  action2.setJson(mapper.writeValueAsString(casted.getTitleModel()));
                                     action2.getExtra().put("sessionState",
-                                        mapper.writeValueAsString(service.getSessionStateById( casted.getTitleModel().getId())));
+                                        mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getSessionStateById( casted.getTitleModel().getId())));
                                  this.sendCustomMessage(casted.getTitleModel().getId(), action2, Q.ACTION, TARGET_TYPE.ITEM, RESPONSE_SCOPE.PUBLIC, "");
                                  
                                 for (SimpleClassElementGroup g : casted.getGroups()) {
@@ -232,7 +246,7 @@ public class EditorActionProcessor extends CustomProcessor {
                                       actiong.getTarget().setParent_id(casted.getId());
                                        actiong.setJson(mapper.writeValueAsString(g));
                                            actiong.getExtra().put("sessionState",
-                                        mapper.writeValueAsString(service.getContainerSessionStateById(g.getId())));
+                                        mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getContainerSessionStateById(g.getId())));
                                      this.sendCustomMessage(g.getId(), actiong, Q.ACTION, TARGET_TYPE.CONTAINER, RESPONSE_SCOPE.PUBLIC, "");
                                     for (Element_c e : g.getAttributes()) {
                                         //elements
@@ -244,7 +258,7 @@ public class EditorActionProcessor extends CustomProcessor {
                                         
                                          actione.setJson(mapper.writeValueAsString(e));
                                              actione.getExtra().put("sessionState",
-                                        mapper.writeValueAsString(service.getSessionStateById( e.getId())));
+                                        mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getSessionStateById( e.getId())));
                                      this.sendCustomMessage(e.getId(), actione, Q.ACTION, TARGET_TYPE.ITEM, RESPONSE_SCOPE.PUBLIC, "");
 
                                     }
@@ -269,52 +283,63 @@ public class EditorActionProcessor extends CustomProcessor {
 
                 } catch (JsonProcessingException ex) {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (JwtParseException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
                 break;
 
+
                 case DELETE:
                     System.out.println("DELETE REQUEST " + action.getTarget().getTarget_id() + " parent:" + action.getTarget().getParent_id());
-                    if (this.service.deleteItemFromContainerById(action.getUser_id(), action.getTarget().getTarget_id(), action.getTarget().getParent_id())) {
-                        //delete succesful
-                        sendAll(action, Q.ACTION);
-
-                    } else {
-                        try {
-
-                            DynamicSerialObject obj = service.getItemById(action.getTarget().getTarget_id());
-                            //  System.out.println("THIS IS A"+obj.getType());
-                            if (obj instanceof SimpleClass) {
-                                this.sendSimpleClassDeleteRestoreMessage((SimpleClass) obj, action, "[lock error] you can't delete an item if you don't have a lock on it (locker's id: "
-                                        + getLockerIdIfexists(action.getTarget().getTarget_id()) + "). \n Object restored");
-                                System.out.println("OBJECT IS A SIMPLE CLASS");
-                            } else {
-                                this.sendDeleteRestoreMessage(action,
-                                        "[lock error] you can't delete an item if you don't have a lock on it (locker's id: "
-                                        + getLockerIdIfexists(action.getTarget().getTarget_id()) + "). \n Object restored");
+                {
+                    try {
+                        if (this.service.tokenToSession(action.getSession_jwt()).deleteItemFromContainerById(action.getUser_id(), action.getTarget().getTarget_id(), action.getTarget().getParent_id())) {
+                            //delete succesful
+                            sendAll(action, Q.ACTION);
+                            
+                        } else {
+                            try {
+                                
+                                DynamicSerialObject obj = service.tokenToSession(action.getSession_jwt()).getItemById(action.getTarget().getTarget_id());
+                                //  System.out.println("THIS IS A"+obj.getType());
+                                if (obj instanceof SimpleClass) {
+                                    this.sendSimpleClassDeleteRestoreMessage((SimpleClass) obj, action, "[lock error] you can't delete an item if you don't have a lock on it (locker's id: "
+                                            + getLockerIdIfexists(action,action.getTarget().getTarget_id()) + "). \n Object restored");
+                                    System.out.println("OBJECT IS A SIMPLE CLASS");
+                                } else {
+                                    this.sendDeleteRestoreMessage(action,
+                                            "[lock error] you can't delete an item if you don't have a lock on it (locker's id: "
+                                                    + getLockerIdIfexists(action,action.getTarget().getTarget_id()) + "). \n Object restored");
+                                }
+                                //  sendBackPrivate(action, Q.ACTION, "te item does not exists or you dont have a lock on it.");
+                            } catch (JsonProcessingException ex) {
+                                
+                                Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            //  sendBackPrivate(action, Q.ACTION, "te item does not exists or you dont have a lock on it.");
-                        } catch (JsonProcessingException ex) {
-
-                            Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                    } catch (JwtParseException ex) {
+                        Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                }
                     break;
+
 
                 //SERVER_SIDE ACTIONS ////////////////////////////////////////////
                 case S_USER_DISCONNECT:
                     //delete draft elements, send message about them
-                    List<Integer> deleted = service.deleteDraftsByUser(action.getUser_id());
+                   List<Integer> deleted = service.getSessionById(Long.valueOf(action.getExtra().get("session_id"))).deleteDraftsByUser(action.getUser_id());
                     for (Integer id : deleted) {
                         action.setAction(ACTION_TYPE.DELETE);
                         EditorActionResponse resp2 = new EditorActionResponse(action);
                         resp2.setTarget_id(id);
+                        resp2.setTargetsUsers(service.getSessionById(Long.valueOf(action.getExtra().get("session_id"))).getUserSockets());//IMPORTANT 
                         actionResponseQueue.add(resp2);
                     }
-                    List<Integer> unlocked = service.deleteLocksRelatedToUser(action.getUser_id());
+                    List<Integer> unlocked = service.getSessionById(Long.valueOf(action.getExtra().get("session_id"))).deleteLocksRelatedToUser(action.getUser_id());
                     for (Integer id : unlocked) {
-                        SessionStateResponse resp = new SessionStateResponse(service.getSessionStateById(id), "");
-
+                        SessionStateResponse resp = new SessionStateResponse(service.getSessionById(Long.valueOf(action.getExtra().get("session_id"))).getSessionStateById(id), "");
+                        resp.setTargetsUsers(service.getSessionById(Long.valueOf(action.getExtra().get("session_id"))).getUserSockets());
                         resp.setTarget_user_id(action.getUser_id());
                         resp.setTarget_id(id);
                         sessionStateResponseQueue.add(resp);
@@ -331,48 +356,76 @@ public class EditorActionProcessor extends CustomProcessor {
         }
     }
 
-   protected Integer getLockerIdIfexists(Integer target_id) {
-        if (service.getSessionStateById(target_id) != null && service.getSessionStateById(target_id).getLockerUser_id() != null) {
-            return service.getSessionStateById(target_id).getLockerUser_id();
-        }
-        return null;
+   protected Integer getLockerIdIfexists(EditorAction action,Integer target_id) {
+        try {
+            if (service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_id) != null && service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_id).getLockerUser_id() != null) {
+                return service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_id).getLockerUser_id();
+            }
+         
+        } catch (JwtParseException ex) {
+            Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }   return null;
     }
 
-   protected void sendAll(EditorAction action, Q queue) {
+   protected void sendAll(EditorAction action, Q queue) throws JwtParseException {
         switch (queue) {
             case STATE:
-                SessionStateResponse resp = new SessionStateResponse(
-                        service.getSessionStateById(action.getTarget().getTarget_id()),
+             /*   SessionStateResponse resp = new SessionStateResponse(
+                        service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                         action.getId());
+                  resp.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp.setTarget_user_id(action.getUser_id());
                 resp.setTarget_id(action.getTarget().getTarget_id());
-                sessionStateResponseQueue.add(resp);
+                sessionStateResponseQueue.add(resp);*/
+                  sessionStateResponseQueue.add(this.buildStateResponse(
+                action.getTarget().getTarget_id()
+                , action
+                , service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())
+                , TARGET_TYPE.ITEM
+                , RESPONSE_SCOPE.PUBLIC
+                , ""));
+               
                 break;
             case ACTION:
-                EditorActionResponse resp2 = new EditorActionResponse(action);
+              /*  EditorActionResponse resp2 = new EditorActionResponse(action);
+                  resp2.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp2.setTarget_id(action.getTarget().getTarget_id());
-                actionResponseQueue.add(resp2);
+                actionResponseQueue.add(resp2);*/
+                        actionResponseQueue.add(this.buildActionResponse(action.getTarget().getTarget_id(), action,TARGET_TYPE.ITEM, RESPONSE_SCOPE.PUBLIC, ""));
+
                 break;
         }
     }
 
-   protected void sendBackPrivate(EditorAction action, Q queue, String msg) {
+   protected void sendBackPrivate(EditorAction action, Q queue, String msg) throws JwtParseException {
         switch (queue) {
             case STATE:
-                SessionStateResponse resp = new SessionStateResponse(
-                        service.getSessionStateById(action.getTarget().getTarget_id()),
+             /*   SessionStateResponse resp = new SessionStateResponse(
+                        service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                         action.getId());
+              //  resp.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp.setTarget_user_id(action.getUser_id());
                 resp.setTarget_id(action.getTarget().getTarget_id());
                 resp.setScope(RESPONSE_SCOPE.PRIVATE);
-                sessionStateResponseQueue.add(resp);
+                sessionStateResponseQueue.add(resp);*/
+                  sessionStateResponseQueue.add(this.buildStateResponse(
+                action.getTarget().getTarget_id()
+                , action
+                , service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())
+                , TARGET_TYPE.ITEM
+                , RESPONSE_SCOPE.PRIVATE
+                , msg));
                 break;
             case ACTION:
-                EditorActionResponse resp2 = new EditorActionResponse(action);
+              /*  EditorActionResponse resp2 = new EditorActionResponse(action);
+                //resp2.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp2.setTarget_id(action.getTarget().getTarget_id());
                 resp2.setScope(RESPONSE_SCOPE.PRIVATE);
                 resp2.setResponse_msg("could not complete delete request");
-                actionResponseQueue.add(resp2);
+                actionResponseQueue.add(resp2);*/
+                
+        actionResponseQueue.add(this.buildActionResponse(action.getTarget().getTarget_id(), action,TARGET_TYPE.ITEM, RESPONSE_SCOPE.PRIVATE, msg));
+
                 break;
         }
     }
@@ -380,7 +433,7 @@ public class EditorActionProcessor extends CustomProcessor {
     /**
      * this one only sends sessions
      */
-  protected   void sendSimpleClassDeleteRestoreMessage(SimpleClass obj, EditorAction action, String message) {
+  protected   void sendSimpleClassDeleteRestoreMessage(SimpleClass obj, EditorAction action, String message) throws JwtParseException {
         for (SimpleClassElementGroup g : obj.getGroups()) {
             sendCustomMessage(g.getId(), action, Q.STATE, TARGET_TYPE.CONTAINER_INJECTION, RESPONSE_SCOPE.PRIVATE, message);
 
@@ -395,103 +448,113 @@ public class EditorActionProcessor extends CustomProcessor {
         System.out.println("object restoration is sent");
     }
 
-    protected void sendCustomMessage(Integer target_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
-
-        switch (queue) {
-            case ACTION:
-                EditorActionResponse resp2 = new EditorActionResponse(action);
+  
+   protected EditorActionResponse buildActionResponse(Integer target_id, EditorAction action, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException{
+         EditorActionResponse resp2 = new EditorActionResponse(action);
                 resp2.setTarget_id(target_id);
                 resp2.setTarget_user_id(action.getUser_id());
                 resp2.setTarget_type(target_type);
                 resp2.getAction().getTarget().setTarget_id(target_id);
-                resp2.setScope(response_scope);
                 resp2.setResponse_msg(message);
-                actionResponseQueue.add(resp2);
-                break;
-            case STATE:
-                SessionStateResponse resp = new SessionStateResponse(
-                        service.getSessionStateById(target_id),
-                        action.getId());
+                resp2.setScope(response_scope);
+                if(response_scope==RESPONSE_SCOPE.PUBLIC)
+                        resp2.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
+                else if(response_scope==RESPONSE_SCOPE.PRIVATE)
+                resp2.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getUser_id()));
+                return resp2;
+    }
+   protected SessionStateResponse buildStateResponse(Integer target_id,EditorAction action, SessionState state, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException{
+         SessionStateResponse resp = new SessionStateResponse(
+                      state,
+                      action.getId());
                 resp.setTarget_id(target_id);
                 resp.setTarget_user_id(action.getUser_id());
                 resp.setTarget_type(target_type);
                 resp.setScope(response_scope);
                 resp.setResponse_msg(message);
-                sessionStateResponseQueue.add(resp);
+                 if(response_scope==RESPONSE_SCOPE.PUBLIC)
+                        resp.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
+                else if(response_scope==RESPONSE_SCOPE.PRIVATE)
+                     resp.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getUser_id()));
+                return resp;
+   }
+  
+  
+  
+  
+    protected void sendCustomMessage(Integer target_object_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException {
+        switch (queue) {
+            case ACTION:
+                actionResponseQueue.add(buildActionResponse(target_object_id, action, target_type, response_scope, message));
+                break;
+            case STATE:
+                sessionStateResponseQueue.add(buildStateResponse(target_object_id, action,   service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_object_id), target_type, response_scope, message));
                 break;
         }
     }
-
-    protected void sendCustomMessage(EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) {
-
-        switch (queue) {
-            case ACTION:
-                EditorActionResponse resp2 = new EditorActionResponse(action);
-                resp2.setTarget_id(action.getTarget().getTarget_id());
-                resp2.setTarget_user_id(action.getUser_id());
-                resp2.setTarget_type(target_type);
-                resp2.setScope(response_scope);
-                resp2.setResponse_msg(message);
-                actionResponseQueue.add(resp2);
-                break;
-            case STATE:
-                SessionStateResponse resp = new SessionStateResponse(
-                        service.getSessionStateById(action.getTarget().getTarget_id()),
-                        action.getId());
-                resp.setTarget_id(action.getTarget().getTarget_id());
-                resp.setTarget_user_id(action.getUser_id());
-                resp.setTarget_type(target_type);
-                resp.setScope(response_scope);
-                resp.setResponse_msg(message);
-                sessionStateResponseQueue.add(resp);
-                break;
-        }
+/*send it to all*/
+    protected void sendCustomMessage(EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException {
+        sendCustomMessage(action.getTarget().getTarget_id(), action, queue, target_type, response_scope, message);
     }
 
     public enum Q {
         STATE, ACTION
     }
 
-  protected  void sendRestoreMessage(EditorAction action, String message) throws JsonProcessingException {
-        SessionStateResponse resp = new SessionStateResponse(
-                service.getSessionStateById(action.getTarget().getTarget_id()),
+  protected  void sendRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException {
+      /*  SessionStateResponse resp = new SessionStateResponse(
+                service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
         resp.setTarget_id(action.getTarget().getTarget_id());
         resp.setTarget_user_id(action.getUser_id());
-
-        sessionStateResponseQueue.add(resp);
+        resp.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getTarget().getTarget_id()));*/
+        sessionStateResponseQueue.add(this.buildStateResponse(
+                action.getTarget().getTarget_id()
+                , action
+                , service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())
+                , TARGET_TYPE.ITEM
+                , RESPONSE_SCOPE.PRIVATE
+                , message));
         //Vissza kell állítani az objektet, mert illetéktelenül próbálta meg kiválasztani.
 
         action.setAction(ACTION_TYPE.RESTORE);
-        action.setJson(mapper.writeValueAsString(service.getItemById(action.getTarget().getTarget_id())));
-        EditorActionResponse resp2 = new EditorActionResponse(action, action.getUser_id());
-        resp2.setTarget_user_id(action.getUser_id());
-        resp2.setTarget_id(action.getTarget().getTarget_id());
-        resp2.setScope(RESPONSE_SCOPE.PRIVATE);
-        resp2.setResponse_msg(message);
-        actionResponseQueue.add(resp2);
+        action.setJson(mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getItemById(action.getTarget().getTarget_id())));
+   
+        actionResponseQueue.add(this.buildActionResponse(action.getTarget().getTarget_id(), action,TARGET_TYPE.ITEM, RESPONSE_SCOPE.PRIVATE, message));
 
         System.out.println("object restoration is sent");
     }
 
-   protected void sendDeleteRestoreMessage(EditorAction action, String message) throws JsonProcessingException {
-        SessionStateResponse resp = new SessionStateResponse(
-                service.getSessionStateById(action.getTarget().getTarget_id()),
+   protected void sendDeleteRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException {
+       /* SessionStateResponse resp = new SessionStateResponse(
+                service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
         resp.setTarget_id(action.getTarget().getTarget_id());
         resp.setTarget_user_id(action.getUser_id());
-        sessionStateResponseQueue.add(resp);
+        resp.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getTarget().getTarget_id()));
+        
+        sessionStateResponseQueue.add(resp);*/
+         sessionStateResponseQueue.add(this.buildStateResponse(
+                action.getTarget().getTarget_id()
+                , action
+                , service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())
+                , TARGET_TYPE.ITEM
+                , RESPONSE_SCOPE.PRIVATE
+                , message));
         //Vissza kell állítani az objektet, mert illetéktelenül próbálta meg kiválasztani.
 
         action.setAction(ACTION_TYPE.RESTORE);
-        action.getExtra().put("sessionState", mapper.writeValueAsString(service.getSessionStateById(action.getTarget().getTarget_id())));
-        action.setJson(mapper.writeValueAsString(service.getItemById(action.getTarget().getTarget_id())));
-        EditorActionResponse resp2 = new EditorActionResponse(action, action.getUser_id());
+        action.getExtra().put("sessionState", mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())));
+        action.setJson(mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getItemById(action.getTarget().getTarget_id())));
+      /*  EditorActionResponse resp2 = new EditorActionResponse(action, action.getUser_id());
         resp2.setTarget_user_id(action.getUser_id());
         resp2.setTarget_id(action.getTarget().getTarget_id());
         resp2.setScope(RESPONSE_SCOPE.PRIVATE);
         resp2.setResponse_msg(message);
-        actionResponseQueue.add(resp2);
+        resp2.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getTarget().getTarget_id()));
+        actionResponseQueue.add(resp2);*/
+
+        actionResponseQueue.add(this.buildActionResponse(action.getTarget().getTarget_id(), action,TARGET_TYPE.ITEM, RESPONSE_SCOPE.PRIVATE, message));
 
         System.out.println("object restoration is sent");
     }

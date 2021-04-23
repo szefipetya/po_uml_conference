@@ -7,6 +7,7 @@ package com.szefi.uml_conference.socket.threads.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.szefi.uml_conference._exceptions.JwtParseException;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import com.szefi.uml_conference.editor.model.diagram.Diagram;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
@@ -27,6 +28,11 @@ import com.szefi.uml_conference.editor.model.top.AutoSessionInjectable_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.repository.DiagramRepository;
 import com.szefi.uml_conference.editor.repository.DynamicSerialObjectRepository;
+import com.szefi.uml_conference.security.model.MyUserDetails;
+import com.szefi.uml_conference.security.model.UserEntity;
+import com.szefi.uml_conference.security.repository.UserRepository;
+import com.szefi.uml_conference.security.service.JwtUtilService;
+import com.szefi.uml_conference.socket.security.model.SocketAuthenticationRequest;
 import com.szefi.uml_conference.socket.threads.SocketThreadManager;
 
 import java.io.File;
@@ -40,21 +46,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
 
 /**
  *
@@ -68,20 +79,19 @@ public class SocketSessionService {
     @Qualifier("nestedActionQueue") 
     BlockingQueue<EditorAction> nestedActionQueue;
     
-    @Autowired
-    @Qualifier("actionSockets")
-    private List<UserWebSocket> actionSockets;
-    @Autowired
-    @Qualifier("stateSockets")
-    private List<UserWebSocket> stateSockets;
+
 
     @Autowired
             DynamicSerialObjectRepository objectRepo;
     
     @Autowired 
             DiagramRepository diagramRepo;
+     public static final Integer L_ROOT_ID=-2;
+    public static final Integer ROOT_ID=-1;
     
-    
+  public DiagramEntity  getDiagramById(Integer id){
+      return  diagramRepo.findById(id).get();
+    }
     
     List<EditorSession> sessions=new LinkedList<>();
     
@@ -95,7 +105,7 @@ public class SocketSessionService {
 /**
  * @return The list of ids, that were locked by the user
  */
-    public List<Integer> deleteLocksRelatedToUser(Integer user_id){
+   /* public List<Integer> deleteLocksRelatedToUser(Integer user_id){
         List<Integer> ret=new ArrayList<>();
      for( Entry<Integer,Pair<SessionState,DynamicSerialObject>> e : sessionItemMap.entrySet()){
         if(e.getValue().getFirst().getLockerUser_id()!=null&&
@@ -119,13 +129,13 @@ public class SocketSessionService {
         return null;
     }
     
-
+*/
     ObjectMapper objectMapper;
     DiagramEntity dg;
-    Map<Integer, Pair<SessionState,DynamicSerialObject>> sessionItemMap=new HashMap<>();
-    Map<Integer, Pair<SessionState,DynamicSerialContainer_I>> sessionContainerMap=new HashMap<>();
+  /*  Map<Integer, Pair<SessionState,DynamicSerialObject>> sessionItemMap=new HashMap<>();
+    Map<Integer, Pair<SessionState,DynamicSerialContainer_I>> sessionContainerMap=new HashMap<>();*/
 
-    public  Map<Integer, Pair<SessionState,DynamicSerialObject>> getSessionItemMap() {
+  /*  public  Map<Integer, Pair<SessionState,DynamicSerialObject>> getSessionItemMap() {
         return sessionItemMap;
     }
 
@@ -236,9 +246,7 @@ public class SocketSessionService {
             if(obj instanceof AutoSessionInjectable_I){
                 AutoSessionInjectable_I casted=(AutoSessionInjectable_I)obj;
                 casted.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);
-                 /*   this.lockObjectById(obj.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
-            SessionState state=getSessionStateById(obj.getId());
-            state.setDraft(true);*/
+             
            
             
             System.out.println("obj created and locked for"+user_id);
@@ -251,55 +259,61 @@ public class SocketSessionService {
             }      
         }
       return null;
-    }
+    }*/
+    @Autowired
+    UserRepository userRepo;//temp
  @EventListener(ApplicationReadyEvent.class)
     public void init() {
         try {
-            EditorSession session=new EditorSession();
-            sessions.add(session);
-           session.setDg(new DiagramEntity());
+          //  EditorSession session=new EditorSession();
+          //  sessions.add(session);
+         
             System.out.println("service started");
-            this.dg=session.getDg();
+           // this.dg=new DiagramEntity();
+         
             Resource res = new ClassPathResource("d.json");
             byte[] buffer = new byte[res.getInputStream().available()];
             res.getInputStream().read(buffer);
             File targetFile = new File("src/main/resources/tmp_d.tmp");
             OutputStream outStream = new FileOutputStream(targetFile);
             outStream.write(buffer);
-          
             try {
                 objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                session.setDg(objectMapper.readValue(targetFile, DiagramEntity.class));
-            // this.diagramRepo.save(session.getDg());
-                for (DiagramObject d : session.getDg().getDgObjects()) { 
+                       this.dg=objectMapper.readValue(targetFile, DiagramEntity.class);
+
+         
+                for (DiagramObject d :this.dg.getDgObjects()) { 
                     //  sessionItemMap.put(d.getId(),Pair.of(new SessionState(),d));
-                    d.setDiagram(session.getDg());
+                    d.setDiagram(this.dg);
+                    d.getDimensionModel().setDgObject(d);
                     if(d instanceof NoteBox){
                         NoteBox n=(NoteBox)d;
-         sessionItemMap.put(n.getId(), Pair.of(new SessionState(),n));
                        // n.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
                     }
                     if (d instanceof SimpleClass) {
-                        SimpleClass c = (SimpleClass) d;
-                       
-                         sessionItemMap.put(c.getId(), Pair.of(new SessionState(),c));
-                         sessionContainerMap.put(c.getId(), Pair.of(new SessionState(),c));
-                         sessionItemMap.put(c.getTitleModel().getId(), Pair.of(new SessionState(),c.getTitleModel()));
+                        SimpleClass c = (SimpleClass) d;     
+                        c.getTitleModel().setParent(c);
                          for(SimpleClassElementGroup g:c.getGroups()){
-                             sessionContainerMap.put(g.getId(), Pair.of(new SessionState(),g));
                               g.setParentClass(c);
                              for(AttributeElement e:g.getAttributes()){
                                  e.setGroup(g);
-                                sessionItemMap.put(e.getId(), Pair.of(new SessionState(),e));
-
                              }
                          }
-                        //c.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
                     }
                 }
-                System.out.println("pause");;
-                this.diagramRepo.save(session.getDg());
+               
+            
+                   // this.diagramRepo.save(session.getDg());   
+            UserEntity user=userRepo.findByUserName("user").get();
+          
+          //  user.getDiagrams().add(this.dg);
+           this.dg.setOwner(user);  
+            this.diagramRepo.save(this.dg); 
+            UserEntity user2=userRepo.findByUserName("user2").get();
+            user2.getSharedDiagramsWithMe().add(this.dg);
+            userRepo.save(user2);
+             // session.setDg(this.dg);
             } catch (IOException ex) {
 
                 Logger.getLogger(SocketSessionService.class.getName()).log(Level.SEVERE, null, ex);
@@ -309,9 +323,9 @@ public class SocketSessionService {
         }
 
     }
-
+/*
     public DiagramEntity getDummyDiagram() {
-        return dg;
+        return this.sessions.get(0).getDg();
     }
 
     public DynamicSerialObject getItemById(Integer target_id){
@@ -352,8 +366,7 @@ public class SocketSessionService {
           }
          return null;      
     }
-    public static final Integer L_ROOT_ID=-2;
-    public static final Integer ROOT_ID=-3;
+   
   
 
     public boolean deleteItemFromContainerById(Integer user_id,Integer target_id, Integer parent_id) {
@@ -473,7 +486,7 @@ public class SocketSessionService {
         }
         return list;
     }
-
+*//*
     public Object updateObjectAndHoldLock(DynamicSerialObject obj, Integer user_id) {
           SessionState s=this.getSessionStateById(obj.getId());
           if(s!=null){
@@ -481,13 +494,105 @@ public class SocketSessionService {
                if(this.isItemLockedByMe(obj.getId(), user_id)){
                    System.out.println("object updated");
                    this.getItemById(obj.getId()).update(obj); 
-                /*   if(obj.getExtra().containsKey("draft")){
+                 if(obj.getExtra().containsKey("draft")){
                        obj.getExtra().replace("draft", "false");
-                   }*/
+                   }
                    return this.sessionItemMap.get(obj.getId());
                 }
           }
          return null;      
+    }*/ 
+@Autowired JwtUtilService jwtService;
+
+
+    public void onSocketDisconnect(UserWebSocket userSocket){
+        
+    }
+   public EditorSession getSessionById(Long id){
+        return this.sessions.stream().filter(r->r.getId().equals(id)).findFirst().get();
+
+    }
+   public EditorSession tokenToSession(String token) throws JwtParseException{
+         return  this.getSessionById(Long.valueOf((String)this.jwtService.extractAllClaims(token).get("session_id")));
+
+    }
+   @Bean
+   @Scope("prototype")    
+   EditorSession generateSession(){
+       return new EditorSession(this.diagramRepo,this.objectRepo,this.nestedActionQueue);
+   }
+
+ public List<UserWebSocket> getUserSocketsByToken(String token) throws JwtParseException{
+       return this.tokenToSession(token).getUserSockets();
+   }
+   
+    public EditorSession autoProcessRequest( MyUserDetails details,UserWebSocket userSocket,SocketAuthenticationRequest req) {
+        //step 1 ://find a diagram that matches the req.getDiagram_id()
+                  //if not found, create a new session and load the diagram from the database.
+       //step 2: Inject the user to the session with  a session Token as an identificator. This enables one users to connect to multiple sessions.
+     // Optional<DiagramEntity> opt= sessionsToDiagrams().stream().filter(d->d.getId().equals(req.getDiagram_id())).findFirst();
+     //identify user with session id
+     Optional<EditorSession> opt= findSessionByDiagramId(req.getDiagram_id());
+        EditorSession s=null;
+      if(opt.isPresent()){//if Session is present with diagram id
+           s=opt.get();
+           s.getUserSockets().add(userSocket);
+          Map<String,Object> claims=new HashMap<>();
+          claims.put("session_id",s.getId().toString());
+          userSocket.setSession_jwt(jwtService.generateToken(claims, details));//generated a token, containing the session's id.
+                    userSocket.setUser_id(details.getId());
+
+            s.getUserSockets().add(userSocket);
+      }else{
+          //create new session and load diagram with given id.
+           s=this.generateSession();//new EditorSession(this.diagramRepo,this.objectRepo);
+           
+          s.setDg(diagramRepo.findById(req.getDiagram_id()).get());  
+          
+          Map<String,Object> claims=new HashMap<>();
+          claims.put("session_id",s.getId().toString());     
+          userSocket.setSession_jwt(jwtService.generateToken(claims, details));//generated a token, containing the session's id.
+          userSocket.setUser_id(details.getId());
+          s.getUserSockets().add(userSocket);
+      
+          sessions.add(s);
+      }
+      return s;
+    }
+    public Pair<Long,List<Integer>> findSessionForNativeSocketAndDeleteFromSession(SOCKET type,WebSocketSession socket){
+        for(EditorSession e:sessions){
+           UserWebSocket u=e.getUserSocketByNativeSocket(type,socket);
+           if(u!=null)
+           {
+               return Pair.of(e.getId(), e.deleteLocksRelatedToUser(u.getUser_id()));
+            }
+        }
+        return null;
+    }
+    private List<DiagramEntity> sessionsToDiagrams(){
+        return this.sessions.stream().map(s->s.getDg()).collect(Collectors.toList());
+    }
+    public EditorSession updateuserWithStateAndGetSession(String session_jwt,WebSocketSession socket) throws JwtParseException{
+        Long session_id=  Long.valueOf((String)this.jwtService.extractAllClaims(session_jwt).get("session_id"));
+        return this.sessions.stream().filter(s->{
+            if(s.getId().equals(session_id)){
+                s.getUserByJwt(session_jwt).setStateSocket(socket);
+            }
+            return s.getId().equals(session_id);
+       }).findFirst().get();
+    }
+    
+    private  Optional<EditorSession>  findSessionWithuser_session_jwt_inside(String session_jwt){
+      /*for(EditorSession s:sessions){
+          if(s.userDisconnect(session_jwt))
+      }
+        
+        ((String)this.jwtService.extractAllClaims(session_jwt).get("session_id"))*/
+      return null;
+    }
+    
+    private Optional<EditorSession> findSessionByDiagramId(Integer id){
+        return this.sessions.stream().filter(s->s.getDg().getId().equals(id)).findFirst();
     }
 
 }

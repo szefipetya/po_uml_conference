@@ -14,12 +14,14 @@ import com.szefi.uml_conference.editor.model.socket.EditorAction;
 public class EditorActionResponse extends CustomResponse {
     private EditorAction action;
     public EditorActionResponse(EditorAction action, Integer target_user_id) {
+        super();
         this.action = action;
         this.target_user_id = target_user_id;
         this.scope=RESPONSE_SCOPE.PRIVATE;
         this.target_type=TARGET_TYPE.ITEM;
     }
   public EditorActionResponse(EditorAction action) {
+      super();
         this.action = action;
         this.scope=RESPONSE_SCOPE.PUBLIC;
         this.target_type=TARGET_TYPE.ITEM;

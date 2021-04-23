@@ -12,21 +12,41 @@ import org.springframework.web.socket.WebSocketSession;
  * @author h9pbcl
  */
 public class UserWebSocket {
-    private WebSocketSession socket;
+    private WebSocketSession actionSocket;
+    private WebSocketSession stateSocket;
     private Integer user_id;
+    private String session_jwt;
 
-    public UserWebSocket(WebSocketSession socket) {
-        this.socket = socket;
+    public WebSocketSession getActionSocket() {
+        return actionSocket;
+    }
+
+    public void setActionSocket(WebSocketSession actionSocket) {
+        this.actionSocket = actionSocket;
+    }
+
+    public WebSocketSession getStateSocket() {
+        return stateSocket;
+    }
+
+    public void setStateSocket(WebSocketSession stateSocket) {
+        this.stateSocket = stateSocket;
+    }
+
+    public String getSession_jwt() {
+        return session_jwt;
+    }
+
+    public void setSession_jwt(String session_jwt) {
+        this.session_jwt = session_jwt;
+    }
+
+    public UserWebSocket() {
+      //  this.socket = socket;
         user_id=-1;
     }
 
-    public WebSocketSession getSocket() {
-        return socket;
-    }
-
-    public void setSocket(WebSocketSession socket) {
-        this.socket = socket;
-    }
+   
 
     public Integer getUser_id() {
         return user_id;

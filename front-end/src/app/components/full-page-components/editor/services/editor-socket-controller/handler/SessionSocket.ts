@@ -56,7 +56,7 @@ export class SessionSocket implements SocketWrapper {
   }
   onopen(m: any) {
     console.log('Connected: ' + m);
-    setTimeout(() => this.parent.socket.send(new SocketAuthenticationRequest(getCookie("jwt_token"), 1000), 50));
+    setTimeout(() => this.parent.socket.send(getCookie("session_jwt"), 50));
   }
   oninitmessage(e: any) {
     let responses: SessionStateResponse[] = JSON.parse(e.data);

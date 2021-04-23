@@ -87,7 +87,7 @@ export class EditorRootComponent implements OnInit, AfterContentInit {
         this.editorService.clientModel.canvas.selectedClassIds.map((id) => {
           this.editorService.model.dgObjects.map((clas: DiagramObject) => {
             if (clas.id == id) {
-              clas.viewModel.deleteAsync('root');
+              clas.viewModel.deleteAsync(GlobalEditorService.ROOT_ID);
             }
           });
         });

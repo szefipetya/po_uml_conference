@@ -33,16 +33,15 @@ public class SessionStateResponseProcessor extends CustomProcessor{
 ObjectMapper mapper;
 @Autowired
     public SessionStateResponseProcessor(
-            @Qualifier("stateSockets") List<UserWebSocket> sessions,
              @Qualifier("sessionStateResponseQueue") BlockingQueue<SessionStateResponse> stateResponseQueue) {
       this.stateResponseQueue=stateResponseQueue;
-        this.sessions=sessions;
+     
             mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);      
     }
 
     BlockingQueue<SessionStateResponse> stateResponseQueue;
-     private final List<UserWebSocket> sessions;
+  
 @Override
     public void run() {
         while(!isClosed){
@@ -59,12 +58,12 @@ ObjectMapper mapper;
           //  System.out.println(response.getSessionState().getLockerUser_id());
             System.out.println("----");
            
-            for(UserWebSocket s:sessions){
+            for(UserWebSocket s:response.getTargetsUsers()){
                 System.out.println(s.getUser_id());
                 if(response.getScope()==RESPONSE_SCOPE.PUBLIC||s.getUser_id().equals(response.getTarget_user_id())){
                     try {
-                        if(s.getSocket().isOpen()){
-                        s.getSocket().sendMessage(new TextMessage(mapper.writeValueAsString(response)));
+                        if(s.getStateSocket().isOpen()){
+                        s.getStateSocket().sendMessage(new TextMessage(mapper.writeValueAsString(response)));
                         System.out.println("stateresponse sent to user "+s.getUser_id());
                             if(response.getScope()==RESPONSE_SCOPE.PRIVATE) break;
                         }
