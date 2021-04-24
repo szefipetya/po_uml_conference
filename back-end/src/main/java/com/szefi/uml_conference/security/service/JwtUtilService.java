@@ -56,20 +56,23 @@ public class JwtUtilService {
         }
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws JwtParseException {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws JwtParseException ,IllegalArgumentException {
         try{
         final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims); }catch(Exception ex){
+        return claimsResolver.apply(claims); }
+        catch(Exception ex){
             throw new JwtParseException("jwt parse error");
         }
     }
-    public Claims extractAllClaims(String token) throws JwtParseException {
-     
+    public Claims extractAllClaims(String token) throws JwtParseException,IllegalArgumentException  {
+     try{
             Jws<Claims> claims = Jwts.parser()
                     .setSigningKey(this.SECRET_KEY)
                     .parseClaimsJws(token);
             return claims.getBody();
-                  
+     }  catch(Exception ex){
+            throw new JwtParseException("jwt parse error\n"+ex.getMessage());
+        }
                         
                        // return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
                    

@@ -21,23 +21,11 @@ import org.springframework.data.util.Pair;
  *
  * @author h9pbcl
  */
-@JsonTypeName(value = "BreakPoint")
-@Entity
-public class BreakPoint extends DynamicSerialObject {
+public class BreakPoint {
         private boolean edit;
-        @OneToOne(mappedBy = "parentBp",cascade = CascadeType.ALL)
         private Point point;
         private int index;
-        @ManyToOne
-        private Line line;
-        @JsonIgnore 
-    public Line getLine() {
-        return line;
-    }
-
-    public void setLine(Line line) {
-        this.line = line;
-    }
+    
 
     public int getIndex() {
         return index;
@@ -68,20 +56,7 @@ public class BreakPoint extends DynamicSerialObject {
         this.point = point;
     }
 
-    @Override
-    public void update(DynamicSerialObject obj) {
-        this.point=((BreakPoint)obj).getPoint();
-    }
-
-    @Override
-    public void injectSelfToStateMap(Map<Integer, Pair<SessionState, DynamicSerialObject>> sessionItemMap, Map<Integer, Pair<SessionState, DynamicSerialContainer_I>> sessionContainerMap) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void deleteSelfFromStateMap(Map<Integer, Pair<SessionState, DynamicSerialObject>> sessionItemMap, Map<Integer, Pair<SessionState, DynamicSerialContainer_I>> sessionContainerMap) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+  
 
   
         

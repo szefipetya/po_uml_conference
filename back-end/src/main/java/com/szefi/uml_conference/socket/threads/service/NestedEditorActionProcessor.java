@@ -19,6 +19,7 @@ import com.szefi.uml_conference.editor.model.socket.Response.EditorActionRespons
 import com.szefi.uml_conference.editor.model.socket.Response.RESPONSE_SCOPE;
 import com.szefi.uml_conference.editor.model.socket.Response.SessionStateResponse;
 import com.szefi.uml_conference.editor.model.socket.Response.TARGET_TYPE;
+import com.szefi.uml_conference.editor.model.socket.SessionState;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import com.szefi.uml_conference.socket.threads.ActionResponseProcessor;
 import com.szefi.uml_conference.socket.threads.CustomProcessor;
@@ -28,6 +29,7 @@ import static com.szefi.uml_conference.socket.threads.service.SOCKET.STATE;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -54,6 +56,7 @@ public class NestedEditorActionProcessor extends CustomProcessor {
             @Qualifier("sessionStateResponseQueue") BlockingQueue<SessionStateResponse> sessionStateResponseQueue,
             @Qualifier("actionResponseQueue") BlockingQueue<EditorActionResponse> actionResponseQueue
     ) {
+        
         this.nestedActionQueue = nestedActionQueue;
         this.actionResponseQueue = actionResponseQueue;
         this.sessionStateResponseQueue = sessionStateResponseQueue;
@@ -73,8 +76,9 @@ NestedEditorActionProcessor(){
     @Override
     public void run() {
         while (!isClosed) {
+            EditorAction action = null;
             try {
-                EditorAction action = null;
+                
                 try {
                     action = nestedActionQueue.take();
                     System.out.println("stuff taken");
@@ -85,6 +89,8 @@ NestedEditorActionProcessor(){
                 switch (action.getAction()) {
                     
                     case DELETE:
+                          
+                      
                         System.out.println("DELETE REQUEST " + action.getTarget().getTarget_id() + " parent:" + action.getTarget().getParent_id());
                         if (this.service.tokenToSession(action.getSession_jwt()).deleteItemFromContainerById(action.getUser_id(), action.getTarget().getTarget_id(), action.getTarget().getParent_id())) {
                             //delete succesful
@@ -95,11 +101,13 @@ NestedEditorActionProcessor(){
                                 
                                 DynamicSerialObject obj = service.tokenToSession(action.getSession_jwt()).getItemById(action.getTarget().getTarget_id());
                                 //  System.out.println("THIS IS A"+obj.getType());
+                                
                                 if (obj instanceof SimpleClass) {
                                     this.sendSimpleClassDeleteRestoreMessage((SimpleClass) obj, action, "[lock error] you can't delete an item if you don't have a lock on it (locker's id: "
                                             + getLockerIdIfexists(action,action.getTarget().getTarget_id()) + "). \n Object restored");
                                     System.out.println("OBJECT IS A SIMPLE CLASS");
                                 } else {
+                                    
                                     this.sendDeleteRestoreMessage(action,
                                             "[lock error] you can't delete an item if you don't have a lock on it (locker's id: "
                                                     + getLockerIdIfexists(action,action.getTarget().getTarget_id()) + "). \n Object restored");
@@ -114,10 +122,16 @@ NestedEditorActionProcessor(){
                 }
             } catch (JwtParseException ex) {
                 Logger.getLogger(NestedEditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NotFoundException ex) {
+                try {//ha beakad valami, akkor a hamis elem törlését még el lehessen küldeni
+                    sendAll(action, Q.ACTION);
+                } catch (JwtParseException ex1) {
+                    Logger.getLogger(NestedEditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
+                }
             }
         }
     }
-     
+     //METHODS_BEG
    protected Integer getLockerIdIfexists(EditorAction action,Integer target_id) {
         try {
             if (service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_id) != null && service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_id).getLockerUser_id() != null) {
@@ -132,19 +146,29 @@ NestedEditorActionProcessor(){
    protected void sendAll(EditorAction action, Q queue) throws JwtParseException {
         switch (queue) {
             case STATE:
-                SessionStateResponse resp = new SessionStateResponse(
+             /*   SessionStateResponse resp = new SessionStateResponse(
                         service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                         action.getId());
                   resp.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp.setTarget_user_id(action.getUser_id());
                 resp.setTarget_id(action.getTarget().getTarget_id());
-                sessionStateResponseQueue.add(resp);
+                sessionStateResponseQueue.add(resp);*/
+                  sessionStateResponseQueue.add(this.buildStateResponse(
+                action.getTarget().getTarget_id()
+                , action
+                , service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())
+                , TARGET_TYPE.ITEM
+                , RESPONSE_SCOPE.PUBLIC
+                , ""));
+               
                 break;
             case ACTION:
-                EditorActionResponse resp2 = new EditorActionResponse(action);
+              /*  EditorActionResponse resp2 = new EditorActionResponse(action);
                   resp2.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp2.setTarget_id(action.getTarget().getTarget_id());
-                actionResponseQueue.add(resp2);
+                actionResponseQueue.add(resp2);*/
+                        actionResponseQueue.add(this.buildActionResponse(action.getTarget().getTarget_id(), action,TARGET_TYPE.ITEM, RESPONSE_SCOPE.PUBLIC, ""));
+
                 break;
         }
     }
@@ -152,22 +176,32 @@ NestedEditorActionProcessor(){
    protected void sendBackPrivate(EditorAction action, Q queue, String msg) throws JwtParseException {
         switch (queue) {
             case STATE:
-                SessionStateResponse resp = new SessionStateResponse(
+             /*   SessionStateResponse resp = new SessionStateResponse(
                         service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                         action.getId());
               //  resp.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp.setTarget_user_id(action.getUser_id());
                 resp.setTarget_id(action.getTarget().getTarget_id());
                 resp.setScope(RESPONSE_SCOPE.PRIVATE);
-                sessionStateResponseQueue.add(resp);
+                sessionStateResponseQueue.add(resp);*/
+                  sessionStateResponseQueue.add(this.buildStateResponse(
+                action.getTarget().getTarget_id()
+                , action
+                , service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())
+                , TARGET_TYPE.ITEM
+                , RESPONSE_SCOPE.PRIVATE
+                , msg));
                 break;
             case ACTION:
-                EditorActionResponse resp2 = new EditorActionResponse(action);
+              /*  EditorActionResponse resp2 = new EditorActionResponse(action);
                 //resp2.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp2.setTarget_id(action.getTarget().getTarget_id());
                 resp2.setScope(RESPONSE_SCOPE.PRIVATE);
                 resp2.setResponse_msg("could not complete delete request");
-                actionResponseQueue.add(resp2);
+                actionResponseQueue.add(resp2);*/
+                
+        actionResponseQueue.add(this.buildActionResponse(action.getTarget().getTarget_id(), action,TARGET_TYPE.ITEM, RESPONSE_SCOPE.PRIVATE, msg));
+
                 break;
         }
     }
@@ -190,107 +224,115 @@ NestedEditorActionProcessor(){
         System.out.println("object restoration is sent");
     }
 
-    protected void sendCustomMessage(Integer target_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException {
-
-        switch (queue) {
-            case ACTION:
-                EditorActionResponse resp2 = new EditorActionResponse(action);
+  
+   protected EditorActionResponse buildActionResponse(Integer target_id, EditorAction action, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException{
+         EditorActionResponse resp2 = new EditorActionResponse(action);
                 resp2.setTarget_id(target_id);
                 resp2.setTarget_user_id(action.getUser_id());
                 resp2.setTarget_type(target_type);
                 resp2.getAction().getTarget().setTarget_id(target_id);
-                resp2.setScope(response_scope);
-                  resp2.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
                 resp2.setResponse_msg(message);
-                actionResponseQueue.add(resp2);
-                break;
-            case STATE:
-                SessionStateResponse resp = new SessionStateResponse(
-                        service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_id),
-                        action.getId());
+                resp2.setScope(response_scope);
+                if(response_scope==RESPONSE_SCOPE.PUBLIC)
+                        resp2.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
+                else if(response_scope==RESPONSE_SCOPE.PRIVATE)
+                resp2.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getUser_id()));
+                return resp2;
+    }
+   protected SessionStateResponse buildStateResponse(Integer target_id,EditorAction action, SessionState state, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException{
+         SessionStateResponse resp = new SessionStateResponse(
+                      state,
+                      action.getId());
                 resp.setTarget_id(target_id);
                 resp.setTarget_user_id(action.getUser_id());
                 resp.setTarget_type(target_type);
                 resp.setScope(response_scope);
                 resp.setResponse_msg(message);
-                sessionStateResponseQueue.add(resp);
+                 if(response_scope==RESPONSE_SCOPE.PUBLIC)
+                        resp.setTargetsUsers(service.getUserSocketsByToken(action.getSession_jwt()));
+                else if(response_scope==RESPONSE_SCOPE.PRIVATE)
+                     resp.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getUser_id()));
+                return resp;
+   }
+  
+  
+  
+  
+    protected void sendCustomMessage(Integer target_object_id, EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException {
+        switch (queue) {
+            case ACTION:
+                actionResponseQueue.add(buildActionResponse(target_object_id, action, target_type, response_scope, message));
+                break;
+            case STATE:
+                sessionStateResponseQueue.add(buildStateResponse(target_object_id, action,   service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_object_id), target_type, response_scope, message));
                 break;
         }
     }
-
+/*send it to all*/
     protected void sendCustomMessage(EditorAction action, Q queue, TARGET_TYPE target_type, RESPONSE_SCOPE response_scope, String message) throws JwtParseException {
-
-        switch (queue) {
-            case ACTION:
-                EditorActionResponse resp2 = new EditorActionResponse(action);
-                resp2.setTarget_id(action.getTarget().getTarget_id());
-                resp2.setTarget_user_id(action.getUser_id());
-                resp2.setTarget_type(target_type);
-                resp2.setScope(response_scope);
-                resp2.setResponse_msg(message);
-                actionResponseQueue.add(resp2);
-                break;
-            case STATE:
-                SessionStateResponse resp = new SessionStateResponse(
-                        service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
-                        action.getId());
-                resp.setTarget_id(action.getTarget().getTarget_id());
-                resp.setTarget_user_id(action.getUser_id());
-                resp.setTarget_type(target_type);
-                resp.setScope(response_scope);
-                resp.setResponse_msg(message);
-                sessionStateResponseQueue.add(resp);
-                break;
-        }
+        sendCustomMessage(action.getTarget().getTarget_id(), action, queue, target_type, response_scope, message);
     }
 
     public enum Q {
         STATE, ACTION
     }
 
-  protected  void sendRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException {
-        SessionStateResponse resp = new SessionStateResponse(
+  protected  void sendRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException,NotFoundException {
+      /*  SessionStateResponse resp = new SessionStateResponse(
                 service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
         resp.setTarget_id(action.getTarget().getTarget_id());
         resp.setTarget_user_id(action.getUser_id());
-
-        sessionStateResponseQueue.add(resp);
+        resp.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getTarget().getTarget_id()));*/
+        sessionStateResponseQueue.add(this.buildStateResponse(
+                action.getTarget().getTarget_id()
+                , action
+                , service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())
+                , TARGET_TYPE.ITEM
+                , RESPONSE_SCOPE.PRIVATE
+                , message));
         //Vissza kell állítani az objektet, mert illetéktelenül próbálta meg kiválasztani.
 
         action.setAction(ACTION_TYPE.RESTORE);
         action.setJson(mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getItemById(action.getTarget().getTarget_id())));
-        EditorActionResponse resp2 = new EditorActionResponse(action, action.getUser_id());
-        resp2.setTarget_user_id(action.getUser_id());
-        resp2.setTarget_id(action.getTarget().getTarget_id());
-        resp2.setScope(RESPONSE_SCOPE.PRIVATE);
-        resp2.setResponse_msg(message);
-        actionResponseQueue.add(resp2);
+   
+        actionResponseQueue.add(this.buildActionResponse(action.getTarget().getTarget_id(), action,TARGET_TYPE.ITEM, RESPONSE_SCOPE.PRIVATE, message));
 
         System.out.println("object restoration is sent");
     }
 
-   protected void sendDeleteRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException {
-        SessionStateResponse resp = new SessionStateResponse(
+   protected void sendDeleteRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException, NotFoundException {
+       /* SessionStateResponse resp = new SessionStateResponse(
                 service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
         resp.setTarget_id(action.getTarget().getTarget_id());
         resp.setTarget_user_id(action.getUser_id());
-        sessionStateResponseQueue.add(resp);
+        resp.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getTarget().getTarget_id()));
+        
+        sessionStateResponseQueue.add(resp);*/
+         sessionStateResponseQueue.add(this.buildStateResponse(
+                action.getTarget().getTarget_id()
+                , action
+                , service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())
+                , TARGET_TYPE.ITEM
+                , RESPONSE_SCOPE.PRIVATE
+                , message));
         //Vissza kell állítani az objektet, mert illetéktelenül próbálta meg kiválasztani.
 
         action.setAction(ACTION_TYPE.RESTORE);
         action.getExtra().put("sessionState", mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id())));
         action.setJson(mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getItemById(action.getTarget().getTarget_id())));
-        EditorActionResponse resp2 = new EditorActionResponse(action, action.getUser_id());
+      /*  EditorActionResponse resp2 = new EditorActionResponse(action, action.getUser_id());
         resp2.setTarget_user_id(action.getUser_id());
         resp2.setTarget_id(action.getTarget().getTarget_id());
         resp2.setScope(RESPONSE_SCOPE.PRIVATE);
         resp2.setResponse_msg(message);
-        actionResponseQueue.add(resp2);
+        resp2.setTargetsUsers( service.tokenToSession(action.getSession_jwt()).getSocketListContainingUserWithId(action.getTarget().getTarget_id()));
+        actionResponseQueue.add(resp2);*/
+
+        actionResponseQueue.add(this.buildActionResponse(action.getTarget().getTarget_id(), action,TARGET_TYPE.ITEM, RESPONSE_SCOPE.PRIVATE, message));
 
         System.out.println("object restoration is sent");
     }
-
-    
+//METHODS_END
 }

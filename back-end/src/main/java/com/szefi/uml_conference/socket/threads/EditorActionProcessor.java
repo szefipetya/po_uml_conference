@@ -32,6 +32,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javassist.NotFoundException;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,14 +109,19 @@ public EditorActionProcessor(){}
                         Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
                     } catch (JwtParseException ex1) {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (NotFoundException ex1) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
                 }
 
                 } catch (JwtParseException ex) {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (JsonProcessingException ex) {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NotFoundException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+
 
 
 
@@ -152,8 +158,13 @@ public EditorActionProcessor(){}
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (JwtParseException ex) {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NullPointerException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NotFoundException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+
 
                 case DIMENSION_UPDATE: {
                     try {
@@ -169,6 +180,8 @@ public EditorActionProcessor(){}
                     } catch (JsonProcessingException ex) {
                         Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (JwtParseException ex) {
+                    Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NotFoundException ex) {
                     Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 }
@@ -188,7 +201,7 @@ public EditorActionProcessor(){}
                                 //DynamicSerialObject  originalObj=   mapper.readValue(action.getJson(), DynamicSerialObject.class);
                                     
                                 action.setJson(mapper.writeValueAsString(obj));
-                                service.tokenToSession(action.getSession_jwt()).getSessionStateById(obj.getId()).setExtra(new HashMap<String, String>());
+                                service.tokenToSession(action.getSession_jwt()).getSessionStateById(obj.getId()).setExtra(new HashMap<>());
                                 service.tokenToSession(action.getSession_jwt()).getSessionStateById(obj.getId()).setDraft(true);
                                 service.tokenToSession(action.getSession_jwt()).getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:" + action.getUser_id());
 
@@ -221,6 +234,7 @@ public EditorActionProcessor(){}
                                action1.setJson(mapper.writeValueAsString(casted));
                                  action1.getTarget().setParent_id(SocketSessionService.ROOT_ID);
                                  action1.setAction(ACTION_TYPE.CREATE);
+                                 action1.setSession_jwt(action.getSession_jwt());
                                     action1.getExtra().put("sessionState",
                                         mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getContainerSessionStateById(obj.getId())));
                                  this.sendCustomMessage(casted.getId(), action1, Q.ACTION, TARGET_TYPE.CONTAINER, RESPONSE_SCOPE.PUBLIC, "");
@@ -230,7 +244,7 @@ public EditorActionProcessor(){}
                                   action2.setAction(ACTION_TYPE.CREATE);
                                      action2.setUser_id(action.getUser_id());
                                    action2.getExtra().put("old_id", casted.getTitleModel().getExtra().get("old_id"));
-                                 
+                                    action2.setSession_jwt(action.getSession_jwt());
                                  action2.getTarget().setParent_id(casted.getId());
                                  action2.setJson(mapper.writeValueAsString(casted.getTitleModel()));
                                     action2.getExtra().put("sessionState",
@@ -244,6 +258,7 @@ public EditorActionProcessor(){}
                                         actiong.setUser_id(action.getUser_id());
                                       actiong.getExtra().put("old_id", g.getExtra().get("old_id"));
                                       actiong.getTarget().setParent_id(casted.getId());
+                                         actiong.setSession_jwt(action.getSession_jwt());
                                        actiong.setJson(mapper.writeValueAsString(g));
                                            actiong.getExtra().put("sessionState",
                                         mapper.writeValueAsString(service.tokenToSession(action.getSession_jwt()).getContainerSessionStateById(g.getId())));
@@ -252,6 +267,7 @@ public EditorActionProcessor(){}
                                         //elements
                                           EditorAction actione=new EditorAction();
                                              actione.setUser_id(action.getUser_id());
+                                                actione.setSession_jwt(action.getSession_jwt());
                                          actione.setAction(ACTION_TYPE.CREATE);
                                         actione.getExtra().put("old_id", e.getExtra().get("old_id"));
                                         actione.getTarget().setParent_id(g.getId());
@@ -320,7 +336,9 @@ public EditorActionProcessor(){}
                         }
                     } catch (JwtParseException ex) {
                         Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    }catch(NotFoundException ex){
+                                
+                            }
                 }
                     break;
 
@@ -328,6 +346,7 @@ public EditorActionProcessor(){}
                 //SERVER_SIDE ACTIONS ////////////////////////////////////////////
                 case S_USER_DISCONNECT:
                     //delete draft elements, send message about them
+                    try{
                    List<Integer> deleted = service.getSessionById(Long.valueOf(action.getExtra().get("session_id"))).deleteDraftsByUser(action.getUser_id());
                     for (Integer id : deleted) {
                         action.setAction(ACTION_TYPE.DELETE);
@@ -348,6 +367,9 @@ public EditorActionProcessor(){}
 
                 //unlock everything, that had been locked by him.
                 /* */
+                    }catch(NotFoundException ex){
+                        Logger.getLogger(EditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 default:
                     break;
             }
@@ -355,7 +377,7 @@ public EditorActionProcessor(){}
 
         }
     }
-
+//METHODS_BEG
    protected Integer getLockerIdIfexists(EditorAction action,Integer target_id) {
         try {
             if (service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_id) != null && service.tokenToSession(action.getSession_jwt()).getSessionStateById(target_id).getLockerUser_id() != null) {
@@ -501,7 +523,7 @@ public EditorActionProcessor(){}
         STATE, ACTION
     }
 
-  protected  void sendRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException {
+  protected  void sendRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException, NotFoundException {
       /*  SessionStateResponse resp = new SessionStateResponse(
                 service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
@@ -525,7 +547,7 @@ public EditorActionProcessor(){}
         System.out.println("object restoration is sent");
     }
 
-   protected void sendDeleteRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException {
+   protected void sendDeleteRestoreMessage(EditorAction action, String message) throws JsonProcessingException, JwtParseException, NotFoundException {
        /* SessionStateResponse resp = new SessionStateResponse(
                 service.tokenToSession(action.getSession_jwt()).getSessionStateById(action.getTarget().getTarget_id()),
                 action.getId(), action.getTarget().getTarget_id(), action.getUser_id());
@@ -558,5 +580,5 @@ public EditorActionProcessor(){}
 
         System.out.println("object restoration is sent");
     }
-
+//METHODS_END
 }

@@ -52,8 +52,10 @@ export class ActionSocket implements SocketWrapper {
             if (si) {
               si.updateModel(load, resp.action.id);
             }
-          } else
+          } else {
             console.log('UPDATE RECEIVED OWNER', this.parent.service.getUser().id);
+          }
+          console.log("UPDATE LOL");//TODO EDITOR SERVICE SEND UPDATE EVENT WHO ARE REGISTERED(CANVAS BOX)
           break;
         case ACTION_TYPE.RESTORE:
           if (resp.target_type == TARGET_TYPE.CONTAINER) {

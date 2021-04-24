@@ -42,7 +42,7 @@ public class DiagramEntity implements Serializable{
 @ManyToOne
 private UserEntity owner;
 @LazyCollection(LazyCollectionOption.FALSE)
-@OneToMany(mappedBy = "diagram",cascade = {CascadeType.ALL})
+@OneToMany(mappedBy = "diagram",cascade = CascadeType.PERSIST)
 private List<DiagramObject> dgObjects;
 @LazyCollection(LazyCollectionOption.FALSE)
 @OneToMany(mappedBy = "diagram",cascade = {CascadeType.ALL})

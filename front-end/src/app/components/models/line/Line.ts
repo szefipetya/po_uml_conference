@@ -18,7 +18,7 @@ export class Line extends DynamicSerialObject {
   // object_start: DiagramObject; //ignore in REST
   public constructor(lt: LINE_TYPE) {
     super();
-    this.id = 'l_' + uniqId();
+    this.id = uniqId();
     this._type = 'Line';
     this.lineType = new LineType(lt);
   }

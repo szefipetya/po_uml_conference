@@ -7,6 +7,8 @@ package com.szefi.uml_conference.editor.model.socket.session;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.szefi.uml_conference.D;
+import com.szefi.uml_conference.DLEVEL;
 import com.szefi.uml_conference.editor.model.diagram.Diagram;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
@@ -15,6 +17,7 @@ import com.szefi.uml_conference.editor.model.do_related.Element_c;
 import com.szefi.uml_conference.editor.model.do_related.NoteBox;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClassElementGroup;
+import com.szefi.uml_conference.editor.model.do_related.line.BreakPoint;
 import com.szefi.uml_conference.editor.model.do_related.line.Line;
 import com.szefi.uml_conference.editor.model.socket.ACTION_TYPE;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
@@ -24,6 +27,8 @@ import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
 import com.szefi.uml_conference.editor.model.top.AutoSessionInjectable_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
+import com.szefi.uml_conference.editor.repository.AttributeElementRepository;
+
 import com.szefi.uml_conference.editor.repository.DiagramRepository;
 import com.szefi.uml_conference.editor.repository.DynamicSerialObjectRepository;
 import com.szefi.uml_conference.socket.threads.service.SOCKET;
@@ -39,9 +44,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javassist.NotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -73,13 +81,20 @@ public class EditorSession {
      ObjectMapper objectMapper;
      @Autowired
 DiagramRepository diagramRepo;
-     
+     AttributeElementRepository attrElementRepo;
       @Autowired
  DynamicSerialObjectRepository objectRepo;
-    public EditorSession(DiagramRepository diagramRepo, DynamicSerialObjectRepository objectRepo,   BlockingQueue<EditorAction>  nestedActionQueue) {
+     
+    public EditorSession(DiagramRepository diagramRepo, DynamicSerialObjectRepository objectRepo,   BlockingQueue<EditorAction>  nestedActionQueue
+    ,AttributeElementRepository attrElementRepo
+    
+    ) {
            this.id=UUID.randomUUID().getLeastSignificantBits();
         this.objectRepo=objectRepo;
         this.diagramRepo=diagramRepo;
+        this.attrElementRepo=attrElementRepo;
+        this.nestedActionQueue=nestedActionQueue;
+      
     }
      
      
@@ -166,10 +181,10 @@ DiagramRepository diagramRepo;
             return false;
         return s.getLocks().length > 0;
     }
-    public boolean isItemLockedByMe(Integer id,Integer user_id){
+    public boolean isItemLockedByMe(Integer id,Integer user_id) throws NotFoundException{
          SessionState s =this.getSessionStateById(id);
           if (s == null) 
-            return false;
+           throw new NotFoundException("item with id"+id+"does not exist in the session");
           return s.getLockerUser_id().equals(user_id);
     }
     //returning new item's id
@@ -185,7 +200,7 @@ DiagramRepository diagramRepo;
                 
           //obj gets an id.
          //   cont.container().add(obj);
-           
+           try{
             if(obj instanceof AttributeElement){              
                 AttributeElement casted=(AttributeElement)obj; 
                 casted.setEdit(false);
@@ -193,14 +208,17 @@ DiagramRepository diagramRepo;
                    casted.setGroup((SimpleClassElementGroup)cont); 
                    casted=objectRepo.save(casted);//id injected  
                    cont.container().add(casted);
-                 SimpleClassElementGroup gr=objectRepo.save((SimpleClassElementGroup)cont);
+                 //SimpleClassElementGroup gr=objectRepo.save((SimpleClassElementGroup)cont);
                  
                //  obj=gr.get
                // objectRepo.save((SimpleClassElementGroup)cont);//update function will save it
                 //objectRepo.save((SimpleClassElementGroup)cont);
                obj=casted;
-            }
-         
+            }}
+           catch(org.springframework.orm.jpa.JpaObjectRetrievalFailureException ex)
+           {
+               System.err.println(ex);
+           }
             this.sessionItemMap.put(obj.getId(),Pair.of(new SessionState(),obj)); 
             this.lockObjectById(obj.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
             SessionState state=getSessionStateById(obj.getId());
@@ -219,48 +237,80 @@ DiagramRepository diagramRepo;
             if(obj instanceof AutoSessionInjectable_I){
                 AutoSessionInjectable_I casted=(AutoSessionInjectable_I)obj;
               //  casted.injectIdWithPrefix(rand_id);
-                casted.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);
-               
-                
-            this.lockObjectById(obj.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
-            SessionState state=getSessionStateById(obj.getId());
-            state.setDraft(true);
-           
-            
-            System.out.println("obj created and locked for"+user_id);
-              getSessionStateById(obj.getId()).setExtra(new HashMap<>());
-              getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+user_id);
-              //extra step for titleModel locking
-              if(obj instanceof DiagramObject){
+                  if(obj instanceof DiagramObject){    
                 DiagramObject dgo=(DiagramObject)obj;
+             
                     if(dgo instanceof SimpleClass){
                         SimpleClass cls=(SimpleClass)dgo;
+                          for(SimpleClassElementGroup g: cls.getGroups()){
+                         g.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
+                               for(AttributeElement e:g.getAttributes()){
+                                 e.setId(null);
+                                  e.setGroup(g);
+                               }
+                              g.setId(null);
+                              g.setParentClass(cls);
+                                
+                        }
+                          cls.getDimensionModel().setDgObject(cls);
+                          cls.getTitleModel().setId(null);
+                          cls.getTitleModel().setParent(cls);
+                          cls.setId(null);
+                          cls.setDiagram(dg);
+                        
+                      this.dg.getDgObjects().add(cls);
+                         this.objectRepo.save(cls);
+                     
                       this.lockObjectById(cls.getTitleModel().getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+                        cls.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);
+                 getSessionStateById(cls.getId()).setExtra(new HashMap<>());
+              getSessionStateById(cls.getId()).getExtra().put("placeholder", "c:"+user_id);
+                   SessionState state=getSessionStateById(cls.getId());
+            state.setDraft(true);
+            this.lockObjectById(cls.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
 
+                      
+                    }else{   //normal DgObject
+                        this.objectRepo.save(dgo);
                     }
-
-
-                this.dg.getDgObjects().add(dgo);
-                
-              }       
-              //   this.dg=this.diagramRepo.save(this.dg);
+                    try{
+              //  this.dg=this.diagramRepo.save(dg);
+                    }catch(Exception ex){
+                        D.log(ex.getMessage(),ex.getClass(),DLEVEL.ERR);
+                    }
+              }    
+                    
+            System.out.println("obj created and locked for"+user_id);
+ 
                 return obj;
             }
             return null;
         }else if(cont_id.equals(SocketSessionService.L_ROOT_ID)){
             if(obj instanceof AutoSessionInjectable_I){
                 AutoSessionInjectable_I casted=(AutoSessionInjectable_I)obj;
-                casted.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);
+         
                
            
             
             System.out.println("obj created and locked for"+user_id);
-              getSessionStateById(obj.getId()).setExtra(new HashMap<>());
-              getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+user_id);
-              if(obj instanceof Line){
-                 this.dg.getLines().add((Line)obj);
-                   this.dg= this.diagramRepo.save(this.dg);
-              return (Line)obj;
+           
+              if(obj instanceof Line){ 
+                  Line l=(Line)obj;  
+                  l.setId(null);
+                  l.getLineType().setLine(l); 
+                  (l).setDiagram(dg);
+                     l= this.objectRepo.save(l);
+               
+             
+                  
+              
+               l.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);   
+               getSessionStateById(l.getId()).setExtra(new HashMap<>());
+              getSessionStateById(l.getId()).getExtra().put("placeholder", "c:"+user_id);
+                 this.dg.getLines().add(l);
+              
+                 //  this.dg= this.diagramRepo.save(this.dg);
+              return l;
               }
             }      
         }
@@ -270,7 +320,7 @@ DiagramRepository diagramRepo;
 
 
     @Transactional
-    public Pair<SessionState,DynamicSerialObject> updateObjectAndUnlock(DynamicSerialObject obj,Integer user_id) throws NullPointerException {
+    public Pair<SessionState,DynamicSerialObject> updateObjectAndUnlock(DynamicSerialObject obj,Integer user_id) throws NullPointerException,NotFoundException {
        
        
           SessionState s=this.getSessionStateById(obj.getId());
@@ -278,27 +328,42 @@ DiagramRepository diagramRepo;
                 s.setDraft(false);
                if(this.unLockObjectById(obj.getId(), user_id)){
                   
-                   this.getItemById(obj.getId()).update(obj); 
+                
                    
                   /* if(obj instanceof SimpleClass)
                   this.objectRepo.save((SimpleClass)this.getItemById(obj.getId()));
                     else if(obj instanceof NoteBox)
                   this.objectRepo.save((NoteBox)this.getItemById(obj.getId()));*/
                      if(obj instanceof AttributeElement){
+                            this.getItemById(obj.getId()).update(obj); 
                          ((AttributeElement) obj).setGroup(((AttributeElement)this.getItemById(obj.getId())).getGroup());
-                     }this.objectRepo.save(this.getItemById(obj.getId()));
+                           this.objectRepo.save(this.getItemById(obj.getId()));
+                     }
+                     else if(obj instanceof Line){
+                        this.getItemById(obj.getId()).update(obj);
+                        
+                          
+                                  objectRepo.save(this.getItemById(obj.getId()));
+                   //     this.dg= this.diagramRepo.save(this.dg);  
+                           
+                 
+                       }
+                     else{
+                            this.getItemById(obj.getId()).update(obj); 
+                         this.objectRepo.save(this.getItemById(obj.getId()));
+                     }
                      
                    return this.sessionItemMap.get(obj.getId());
                 }
           }
-             // this.dg= this.diagramRepo.save(this.dg); 
+             // 
          return null;      
     }
-    public static final Integer L_ROOT_ID=-2;
-    public static final Integer ROOT_ID=-3;
+
   
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public boolean deleteItemFromContainerById(Integer user_id,Integer target_id, Integer parent_id) {
+    public boolean deleteItemFromContainerById(Integer user_id,Integer target_id, Integer parent_id) throws NotFoundException {
+        try{
         if(this.isItemLockedByMe(target_id, user_id)){
             DynamicSerialContainer_I cont= getContainerById(parent_id);
             if(cont!=null){
@@ -317,7 +382,9 @@ DiagramRepository diagramRepo;
                    }catch(Exception e){
                        e.printStackTrace();
                    }
-                  //this.dg=  this.diagramRepo.save(this.dg);
+          
+                  //clear the ones with empty name
+              
                    return l;
                }
                }
@@ -325,6 +392,7 @@ DiagramRepository diagramRepo;
                 if(parent_id.equals(SocketSessionService.ROOT_ID)){//global object
                   
                         DynamicSerialObject item=this.getItemById(target_id);
+                        
                     if(item instanceof SimpleClass){
                         System.out.println("this is a SimpleClass delete");
                         SimpleClass casted=(SimpleClass)item;
@@ -332,15 +400,25 @@ DiagramRepository diagramRepo;
                          g.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
                                for(AttributeElement e:g.getAttributes()){
                                  e.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
+                                   this.objectRepo.delete(e);
+                                  
                                }
+                                this.objectRepo.delete(g);
+                                
                         }
-                        this.sessionItemMap.remove(casted.getTitleModel().getId());
-                        
-                        //find any related lines. Delete them first.
+                     
+                        this.sessionItemMap.remove(casted.getTitleModel().getId());  
+                         this.objectRepo.delete(casted.getTitleModel());
+                          casted.getGroups().clear();
+                    }
+                     
+                      //  this.dg=diagramRepo.save(this.dg);
+                        //find any related lines. Delete them first.    
+                        boolean ldel=this.dg.getDgObjects().remove(item);//the equals is overrided with id comparison;
                         List<Line> filteredList=new ArrayList<>();
                         for(Line l:this.dg.getLines()){
-                            if((l.getObject_start_id()==null?"":l.getObject_start_id()).equals(casted.getId())
-                                    ||(l.getObject_end_id()==null?"":l.getObject_end_id()).equals(casted.getId())){
+                            if((l.getObject_start_id()==null?"":l.getObject_start_id()).equals(item.getId())
+                                    ||(l.getObject_end_id()==null?"":l.getObject_end_id()).equals(item.getId())){
                                 //send a delete event to the actionprocessor
                                 filteredList.add(l);
                                
@@ -350,45 +428,94 @@ DiagramRepository diagramRepo;
                                this.lockObjectById(l.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
                                 EditorAction action=new EditorAction(ACTION_TYPE.DELETE);
                                 action.getTarget().setParent_id(SocketSessionService.L_ROOT_ID);
+                                action.setSession_jwt(this.getUserSockets().stream().filter(u->u.getUser_id().equals(user_id)).findFirst().get().getSession_jwt());
                                 action.getTarget().setTarget_id(l.getId());
                                 action.getTarget().setType("Line");
                                 action.setUser_id(user_id);
                                 nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW
                         }
                         filteredList.clear();
-                    }
+                           this.dg.getDgObjects().remove((DiagramObject)item);
+                      
+                     this.objectRepo.delete(item);
+                       
+                    
                     
                  
                          item.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
-                    DiagramObject ob=new DiagramObject();
-                    ob.setId(target_id);
-                   boolean l=this.dg.getDgObjects().remove(ob);//the equals is overrided with id comparison;
-                   
-                   //  this.dg= this.diagramRepo.save(this.dg);
-                   return  l;
+                  
+              try{
+                        dg=  this.diagramRepo.save(this.dg);}
+              catch(Exception e){
+              D.log(e.getMessage(), e.getClass(), DLEVEL.ERR);
+              }
+                  //   this.dg= this.diagramRepo.save(this.dg);
+                   return  true;
                 }else  if(parent_id.equals(SocketSessionService.L_ROOT_ID)){//global line
                   
                         DynamicSerialObject item=this.getItemById(target_id);
                     if(item instanceof Line){
                         System.out.println("this is a Line delete");
-                        Line casted=(Line)item;
+                        Line l1=(Line)item;
                         
-                      casted.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);           
-                      boolean l= this.dg.getLines().remove(casted);//the equals is overrided with id comparison;
-                       
+                        
+                        
+                        
+                        
+                      l1.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);           
+                      boolean l= this.dg.getLines().remove(l1);//the equals is overrided with id comparison;
+                      
+                          //((AttributeElement)obj).setGroup(null);
+                     // objectRepo.deleteById(target_id);
+                   this.objectRepo.delete(l1);
+                   sessionItemMap.remove(target_id);
+                
+                  this.dg=  this.diagramRepo.save(this.dg);
+                  //clear the ones with empty name
+              
+             
+                      
+                      
+                      // this.dg=this.diagramRepo.save(dg);
                     //     this.dg=this.diagramRepo.save(this.dg);
                     return l;
                     }
                 }
             }
         }
-        
+        }
+        catch(NotFoundException ex){
+            //probably the element didn't got its server side id before it got deleted.
+            System.err.println(ex.getMessage());
+            
+               List<AttributeElement> todel= attrElementRepo.findAllByName("");
+               //todel. 
+               for(AttributeElement l:todel){
+                            //  this.lockObjectById(l.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+                                EditorAction action=new EditorAction(ACTION_TYPE.DELETE);
+                                action.setSession_jwt(this.getUserSockets().stream().filter(u->u.getUser_id().equals(user_id)).findFirst().get().getSession_jwt());
+                                action.getTarget().setParent_id(l.getGroup().getId());
+                                action.getTarget().setTarget_id(l.getId());
+                                action.getTarget().setType("AttributeElement");
+                                action.setUser_id(user_id);
+                                nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW
+                        }
+            todel.stream().forEach((Consumer<? super AttributeElement>) e->{
+                    
+                    this.attrElementRepo.deleteById(e.getId());
+                      e.getGroup().container().remove(e);
+                      this.sessionItemMap.remove(e.getId());
+                      this.objectRepo.save(e.getGroup());
+                 });
+                              
+                        throw ex;
+        }
             return false;
     }
 
-    public DynamicSerialObject getItemById(Integer target_id){
+    public DynamicSerialObject getItemById(Integer target_id) throws NotFoundException{
           Pair<SessionState,DynamicSerialObject> ss = sessionItemMap.get(target_id);
-                 if(ss==null) return null;
+                 if(ss==null) throw new NotFoundException("item not found with id="+target_id);
              return ss.getSecond();
     }
  
@@ -434,7 +561,7 @@ DiagramRepository diagramRepo;
    
     
     //returning the list of deleted object's ids
-    public List<Integer> deleteDraftsByUser(Integer user_id) {
+    public List<Integer> deleteDraftsByUser(Integer user_id) throws NotFoundException {
         
         List<Integer> ret=new ArrayList<>();
           List<Map.Entry<Integer,Pair<SessionState,DynamicSerialObject>>> list=this.getItemsByUser(user_id);
@@ -468,7 +595,7 @@ DiagramRepository diagramRepo;
         return list;
     }
 
-    public Object updateObjectAndHoldLock(DynamicSerialObject obj, Integer user_id) {
+    public Object updateObjectAndHoldLock(DynamicSerialObject obj, Integer user_id) throws NotFoundException {
           SessionState s=this.getSessionStateById(obj.getId());
           if(s!=null){
                 s.setDraft(false);

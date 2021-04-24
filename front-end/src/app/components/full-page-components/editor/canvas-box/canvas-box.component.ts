@@ -73,7 +73,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   drawedClassX: number;
   drawedClassY: number;
   getNewClassId = () => {
-    return uniqId('');
+    return uniqId();
   };
   getHighestClassZIndex = () => {
     let max = 0;
@@ -202,6 +202,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
 
   ebox: any;
   updateCanvas() {
+
     this.lineCanvasComponent.update();
   }
   targetDOM: any;
@@ -814,10 +815,11 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     const y = e.clientY - rect.top;
     this.drawedClassX = x;
     this.drawedClassY = y;
-    this.drawedClassId = this.getNewClassId();
+    this.drawedClassId = uniqId();
     let newclass: SimpleClass;
-    let g1_id = uniqId() + '1104234';
+    let g1_id = uniqId();
     let g2_id = uniqId();
+    let t_id = uniqId();
     newclass = {
       doc: '',
       _type: 'SimpleClass',
@@ -864,11 +866,11 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
         },
       ],
       titleModel: {
-        extra: { old_id: this.drawedClassId + '-t', draft: true },
-        _type: 'Element_c',
+        extra: { old_id: t_id, draft: true },
+        _type: 'TitleElement',
         edit: true,
-        id: this.drawedClassId + '-t',
-        name: 'Class',
+        id: t_id,
+        name: 'New Class',
         viewModel: null,
       },
     };
@@ -885,6 +887,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     }, 50);
     this.drawedClassPositionSpecified = true;
   }
+
 
   sendDiagramObjectCreateMessage(obj: DiagramObject) {
     let action: EditorAction = new EditorAction(obj.id, obj._type, GlobalEditorService.ROOT_ID);

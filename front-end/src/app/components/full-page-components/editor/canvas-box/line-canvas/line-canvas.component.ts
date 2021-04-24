@@ -190,7 +190,7 @@ export class LineCanvasComponent
     }
     if (target) {
       this.lineInstance.object_start_id = this.editorService.model.dgObjects.filter(
-        (c) => target.id == c.id
+        (c) => target.dataset.id == c.id
       )[0].id;
     }
   }
@@ -225,7 +225,7 @@ export class LineCanvasComponent
 
     if (target) {
       this.lineInstance.object_end_id = this.editorService.model.dgObjects.filter(
-        (c) => target.id == c.id
+        (c) => target.dataset.id == c.id
       )[0].id;
       if (this.lineInstance.object_end_id != this.lineInstance.object_start_id) {
 

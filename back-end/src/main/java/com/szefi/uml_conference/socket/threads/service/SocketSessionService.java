@@ -26,6 +26,8 @@ import com.szefi.uml_conference.editor.model.socket.session.EditorSession;
 import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
 import com.szefi.uml_conference.editor.model.top.AutoSessionInjectable_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
+import com.szefi.uml_conference.editor.repository.AttributeElementRepository;
+
 import com.szefi.uml_conference.editor.repository.DiagramRepository;
 import com.szefi.uml_conference.editor.repository.DynamicSerialObjectRepository;
 import com.szefi.uml_conference.security.model.MyUserDetails;
@@ -516,10 +518,13 @@ public class SocketSessionService {
          return  this.getSessionById(Long.valueOf((String)this.jwtService.extractAllClaims(token).get("session_id")));
 
     }
+ 
+   @Autowired
+   AttributeElementRepository attrElementRepo;
    @Bean
    @Scope("prototype")    
    EditorSession generateSession(){
-       return new EditorSession(this.diagramRepo,this.objectRepo,this.nestedActionQueue);
+       return new EditorSession(this.diagramRepo,this.objectRepo,this.nestedActionQueue,attrElementRepo);
    }
 
  public List<UserWebSocket> getUserSocketsByToken(String token) throws JwtParseException{
@@ -536,7 +541,7 @@ public class SocketSessionService {
         EditorSession s=null;
       if(opt.isPresent()){//if Session is present with diagram id
            s=opt.get();
-           s.getUserSockets().add(userSocket);
+       
           Map<String,Object> claims=new HashMap<>();
           claims.put("session_id",s.getId().toString());
           userSocket.setSession_jwt(jwtService.generateToken(claims, details));//generated a token, containing the session's id.

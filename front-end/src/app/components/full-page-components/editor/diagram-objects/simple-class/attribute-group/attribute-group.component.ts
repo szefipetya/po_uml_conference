@@ -156,7 +156,7 @@ export class AttributeGroupComponent
     if (name == '') {
       name = '';
     }
-    let id = uniqId('a');
+    let id = uniqId();
     let newAttr = {
       doc: '',
       index: this.getHghestIndex() + 1,

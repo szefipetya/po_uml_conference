@@ -12,10 +12,14 @@ import com.szefi.uml_conference.editor.model.socket.SessionState;
 import com.szefi.uml_conference.editor.model.top.AutoSessionInjectable_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
+import com.szefi.uml_conference.model.converter.BreakPointListConverter;
+import com.szefi.uml_conference.security.converter.RoleListConverter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.persistence.CascadeType;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -38,8 +42,10 @@ public class Line extends DynamicSerialObject implements AutoSessionInjectable_I
  private LineType lineType;
  private Integer object_start_id;
  private Integer object_end_id;
- @LazyCollection(LazyCollectionOption.FALSE)
- @OneToMany(mappedBy = "line",cascade=CascadeType.ALL)
+//@LazyCollection(LazyCollectionOption.FALSE)
+ //@OneToMany(mappedBy = "line",cascade=CascadeType.ALL)
+ 
+@Convert(converter = BreakPointListConverter.class)
  private List<BreakPoint> breaks;
  
  @ManyToOne
@@ -52,6 +58,10 @@ DiagramEntity diagram;
 
     public void setDiagram(DiagramEntity diagram) {
         this.diagram = diagram;
+    }
+
+    public Line() {
+        this.breaks=new ArrayList<>();
     }
 
     public List<BreakPoint> getBreaks() {
@@ -106,7 +116,11 @@ DiagramEntity diagram;
         if(obj instanceof Line){
             Line l=(Line)obj;
             this.breaks=l.getBreaks();
+           // this.breaks.stream().forEach((BreakPoint bp)->bp.setLine(this));
+           Integer tid=this.lineType.getId();
             this.lineType=l.getLineType();
+            this.lineType.setLine(this);
+            this.lineType.setId(tid);
             this.object_start_id=l.getObject_start_id();
             this.object_end_id=l.getObject_end_id();
         }

@@ -16,7 +16,7 @@ import javax.persistence.OneToOne;
  * @author h9pbcl
  */
 @Entity
-class LineType {
+public class LineType {
     @Id
             @GeneratedValue
     Integer id;

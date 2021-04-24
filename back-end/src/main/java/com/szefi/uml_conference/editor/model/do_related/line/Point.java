@@ -23,30 +23,8 @@ import org.springframework.data.util.Pair;
  * @author h9pbcl
  */
 //@JsonTypeName(value = "Point")
-@Entity
+
 public class Point  {
-    @OneToOne
-    BreakPoint parentBp;
-    @JsonIgnore
-    public BreakPoint getParentBp() {
-        return parentBp;
-    }
-
-    public void setParentBp(BreakPoint parentBp) {
-        this.parentBp = parentBp;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-    
-    @Id
-    @GeneratedValue
-    Integer id;
     float x;
     float y;
    public Point(){}
