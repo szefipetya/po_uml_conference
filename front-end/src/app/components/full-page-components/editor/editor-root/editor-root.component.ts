@@ -49,15 +49,13 @@ export class EditorRootComponent implements OnInit, AfterContentInit {
       this.newButton.style.height = '1.0em';
     }
     const isElem = Array.from(e.target.classList).includes('class-element');
+
     if (
       bool ||
-      (e.target.nodeName != 'INPUT' && e.target.className != 'INPUT')
+      (e.target.nodeName != 'INPUT' && !Array.from(e.target.classList).includes('INPUT'))
     ) {
-      console.log('false on all');
       this.editorService.model.dgObjects.map((clas: DiagramObject) => {
-        //  console.log(clas);
         clas.viewModel.disableEdit();
-
       });
       this.inputDOM = undefined;
     } else if (e.target.id == '#editor-input') this.inputDOM = e.target;
@@ -72,12 +70,21 @@ export class EditorRootComponent implements OnInit, AfterContentInit {
     //  console.log('handle');
     this.handleAsync(e);
   };
-
+  shiftdown = false;
+  onKeyUp(e: KeyboardEvent) {
+    if (e.key?.match('Shift')) {
+      this.shiftdown = false;
+    }
+  }
   onKeyPress = (e: KeyboardEvent) => {
+    if (e.key?.match('Shift')) {
+      this.shiftdown = true;
+    }
 
     if (e.which == 13 || e.keyCode == 13) {
       // enter
-      this.disableEdits(e, true);
+      if (!this.shiftdown)
+        this.disableEdits(e, true);
     }
     if (e.key?.match('Delete') || e.keyCode == 46) {
       //   console.log('del');

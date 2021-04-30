@@ -58,7 +58,7 @@ export class AttributeComponent
   type: string;
   responseMsg: string = '';
   @Input() parent: any;
-
+  @Input() isEditLockedPermanently: boolean = false;
   @Input() isTitle: boolean;
   @Input() model: AttributeElement;
   extra_overlay: string = '';
@@ -133,6 +133,7 @@ export class AttributeComponent
   }
   //view needs this to represent lock state
   isLocked(): string {
+    if (this.isEditLockedPermanently) return '';
     if (this.sessionState == undefined) return 'null';
     if (this.sessionState.lockerUser_id == this.socket.getUser().id)
       return 'editing';
@@ -201,6 +202,7 @@ export class AttributeComponent
   }
 
   onClick(e) {
+    if (this.isEditLockedPermanently) return;
     if (!this.isAccessible()) return;
     this.editBegin();
     this.model.edit = true;

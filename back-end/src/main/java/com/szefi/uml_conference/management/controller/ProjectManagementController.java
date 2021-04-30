@@ -11,6 +11,8 @@ import com.szefi.uml_conference._exceptions.management.FileNotFoundException;
 import com.szefi.uml_conference._exceptions.management.FileTypeConversionException;
 import com.szefi.uml_conference._exceptions.management.IllegalDmlActionException;
 import com.szefi.uml_conference._exceptions.management.UnstatisfiedNameException;
+import com.szefi.uml_conference.management.model.dto.response.FileResponse;
+import com.szefi.uml_conference.management.services.ManagementService;
 import com.szefi.uml_conference.management.services.ProjectManagementService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,38 +35,68 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/project_management")
 public class ProjectManagementController {
+@Autowired ManagementService mService;
     @Autowired
     ProjectManagementService service;
-      @RequestMapping(value="create_project/{id}" ,method = RequestMethod.GET)//create a project with a parent_id given in param
+
+    @RequestMapping(value = "create_project/{id}", method = RequestMethod.GET)//create a project with a parent_id given in param
     public ResponseEntity<?> createProject(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String parent_id,
             @RequestParam(value = "name") String name
     ) {
         try {
-            return ResponseEntity.ok(service.createProject(authHeader.substring(7), Integer.valueOf(parent_id),name));
+            return ResponseEntity.ok(service.createProject(authHeader.substring(7), Integer.valueOf(parent_id), name));
             //return service.getRootFolderByUserId()
         } catch (JwtException | UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        } catch (UnstatisfiedNameException | IllegalDmlActionException ex) {
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        } 
+        } catch (IllegalDmlActionException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (UnstatisfiedNameException ex) {
+            FileResponse resp;
+            try {
+                resp = mService.getFolder(authHeader.substring(7), Integer.valueOf(parent_id));
+                resp.setErrorMsg(ex.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+            } catch (JwtException | FileTypeConversionException | FileNotFoundException ex1) {
+                Logger.getLogger(ProjectManagementController.class.getName()).log(Level.SEVERE, null, ex1);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+
+            } catch (UnAuthorizedActionException ex1) {
+              //  Logger.getLogger(ProjectManagementController.class.getName()).log(Level.SEVERE, null, ex1);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+            }
+
+        }
     }
-   
-      @RequestMapping(value="create_folder/{id}" ,method = RequestMethod.GET)//create a projectfolder with a parent_id given in param
+
+    @RequestMapping(value = "create_folder/{id}", method = RequestMethod.GET)//create a projectfolder with a parent_id given in param
     public ResponseEntity<?> createProjectFolder(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String parent_id,
             @RequestParam(value = "name") String name
     ) {
         try {
-            return ResponseEntity.ok(service.createProjectFolder(authHeader.substring(7), Integer.valueOf(parent_id),name));
+            return ResponseEntity.ok(service.createProjectFolder(authHeader.substring(7), Integer.valueOf(parent_id), name));
             //return service.getRootFolderByUserId()
         } catch (JwtException | UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        } catch (UnstatisfiedNameException |FileTypeConversionException ex) {
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        } 
+        } catch (FileTypeConversionException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (UnstatisfiedNameException ex) {
+            FileResponse resp;
+            try {
+                resp = service.getProjectFolder(authHeader.substring(7), Integer.valueOf(parent_id));
+                resp.setErrorMsg(ex.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+            } catch (JwtException | FileTypeConversionException | FileNotFoundException ex1) {
+                Logger.getLogger(ProjectManagementController.class.getName()).log(Level.SEVERE, null, ex1);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+
+            }
+
+        }
+
     }
-    
+
 }

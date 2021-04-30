@@ -1,4 +1,4 @@
-<div *ngIf="this.model.clientModel?.edit; else normal">
+<div *ngIf="this.model.clientModel?.edit; else path">
   <input
     #input
     type="text"
@@ -7,35 +7,67 @@
     (keypress)="onKeyPress($event)"
   />
 </div>
-<ng-template #normal>
+<ng-template #path>
   <a *ngIf="this.renderMode == 'path'; else normalrender">
     {{ model.name }}/
   </a>
   <ng-template #normalrender>
     <div
-      class="file selected"
-      *ngIf="this.model.clientModel?.selected; else unselected"
+      (click)="onClick($event)"
+      (dblclick)="this.dblClickEvent.emit(this.model)"
     >
-      <span>
-        <img
-          class="file-icon"
-          src="{{ this.iconLink }}"
-          alt="folder_icon"
-          srcset=""
-      /></span>
-      {{ model.name }}
-    </div>
-    <ng-template #unselected>
-      <div class="file">
-        <span>
-          <img
-            class="file-icon"
-            src="{{ this.iconLink }}"
-            alt="folder_icon"
-            srcset=""
-        /></span>
+      <div
+        class="file selected"
+        *ngIf="this.model.clientModel?.selected; else unselected"
+      >
+        <span
+          (click)="openNestedTree()"
+          *ngIf="
+            this.model?._type == 'projectFolder' ||
+            this.model?._type == 'projectFolderHeader'
+          "
+          ><ng-container *ngTemplateOutlet="nestedchar"></ng-container
+        ></span>
+        <img class="file-icon" src="{{ this.iconLink }}" />
+
         {{ model.name }}
+        <span (click)="openShareDialog()">share </span>
       </div>
-    </ng-template>
+      <ng-template #unselected>
+        <div class="file">
+          <span
+            (click)="openNestedTree()"
+            *ngIf="
+              this.model?._type == 'projectFolder' ||
+              this.model?._type == 'projectFolderHeader'
+            "
+            ><ng-container *ngTemplateOutlet="nestedchar"></ng-container
+          ></span>
+          <span> <img class="file-icon" src="{{ this.iconLink }}" /> </span>
+          {{ model.name }}
+        </div>
+      </ng-template>
+    </div>
+    <div *ngIf="this.nested_opened">
+      <div *ngFor="let item of this.nestedFiles" class="nested">
+        <app-file
+          [model]="item"
+          (dblClickEvent)="dblClickEvent.emit(item)"
+          (clickEvent)="this.clickEvent.emit($event)"
+        >
+        </app-file>
+      </div>
+    </div>
   </ng-template>
+</ng-template>
+
+<ng-template #nestedchar>
+  <span
+    *ngIf="this.nested_opened"
+    style="transform: rotate(90deg); margin: 0 0.14em"
+    cla
+    >v</span
+  >
+
+  <span *ngIf="!this.nested_opened">></span>
 </ng-template>

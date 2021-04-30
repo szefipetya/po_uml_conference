@@ -11,5 +11,5 @@ package com.szefi.uml_conference.model.common.management;
  */
 public enum ICON {
     PLACEHOLDER,PROJECT,PROJECT_FOLDER,PROJECT_FILE
-    ,DIAGRAM,FOLDER,FOLDER_SHARED,FILE
+    ,DIAGRAM,FOLDER,FOLDER_SHARED,FILE, PROJECT_CLASS
 }

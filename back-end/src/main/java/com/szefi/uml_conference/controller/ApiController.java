@@ -2,12 +2,12 @@ package com.szefi.uml_conference.controller;
 
 import com.szefi.uml_conference.editor.model.diagram.Diagram;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
-import com.szefi.uml_conference.model.dto.management.FolderDto;
+import com.szefi.uml_conference.management.model.dto.FolderDto;
 import com.szefi.uml_conference.security.model.auth.AuthRequest;
 import com.szefi.uml_conference.security.model.auth.LogoutRequest;
 import com.szefi.uml_conference.security.service.JwtAuthRequestHandlerService;
 
-import com.szefi.uml_conference.socket.threads.service.SocketSessionService;
+import com.szefi.uml_conference.editor.service.SocketSessionService;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -53,8 +53,12 @@ public class ApiController {
     SocketSessionService eService;
     
     @GetMapping("get/dg/{id}")
-    public DiagramEntity getOne(@PathVariable("id") String id) {
-        return eService.getDiagramById(Integer.valueOf(id));
+    public ResponseEntity<?> getOne(@PathVariable("id") String id)  {
+        try{
+        return ResponseEntity.ok(eService.getDiagramById(Integer.valueOf(id)));
+        }catch(java.util.NoSuchElementException ex){
+              return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
      
         @GetMapping("/")

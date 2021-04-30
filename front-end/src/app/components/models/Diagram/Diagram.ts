@@ -10,6 +10,7 @@ import { Line } from '../line/Line';
 import { DiagramObject } from '../DiagramObjects/DiagramObject';
 
 export class Diagram {
+  id: number;
   owner: User;
   dgObjects: Array<DiagramObject>;
   lines: Line[];

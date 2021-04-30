@@ -6,6 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { getCookie } from 'src/app/utils/cookieUtils';
 import { endP, environment } from 'src/environments/environment';
 import { FolderDto } from "../models/management/FolderDto";
+import { ProjectFolderDto } from "../models/management/project/projectFolderDto";
 import { FolderHeaderDto } from "../models/management/FolderHeaderDto";
 import { EventEmitter } from '@angular/core';
 import { File_cDto } from '../models/management/File_cDto';
@@ -14,7 +15,21 @@ import { FileClientModel } from '../models/management/FileClientModel';
 import { FileHeaderDto } from '../models/management/FileHeaderDto';
 import { disableDebugTools } from '@angular/platform-browser';
 import { ClientModel } from '../models/Diagram/ClientModel';
+import { FileManagerService } from "./service/file-manager.service";
+
 import { ICON } from '../models/management/ICON';
+import { GlobalEditorService } from '../full-page-components/editor/services/global-editor/global-editor.service';
+import { FileComponent } from './file/file.component';
+export class RequestEvent {
+  constructor(alias, id, _type) {
+    this.alias = alias;
+    this.id = id;
+    this._type = _type;
+  }
+  alias: string;
+  id: number;
+  _type: string;
+}
 @Component({
   selector: 'app-left-panel-component',
   templateUrl: './left-panel-component.component.html',
@@ -22,7 +37,10 @@ import { ICON } from '../models/management/ICON';
 })
 export class LeftPanelComponentComponent implements OnInit {
   actualFolder: FolderDto;
-  constructor(private http: HttpClient, private snackBar: MatSnackBar) { }
+  constructor(private http: HttpClient,
+    private snackBar: MatSnackBar,
+    private editorService: GlobalEditorService,
+    private fileService: FileManagerService) { }
   private eventsSubscription: Subscription;
   public errorMsg = "--";
   isShiftDown: boolean;
@@ -62,7 +80,7 @@ export class LeftPanelComponentComponent implements OnInit {
     this.actualFolder = r.file as FolderDto;
     this.actualFolder.clientModel = new FileClientModel();
     this.actualFolder.files.map(f => { f.clientModel = new FileClientModel() })
-    this.errorMsg = '';
+
   }
 
   containerClick(e) {
@@ -77,12 +95,15 @@ export class LeftPanelComponentComponent implements OnInit {
      file.name = "--"
      let cm = file.clientModel;
      file.clientModel = JSON.parse(JSON.stringify(file.clientModel));*/
-    this.unselectAll();
+    // this.unselectAll();
+    this.actualFolder.files.map(f => { f.viewModel.deselectNested(); })
+
     file.clientModel.selected = true;
     //   this.actualFolder.files.find(f => f.id == file.id).clientModel.selected = true;
     //  this.actualFolder.files = Object.assign([], this.actualFolder.files);
 
   }
+
   onKeyDown(e: KeyboardEvent) {
     console.log('down', e)
     if (e.key == 'Shift') {
@@ -123,14 +144,18 @@ export class LeftPanelComponentComponent implements OnInit {
   }
   onDeleteClick() {
 
-    this.actualFolder.files.map(f => { if (f.clientModel.selected) this.deleteFile(f.id, f._type); })
+    this.actualFolder.files.map(f => {
+      if (f.clientModel.selected)
+        this.deleteFile(f.id, f._type);
+      else
+        f.viewModel.deleteRecursiveIfSelected();
+    })
   }
   fileFocusEventHandler(param) {
     if (param.type == 'folder') {
       this.createFolderToActual(param.name);
     } else if (param.type == 'project') {
       this.createProjectToActual(param.name);
-
     }
     console.log('actual files', this.actualFolder.files)
   }
@@ -164,11 +189,7 @@ export class LeftPanelComponentComponent implements OnInit {
       })
   }
   deleteFile(id, _type) {
-    console.log('deleting')
-    this.http
-      .delete<FileResponse>(environment.api_url_http + endP.management + _type + '/' + id, {
-        headers: { 'Authorization': 'Bearer ' + getCookie("jwt_token") }
-      })
+    this.fileService.deleteFile(id, _type)
       .pipe(catchError(this.handleError<FileResponse>(this, 'getFile', null)))
       .subscribe((r) => {
         if (r?.file._type) {
@@ -179,14 +200,14 @@ export class LeftPanelComponentComponent implements OnInit {
       })
   }
   getFile(id, _type) {
-    this.http
-      .get<FileResponse>(environment.api_url_http + endP.management + _type + '/' + id, {
-        headers: { 'Authorization': 'Bearer ' + getCookie("jwt_token") }
-      })
+    this.fileService.getFile(id, _type)
       .pipe(catchError(this.handleError<FileResponse>(this, 'getFile', null)))
       .subscribe((r) => {
         if (r?.file._type) {
-          this.setActualFolder(r);
+          if (r.file._type == 'projectFolderDto')
+            this.setActualProjectFolder(r);
+          else
+            this.setActualFolder(r);
         }
         console.log('file arrived', r)
         if (r) this.errorMsg = '';
@@ -210,22 +231,34 @@ export class LeftPanelComponentComponent implements OnInit {
   }
 
 
-
+  latestFileRequestFailed = false;
   private handleError<T>(view: LeftPanelComponentComponent, operation = 'operation', result?: T) {
     return (error: HttpErrorResponse): Observable<T> => {
       // TODO: send the error to remote logging infrastructure
       console.error(error); // log to console instead
-      view.errorMsg = error.error;
-      view.snackBar.open(view.errorMsg, "", { duration: 2000 });
+      if (error.error.errorMsg) {
+        view.errorMsg = JSON.stringify(error.error.errorMsg);
+        this.setActualFolder(error.error)
+      }
+      else view.errorMsg = JSON.stringify(error.error);
+
+      view.snackBar.open(view.errorMsg, "Error", { duration: 2000 });
       // TODO: better job of transforming error for user consumption
       console.log(`${operation} failed: ${error.message}`);
 
       // Let the app keep running by returning an empty result.
       return of(result as T);
+
     };
   }
   isAuthenticated() {
     return getCookie('jwt_token');
+  }
+
+  setActualProjectFolder(r: FileResponse) {
+    console.log('this is a project folder', r);
+    this.editorService.initFromServer((r.file as ProjectFolderDto).relatedDiagramId);
+    this.setActualFolder(r);
   }
 
   fileGoBack() {
@@ -237,7 +270,8 @@ export class LeftPanelComponentComponent implements OnInit {
     }
   }
   unselectAll() {
-    if (!this.isCtrlDown)
+
+    if (!this.isCtrlDown && this.actualFolder)
       this.actualFolder.files.map(f => f.clientModel.selected = false)
   } ngOnDestroy() {
     this.eventsSubscription.unsubscribe();

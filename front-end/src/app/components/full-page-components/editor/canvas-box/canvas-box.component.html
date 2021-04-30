@@ -54,6 +54,12 @@
               [general]="this.editorService.clientModel.class_general"
             >
             </app-note-box>
+            <app-package-object
+              *ngIf="item._type == 'PackageObject'"
+              [model]="item"
+              [general]="this.editorService.clientModel.class_general"
+            >
+            </app-package-object>
           </div>
         </div>
       </div>

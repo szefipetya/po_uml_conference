@@ -13,7 +13,7 @@ export enum endP {
   project = 'project/',
   create_project = 'create_project/',
   user_root_folder = 'user_root_folder/', create_folder = 'create_folder/', folder = 'folder/',
-
+  share = 'share/'
 }
 
 /*

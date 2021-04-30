@@ -13,8 +13,11 @@ import com.szefi.uml_conference.editor.model.socket.SessionState;
 import com.szefi.uml_conference.editor.model.top.AutoSessionInjectable_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
+import com.szefi.uml_conference.model.converter.BreakPointListConverter;
+import com.szefi.uml_conference.model.converter.RectConverter;
 import java.util.Map;
 import javax.persistence.CascadeType;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -30,7 +33,8 @@ import org.springframework.data.util.Pair;
 @Entity
 public class DiagramObject extends DynamicSerialObject implements AutoSessionInjectable_I {
    
-    @OneToOne(cascade=CascadeType.ALL,mappedBy = "dgObject")
+  //  @OneToOne(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "dgObject")
+    @Convert(converter = RectConverter.class)
     Rect dimensionModel;
     @ManyToOne
     DiagramEntity diagram;
@@ -96,9 +100,9 @@ private int  z;
     public void update(DynamicSerialObject obj) {
         System.out.println("update diagram on backend");
         if(obj instanceof DiagramObject){
-            DiagramObject ob=this.dimensionModel.getDgObject();
+           
            this.dimensionModel= ((DiagramObject) obj).getDimensionModel();
-           this.dimensionModel.setDgObject(ob);
+         //this.dimensionModel.setDgObject(this);
         }
       
     }
@@ -124,5 +128,12 @@ private int  z;
         sessionItemMap.remove(getId());
     }
 
-  
+  public static Rect StandardDimensionModel(){
+      Rect r=new Rect();
+      r.setX(10);
+      r.setY(10);
+      r.setWidth(150);
+      r.setHeight(200);
+      return r;
+  }
 }

@@ -15,32 +15,9 @@ import javax.persistence.OneToOne;
  *
  * @author h9pbcl
  */
-@Entity
+
 public class Rect {
-    @Id
-    @GeneratedValue
-    Integer id;
-
- 
-    @OneToOne
-    DiagramObject dgObject;
-    @JsonIgnore
-    public DiagramObject getDgObject() {
-        return dgObject;
-    }
-
-    public void setDgObject(DiagramObject dgObject) {
-        this.dgObject = dgObject;
-    }
-    
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-    
+  
     
     private float x;
     private float y;
@@ -78,5 +55,6 @@ public class Rect {
     public void setHeight(float height) {
         this.height = height;
     }
+    
     
 }

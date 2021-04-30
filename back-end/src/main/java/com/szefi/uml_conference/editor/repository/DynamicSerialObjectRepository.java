@@ -6,7 +6,7 @@
 package com.szefi.uml_conference.editor.repository;
 
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
-import com.szefi.uml_conference.model.entity.management.File_cEntity;
+import com.szefi.uml_conference.management.model.entity.File_cEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

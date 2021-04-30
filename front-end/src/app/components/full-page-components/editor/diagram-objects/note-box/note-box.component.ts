@@ -39,7 +39,11 @@ export class NoteBoxComponent
     this.textarea.nativeElement.style.fontSize =
       this.general.fontsize_scaled + 'px';
   }
-  update(): void {}
+  updateModel(model: any, action_id: string, msg?: string): void {
+    super.updateModel(model, action_id, msg);
+    this.model.content = model.content;
+  }
+  update(): void { }
   ngAfterViewChecked(): void {
     if (this.model.edit) {
       this.updateFont();
@@ -51,7 +55,9 @@ export class NoteBoxComponent
     if (this.isAccessible()) this.model.edit = true;
   }
 
-  inputClick(e) {}
+  inputClick(e) {
+    this.model.edit = true;
+  }
   updateHeight() {
     if (!this.textarea) return;
     this.textarea.nativeElement.style.height = '';

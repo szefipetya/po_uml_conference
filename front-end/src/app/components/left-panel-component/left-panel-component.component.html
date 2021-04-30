@@ -76,16 +76,13 @@
     >
       back
     </div>
-    <div
-      (dblclick)="fileDblClick(file)"
-      (click)="fileClick(file)"
-      class="file"
-      *ngFor="let file of this.actualFolder.files"
-    >
+    <div class="file" *ngFor="let file of this.actualFolder.files">
       <app-file
         [model]="file"
+        (dblClickEvent)="this.fileDblClick($event)"
         (focusEvent)="fileFocusEventHandler($event)"
         (destroyEvent)="fileDestroyHandler($event)"
+        (clickEvent)="this.fileClick($event)"
       >
       </app-file>
     </div>

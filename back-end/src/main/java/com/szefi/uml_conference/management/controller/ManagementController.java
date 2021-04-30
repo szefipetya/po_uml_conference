@@ -6,6 +6,8 @@
 package com.szefi.uml_conference.management.controller;
 
 import com.szefi.uml_conference._exceptions.JwtException;
+import com.szefi.uml_conference._exceptions.JwtExpiredException;
+import com.szefi.uml_conference._exceptions.JwtParseException;
 import com.szefi.uml_conference._exceptions.UnAuthorizedActionException;
 import com.szefi.uml_conference._exceptions.management.FileNotFoundException;
 import com.szefi.uml_conference._exceptions.management.FileTypeConversionException;
@@ -13,8 +15,12 @@ import com.szefi.uml_conference._exceptions.management.IllegalDmlActionException
 import com.szefi.uml_conference._exceptions.management.UnstatisfiedNameException;
 import com.szefi.uml_conference.management.services.ManagementService;
 import com.szefi.uml_conference.management.services.ProjectManagementService;
-import com.szefi.uml_conference.model.dto.management.FolderDto;
+import com.szefi.uml_conference.management.model.dto.FolderDto;
+import com.szefi.uml_conference.management.model.dto.request.FileShareRequest;
+import com.szefi.uml_conference.management.model.dto.response.FileResponse;
+import com.szefi.uml_conference.security.model.auth.AuthRequest;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
@@ -22,11 +28,13 @@ import javax.ws.rs.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -54,9 +62,10 @@ public class ManagementController {
         try {
             return ResponseEntity.ok(service.getUserRootFolder(authHeader.substring(7)));
             //return service.getRootFolderByUserId()
-        } catch (JwtException ex) {
+        } catch (JwtException |UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        }
+        } 
+        // return ResponseEntity.status(HttpStatus.FORBIDDEN).body("inscufficient authorities");
     }
 
     @GetMapping("folder/{id}")
@@ -67,7 +76,7 @@ public class ManagementController {
         try {
             return ResponseEntity.ok(service.getFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
             //return service.getRootFolderByUserId()
-        } catch (JwtException ex) {
+        } catch (JwtException |UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         } catch (FileTypeConversionException | FileNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -81,7 +90,7 @@ public class ManagementController {
         try {
             return ResponseEntity.ok(service.deleteFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
             //return service.getRootFolderByUserId()
-        } catch (JwtException ex) {
+        } catch (JwtException|UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         } catch (FileTypeConversionException | FileNotFoundException |IllegalDmlActionException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -132,7 +141,18 @@ public class ManagementController {
             //return service.getRootFolderByUserId()
         } catch (JwtException | UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        } catch (UnstatisfiedNameException | FileTypeConversionException ex) {
+        } catch (UnstatisfiedNameException  ex) {
+            try {
+                FileResponse resp=service.getFolder(authHeader.substring(7),Integer.valueOf(parent_id));
+                resp.setErrorMsg(ex.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+            } catch (JwtException | FileTypeConversionException | FileNotFoundException | UnAuthorizedActionException ex1) {
+                Logger.getLogger(ManagementController.class.getName()).log(Level.SEVERE, null, ex1);
+                          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+
+            }
+        }
+        catch ( FileTypeConversionException ex) {
           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
@@ -183,6 +203,24 @@ public class ManagementController {
         } catch (FileTypeConversionException | FileNotFoundException |IllegalDmlActionException | UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         } 
+    }
+     @RequestMapping(value = "/share", method = RequestMethod.POST)
+    public ResponseEntity<?> createAuthenticationJwt(@RequestBody FileShareRequest req) {
+      
+   
+        try {
+            return ResponseEntity.ok( service.shareRequest(req));
+        } catch (JwtParseException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (JwtExpiredException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (UnAuthorizedActionException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+        
+       
     }
     //projectFolderDto
    

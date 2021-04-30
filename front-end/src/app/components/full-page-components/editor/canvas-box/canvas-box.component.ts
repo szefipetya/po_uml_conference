@@ -19,6 +19,7 @@ import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSer
 import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
 import { SessionState } from 'src/app/components/models/socket/SessionState';
 import { MSG_TYPE } from '../services/common/common.service';
+import { NoteBox } from 'src/app/components/models/DiagramObjects/NoteBox';
 
 @Component({
   selector: 'app-canvas-box',
@@ -155,6 +156,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     }
   };
   selectClickedClassOnly = () => {
+
     this.editorService.clientModel.canvas.selectedClassIds.map((i) => {
       //ha nem azt választom, ki, ami már ki van, akkor
       if (i != this.targetObject_stored.id)
@@ -334,27 +336,31 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     }
   };
   ngOnInit(): void {
-    this.socket.registerContainer(this.getId(), this);
+
     this.setup();
   }
   fullWidth: number;
   fullHeight: number;
   setup() {
     const p = new Promise(async (resolve, reject) => {
-      await this.editorService.initFromServer();
+      if (this.editorService.getDiagramId())
+        await this.editorService.initFromServer(this.editorService.getDiagramId());
       await resolve('success');
     });
-    p.then((o) => {
-      this.fullWidth = document.querySelector('html').clientWidth;
-      this.fullHeight = document.querySelector('html').clientHeight;
-      this.editorService.clientModel.canvas.clip.width =
-        this.fullWidth -
-        this.editorService.alignment.left_dock.width -
-        this.editorService.alignment.right_dock.width;
-      this.editorService.clientModel.canvas.clip.height =
-        this.fullHeight - this.editorService.alignment.bottom_dock.height;
+    this.editorService.addListenerToEvent(this, (t) => {
+      t.fullWidth = document.querySelector('html').clientWidth;
+      t.fullHeight = document.querySelector('html').clientHeight;
+      t.editorService.clientModel.canvas.clip.width =
+        t.fullWidth -
+        t.editorService.alignment.left_dock.width -
+        t.editorService.alignment.right_dock.width;
+      t.editorService.clientModel.canvas.clip.height =
+        t.fullHeight - t.editorService.alignment.bottom_dock.height;
+      t.socket.registerContainer(t.getId(), t);
+    }, 'canvas_size_update')
 
-    });
+
+
   }
   editorService: GlobalEditorService;
   constructor(
@@ -393,8 +399,8 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     // ha, éppen class-t rajzol az illető
     if (
       this.drawedClassPositionSpecified &&
-      this.editorService.clientModel.canvas.drawMode == 'class'
-    ) {
+      this.editorService.clientModel.canvas.drawMode == 'class' ||
+      this.editorService.clientModel.canvas.drawMode == 'note') {
       this.resizeDrawedClass(e);
       return;
     }
@@ -679,12 +685,12 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       this.targetClass.viewModel.onMouseUp(e);
     }
     if (this.drawedClass != null) {
-      this.drawedClass.viewModel.onMouseUp(e);
+      //  this.drawedClass?.viewModel?.onMouseUp(e);
       let copy = {};
 
       // console.log('MODEL', this.drawedClass);
       //console.log('COPY', copy);
-      //this.drawedClass = null;
+      // this.drawedClass = null;
     }
     if (this.targetDOM != undefined)
       this.targetDOM.style.border = `${this.editorService.clientModel.class_general.border_scaled}px solid rgba(255, 255, 255, 0.19)`;
@@ -710,6 +716,9 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     switch (this.editorService.clientModel.canvas.drawMode) {
       case 'class':
         this.drawClassMode(e);
+        break;
+      case 'note':
+        this.drawNoteMode(e);
         break;
       case 'cursor':
         this.cursorMode(e);
@@ -825,8 +834,8 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       _type: 'SimpleClass',
       id: this.drawedClassId,
       dimensionModel: {
-        width: 1,
-        height: 1,
+        width: 150,
+        height: 200,
         x: this.drawedClassX,
         y: this.drawedClassY,
       },
@@ -880,9 +889,56 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     this.drawedClass = newclass;
     this.sendDiagramObjectCreateMessage(this.drawedClass);
     setTimeout(() => {
-      if (newclass.titleModel.viewModel) {
-        newclass.titleModel.viewModel.onClick(e);
-        newclass.viewModel.onSelect();
+      /* if (newclass.titleModel.viewModel) {
+         newclass.titleModel.viewModel.onClick(e);
+         newclass.viewModel.onSelect();
+       }*/
+    }, 50);
+    this.drawedClassPositionSpecified = true;
+  }
+  drawNoteMode(e) {
+    const rect = e.target.closest('.edit-box')?.getBoundingClientRect();
+    if (!rect) return;
+    const x = e.clientX - rect.left; // x position within the element.
+    const y = e.clientY - rect.top;
+    this.drawedClassX = x;
+    this.drawedClassY = y;
+    this.drawedClassId = uniqId();
+    let newBox: NoteBox;
+
+    newBox = {
+      doc: '',
+      _type: 'NoteBox',
+      id: this.drawedClassId,
+      dimensionModel: {
+        width: 150,
+        height: 200,
+        x: this.drawedClassX,
+        y: this.drawedClassY,
+      },
+      extra: { old_id: this.drawedClassId, draft: true },
+      min_height: 75,
+      viewModel: null,
+      scaledModel: {
+        posx_scaled: x,
+        posy_scaled: y,
+        width_scaled: 1,
+        height_scaled: 1,
+        min_height_scaled: 75,
+      },
+      z: this.getHighestClassZIndex(),
+      edit: true,
+      name: 'Note', content: ""
+
+    };
+    this.editorService.createGlobalObject(newBox);
+    //amikor létrejönnek a nézetek, akkor maguk küldenek külön kérést az id injekcióhoz.
+    this.targetClass = newBox;
+    this.drawedClass = newBox;
+    this.sendDiagramObjectCreateMessage(this.drawedClass);
+    setTimeout(() => {
+      if (newBox.viewModel) {
+        // newBox.viewModel.onSelect();
       }
     }, 50);
     this.drawedClassPositionSpecified = true;
@@ -902,8 +958,9 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   createItem(model: DynamicSerialObject, extra?: any) {
     //  if(extra.global_type=='DiagramObject')
     //if(extra.global_type=='Line')
-    if (!this.editorService.hasGlobalObjectById(model.id))
+    if (!this.editorService.hasGlobalObjectById(model.id)) {
       this.editorService.createGlobalObject(model as DiagramObject);
+    }
   }
   hasItem(target_id: string) {
     return this.editorService.hasGlobalObjectById(target_id);

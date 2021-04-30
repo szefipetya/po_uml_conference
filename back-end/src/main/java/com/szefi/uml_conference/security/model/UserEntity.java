@@ -7,12 +7,14 @@ package com.szefi.uml_conference.security.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
-import com.szefi.uml_conference.model.entity.management.File_cEntity;
-import com.szefi.uml_conference.model.entity.management.FolderEntity;
+import com.szefi.uml_conference.management.model.entity.File_cEntity;
+import com.szefi.uml_conference.management.model.entity.FolderEntity;
+import com.szefi.uml_conference.management.model.entity.SPECIAL_FOLDER;
 import com.szefi.uml_conference.security.converter.RoleListConverter;
 import com.szefi.uml_conference.security.model.ROLE;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,6 +55,25 @@ public class UserEntity {
   inverseJoinColumns = @JoinColumn(name = "diagram_id"))
         @LazyCollection(LazyCollectionOption.FALSE)
     private Set<DiagramEntity> sharedDiagramsWithMe;
+    
+    
+     @ManyToMany
+    @JoinTable(
+  name = "file_share_table", 
+  joinColumns = @JoinColumn(name = "user_id"), 
+  inverseJoinColumns = @JoinColumn(name = "file_id"))
+        @LazyCollection(LazyCollectionOption.FALSE)
+    private Set<File_cEntity> sharedFilesWithMe=new HashSet<>();
+@JsonIgnore
+    public Set<File_cEntity> getSharedFilesWithMe() {
+        return sharedFilesWithMe;
+    }
+
+    public void setSharedFilesWithMe(Set<File_cEntity> sharedFilesWithMe) {
+        this.sharedFilesWithMe = sharedFilesWithMe;
+    }
+    
+    
     @JsonIgnore
     public Set<DiagramEntity> getSharedDiagramsWithMe() {
         return sharedDiagramsWithMe;
@@ -94,9 +115,26 @@ public class UserEntity {
         rootFolder.setIs_root(true);
         rootFolder.setName("~");
         this.files.add(rootFolder);
+          FolderEntity sharedWithmeFolder=new FolderEntity();
+             sharedWithmeFolder.setOwner(this);
+        sharedWithmeFolder.setDate(new Date());
+        sharedWithmeFolder.setIs_root(false);
+        sharedWithmeFolder.setName("SharedWithMe");
+        sharedWithmeFolder.setSpecial(SPECIAL_FOLDER.SHARED);
+        sharedWithmeFolder.setParentFolder(sharedWithmeFolder);
+        rootFolder.addFile(sharedWithmeFolder);
+           this.files.add(sharedWithmeFolder);
     }
     public  User_PublicDto makeDto(){
       return new User_PublicDto(this);
+    }
+    public FolderEntity getSharedFolder(){
+       return ((FolderEntity) this.files.stream().filter(f->{
+        if(f instanceof FolderEntity){
+            FolderEntity folder=(FolderEntity)f;
+         return  folder.getSpecial()==SPECIAL_FOLDER.SHARED;
+        } return false;
+        }).findFirst().get());
     }
     
     public List<ROLE> getRoles() {

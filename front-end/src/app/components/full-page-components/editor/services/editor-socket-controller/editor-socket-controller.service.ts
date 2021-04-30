@@ -230,11 +230,10 @@ export class EditorSocketControllerService {
   public triggerEvent(wich: string) {
 
     this.editorService.triggerEvent(wich);
-
-
-
   }
-
+  getDiagramId() {
+    return this.editorService.getDiagramId();
+  }
 
 
   addListenerToEvent(target, fn, alias: string = '') {

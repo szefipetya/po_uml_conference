@@ -19,13 +19,13 @@ import javax.persistence.OneToOne;
 @JsonTypeName("TitleElement")
 public class TitleElement extends Element_c{ 
     @OneToOne
-    SimpleClass parent;
+    DiagramObject parent;
     @JsonIgnore
-    public SimpleClass getParent() {
+    public DiagramObject getParent() {
         return parent;
     }
 
-    public void setParent(SimpleClass parent) {
+    public void setParent(DiagramObject parent) {
         this.parent = parent;
     }
     

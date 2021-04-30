@@ -4,6 +4,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { HttpClientModule } from '@angular/common/http';
 
@@ -11,6 +12,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 //custom source
 import { MainComponent } from './components/main/main.component';
@@ -36,9 +41,11 @@ import { AuthModule } from "src/app/auth/auth.module";
 import { RouterModule } from '@angular/router';
 import { FileComponent } from './components/left-panel-component/file/file.component';
 import { HomeComponentComponent } from './components/full-page-components/home-component/home-component.component';
-
+import { FileManagerService } from './components/left-panel-component/service/file-manager.service';
+import { PackageObjectComponent } from './components/full-page-components/editor/diagram-objects/package-object/package-object.component';
+import { ShareDialogComponent } from "./components/left-panel-component/file/file.component";
 @NgModule({
-  declarations: [
+  declarations: [ShareDialogComponent,
     AppComponent,
     MainComponent,
     TopMenuComponent,
@@ -61,21 +68,24 @@ import { HomeComponentComponent } from './components/full-page-components/home-c
     LeftPanelComponentComponent,
     FileComponent,
     HomeComponentComponent,
+    PackageObjectComponent,
   ],
   imports: [
     //Angular core
+
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    HttpClientModule,
+    HttpClientModule, FormsModule,
     //Material
-    MatToolbarModule,
+    MatInputModule, MatButtonModule,
+    MatToolbarModule, MatDialogModule,
     MatIconModule,
-    MatSidenavModule,
+    MatSidenavModule, MatFormFieldModule,
     //Custom
     AuthModule, RouterModule
   ],
-  providers: [],
+  providers: [FileManagerService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

@@ -20,7 +20,7 @@ import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramO
 import { Pair } from '../../../../../utils/utils';
 import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
 import { environment } from 'src/environments/environment';
-import { getCookie } from 'src/app/utils/cookieUtils';
+import { getCookie, setCookie } from 'src/app/utils/cookieUtils';
 import { User_PublicDto } from 'src/app/auth/models/User_PublicDto';
 @Injectable({
   providedIn: 'root',
@@ -39,6 +39,8 @@ export class GlobalEditorService {
     return this.model.dgObjects.find((o) => o.id == id) != null;
   }
   createGlobalObject(model: DiagramObject) {
+    model.scaledModel = new DiagramObject_Scaled();
+    this.injectScales(model);
     this.model.dgObjects.push(model);
   }
   model: Diagram;
@@ -120,30 +122,46 @@ export class GlobalEditorService {
 
   }
   constructor(private http: HttpClient) {
+    this.addListenerToEvent(this, (t) => {
+      let maxwidth = 0;
+      let maxheight = 0;
+
+      t.model.dgObjects.map(dg => {
+        maxwidth = Math.max(maxwidth, dg.dimensionModel.x + dg.dimensionModel.width);
+        maxheight = Math.max(maxheight, dg.dimensionModel.y + dg.dimensionModel.height);
+      });
+
+
+      t.clientModel.canvas.width = Math.max((maxwidth += 500) * t.clientModel.canvas.scale, window.innerWidth -
+        t.alignment.left_dock.width -
+        t.alignment.right_dock.width);
+      t.clientModel.lineCanvas.width = t.clientModel.canvas.width;
+      t.clientModel.canvas.height = Math.max((maxheight += 500) * t.clientModel.canvas.scale, window.innerHeight - t.alignment.bottom_dock.height);
+      t.clientModel.lineCanvas.height = t.clientModel.canvas.height;
+      console.log("canvas size updated")
+    }, 'canvas_size_update');
     this.init_first();
+
     //this.init();
   }
   namespace(str, scope) {
     return scope;
   }
 
-  public async initFromServer() {
+  public async initFromServer(dg_id) {
     this.init_first();
     await this.triggerEvent('pre_setup');
     this.model = new Diagram();
-    let response = await this.getDiagramFromServer(environment.testdg_id);
+    let response = await this.getDiagramFromServer(dg_id);
     console.log('response:', response);
 
     console.log({ ...response });
     if (response.dgObjects) {
       response.dgObjects.map((dg) => {
-        dg.scaledModel = new DiagramObject_Scaled();
-        dg.scaledModel.posx_scaled = dg.dimensionModel.x;
-        dg.scaledModel.posy_scaled = dg.dimensionModel.y;
-        dg.scaledModel.width_scaled = dg.dimensionModel.width;
-        dg.scaledModel.height_scaled = dg.dimensionModel.height;
-        dg.scaledModel.min_height_scaled = this.clientModel.class_general.min_height_scaled;
+        this.injectScales(dg);
       });
+      this.model.id = response.id;
+      setCookie('dg_id', this.model.id, 10);
       this.model.dgObjects = response.dgObjects;
       this.model.lines = response.lines;
       console.log('diagram is', JSON.stringify(this.model));
@@ -152,7 +170,11 @@ export class GlobalEditorService {
       this.afterDgFetchFunctions.map((p) => {
         p.value(p.key.value);
       });
+      this.triggerEvent('canvas_size_update');
     }
+  }
+  getDiagramId() {
+    return getCookie('dg_id');
   }
   getDiagramFromServer(id: string): Promise<Diagram> {
     return this.http
@@ -194,5 +216,15 @@ export class GlobalEditorService {
 
   init(): Diagram {
     return new Diagram();
+  }
+  injectScales(dg: DiagramObject) {
+
+    dg.scaledModel = new DiagramObject_Scaled();
+    dg.scaledModel.posx_scaled = dg.dimensionModel.x;
+    dg.scaledModel.posy_scaled = dg.dimensionModel.y;
+    dg.scaledModel.width_scaled = dg.dimensionModel.width;
+    dg.scaledModel.height_scaled = dg.dimensionModel.height;
+    dg.scaledModel.min_height_scaled = this.clientModel.class_general.min_height_scaled;
+
   }
 }

@@ -1,0 +1,29 @@
+<ng-template #contentc>
+  <div (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)">
+    <!-- {{ this.model.titleModel.name }} -->
+    <app-attribute
+      [parent]="this"
+      [isTitle]="true"
+      [model]="this.model.titleModel"
+      [isEditLockedPermanently]="true"
+    >
+    </app-attribute>
+    <div
+      style="position: absolute"
+      [style.left]="this.model.scaledModel.width_scaled + 'px'"
+      [style.top]="'-20' + 'px'"
+    >
+      {{ this.isLocked() }} {{ this.isLoading() }}
+    </div>
+    Elements:
+    <div *ngFor="let item of this.model.elements">
+      {{ item.icon + " " + item.name }}
+    </div>
+  </div>
+</ng-template>
+<app-diagram-object
+  [contentTemplate]="contentc"
+  [model]="this.model"
+  [general]="this.general"
+>
+</app-diagram-object>

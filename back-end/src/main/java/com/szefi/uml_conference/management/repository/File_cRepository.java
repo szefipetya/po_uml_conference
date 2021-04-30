@@ -5,7 +5,7 @@
  */
 package com.szefi.uml_conference.management.repository;
 
-import com.szefi.uml_conference.model.entity.management.File_cEntity;
+import com.szefi.uml_conference.management.model.entity.File_cEntity;
 import com.szefi.uml_conference.security.model.UserEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

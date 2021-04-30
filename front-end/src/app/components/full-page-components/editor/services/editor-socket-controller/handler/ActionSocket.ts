@@ -55,6 +55,7 @@ export class ActionSocket implements SocketWrapper {
           } else {
             console.log('UPDATE RECEIVED OWNER', this.parent.service.getUser().id);
           }
+          this.parent.service.triggerEvent('canvas_size_update');
           console.log("UPDATE LOL");//TODO EDITOR SERVICE SEND UPDATE EVENT WHO ARE REGISTERED(CANVAS BOX)
           break;
         case ACTION_TYPE.RESTORE:
@@ -169,7 +170,7 @@ export class ActionSocket implements SocketWrapper {
                 resp.target_type,
                 { sessionState: JSON.parse(resp.action.extra.sessionState) }
               );
-            sc.createItem(load, resp.action.extra);
+            sc?.createItem(load, resp.action.extra);
           }
           console.log(sc);
 
@@ -185,7 +186,8 @@ export class ActionSocket implements SocketWrapper {
   }
   onopen(m: any) {
     console.log('Connected: ' + m);
-    setTimeout(() => this.parent.socket.send(JSON.stringify(new SocketAuthenticationRequest(getCookie("jwt_token"), environment.testdg_id)), 50));
+
+    setTimeout(() => this.parent.socket.send(JSON.stringify(new SocketAuthenticationRequest(getCookie("jwt_token"), this.parent.service.getDiagramId())), 50));
   }
   getItem(id) {
     let p: Pair<

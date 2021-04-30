@@ -8,8 +8,10 @@ package com.szefi.uml_conference.model.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.szefi.uml_conference.editor.model.do_related.PackageElement;
 import com.szefi.uml_conference.editor.model.do_related.line.BreakPoint;
 import com.szefi.uml_conference.security.model.ROLE;
+import java.util.ArrayList;
 import java.util.Arrays;
 import static java.util.Collections.emptyList;
 import java.util.List;
@@ -51,10 +53,14 @@ public class BreakPointListConverter implements AttributeConverter<List<BreakPoi
 
     @Override
     public List<BreakPoint> convertToEntityAttribute(String string) {
-     
+      List<BreakPoint> ret=new ArrayList<>();
        
         try {
-            return Arrays.asList(mapper.readValue(string, BreakPoint[].class));
+             Arrays.asList(mapper.readValue(string, BreakPoint[].class)).forEach(i->ret.add(i));
+             return ret;
+       
+    
+        
         } catch (JsonProcessingException ex) {
             Logger.getLogger(BreakPointListConverter.class.getName()).log(Level.SEVERE, null, ex);
         }

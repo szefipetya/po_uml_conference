@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { DynamicSerialObject } from 'src/app/components/models/common/DynamicSerialObject';
 import { AttributeElement } from 'src/app/components/models/DiagramObjects/AttributeElement';
+import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
 import { Element_c } from 'src/app/components/models/DiagramObjects/Element_c';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
@@ -33,7 +34,7 @@ export class SimpleClassComponent
   implements OnInit, OnChanges, AfterContentInit, SessionInteractiveContainer {
   updateItemWithOld(old_id: string, model: any) {
     throw new Error('Method not implemented.');
-    throw new Error('Method not implemented.');
+
   }
   updateModel(model: any, action_id: string, msg?: string): void {
     let vm = this.model.viewModel;
@@ -68,6 +69,7 @@ export class SimpleClassComponent
       this.model.dimensionModel.height = this.editorService.clientModel.class_general.min_height;
     }
     console.log('DIMENSION UPDATEFD');
+    if (!this.model.scaledModel) this.model.scaledModel = new DiagramObject_Scaled();
     this.model.scaledModel.posy_scaled =
       this.model.dimensionModel.y * this.editorService.clientModel.canvas.scale;
     this.model.scaledModel.width_scaled =
@@ -90,7 +92,8 @@ export class SimpleClassComponent
     let vm = this.model.viewModel;
 
     if (model._type == 'TitleElement') {
-      this.getTitleVm().updateModel(model, '', '');
+      this.getTitleVm().updateModel(model, "", "");
+      this.getTitleVm().updateState(JSON.parse(extra.sessionState))
       console.log(this.model.titleModel);
       //title model
     }

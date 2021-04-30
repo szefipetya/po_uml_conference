@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
 import com.szefi.uml_conference.editor.model.do_related.Element_c;
 import com.szefi.uml_conference.editor.model.do_related.NoteBox;
+import com.szefi.uml_conference.editor.model.do_related.PackageObject;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClassElementGroup;
@@ -29,6 +30,8 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MapKeyColumn;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.util.Pair;
 
 /**
@@ -46,6 +49,7 @@ import org.springframework.data.util.Pair;
         @JsonSubTypes.Type(value=AttributeElement.class, name="AttributeElement"),
         @JsonSubTypes.Type(value=TitleElement.class, name="TitleElement"),
         @JsonSubTypes.Type(value=BreakPoint.class, name="BreakPoint"),
+        @JsonSubTypes.Type(value=PackageObject.class, name="PackageObject"),
       /*  @JsonSubTypes.Type(value=Point.class, name="Point"),*/
         @JsonSubTypes.Type(value=SimpleClassElementGroup.class, name="SimpleClassElementGroup"), 
 })
@@ -57,6 +61,7 @@ public class DynamicSerialObject implements AutoSessionInjectable_I {
     private Integer id;
     // @Convert(converter = MapConverter.class)
       @ElementCollection
+          @LazyCollection(LazyCollectionOption.FALSE)
     @MapKeyColumn(name="extra_map")
     private Map<String,String>extra;
 
@@ -83,6 +88,7 @@ public class DynamicSerialObject implements AutoSessionInjectable_I {
       @Override
     public boolean equals(Object obj) {
         if(obj instanceof DynamicSerialObject){
+            if(((DynamicSerialObject)obj).getId()!=null)
             return ((DynamicSerialObject)obj).getId().equals(this.getId());
         }
         return false;

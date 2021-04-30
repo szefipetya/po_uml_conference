@@ -6,6 +6,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
+import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
 import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
 import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
 import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
@@ -35,9 +36,12 @@ export class DiagramObjectComponent
     console.log('mousedown');
   }
   onMouseUp(e) {
+    this.MouseUpEffect(e);
+  }
+  MouseUpEffect(e) {
     this.sendDimensionUpdate();
     this.dragged = false;
-    console.log('update');
+    console.log('UPDATE SENT OBJJJJ');
   }
   sendDimensionUpdate() {
     let action = new EditorAction(this.model.id, this.model._type, '');
@@ -57,9 +61,11 @@ export class DiagramObjectComponent
   dragged = false;
   updateModel(model: any, action_id: string, msg?: string): void {
     let vm = this.model.viewModel;
+    this.model.id = model.id;
     //  soft_copy(model, this.model, ['edit', 'viewModel', 'scaledModel']);
     this.model.viewModel = vm;
     this.model.dimensionModel = model.dimensionModel;
+    if (!this.model.scaledModel) this.model.scaledModel = new DiagramObject_Scaled();
     this.model.scaledModel.posy_scaled =
       this.model.dimensionModel.y * this.editorService.clientModel.canvas.scale;
     this.model.scaledModel.width_scaled =

@@ -12,9 +12,11 @@ import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.editor.model.do_related.line.Line;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
+import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
 import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.model.User_PublicDto;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -25,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -39,17 +42,29 @@ public class DiagramEntity implements Serializable{
     @Id
     @GeneratedValue
     private Integer id;
+    
+    @OneToOne
+    ProjectFolderEntity relatedFolder;
+@JsonIgnore
+    public ProjectFolderEntity getRelatedFolder() {
+        return relatedFolder;
+    }
+
+    public void setRelatedFolder(ProjectFolderEntity relatedFolder) {
+        this.relatedFolder = relatedFolder;
+    }
+    
 @ManyToOne
 private UserEntity owner;
 @LazyCollection(LazyCollectionOption.FALSE)
-@OneToMany(mappedBy = "diagram",cascade = CascadeType.PERSIST)
+@OneToMany(mappedBy = "diagram",cascade = {CascadeType.REMOVE})
 private List<DiagramObject> dgObjects;
 @LazyCollection(LazyCollectionOption.FALSE)
 @OneToMany(mappedBy = "diagram",cascade = {CascadeType.ALL})
 private List<Line> lines;
 @ManyToMany(mappedBy="sharedDiagramsWithMe")
         @LazyCollection(LazyCollectionOption.FALSE)
-        Set<UserEntity> usersIamSaredWith;
+        Set<UserEntity> usersIamSaredWith=new HashSet<>();
     @JsonIgnore
    public UserEntity getOwner() {
         return owner;
