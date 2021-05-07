@@ -41,7 +41,7 @@ public class UserEntity {
     @Id
     private Integer id;
     private String userName;
-    private String Email;
+    private String email;
     private String password;
     private String name;
     
@@ -173,11 +173,11 @@ public class UserEntity {
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public void setEmail(String Email) {
-        this.Email = Email;
+        this.email = Email;
     }
 
     public String getPassword() {

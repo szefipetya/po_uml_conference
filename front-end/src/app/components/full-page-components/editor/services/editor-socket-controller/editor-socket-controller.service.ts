@@ -53,12 +53,12 @@ export class EditorSocketControllerService {
     this.waitingForResponse_queue = [];
     // this.user = editorService.getUser();
     this.test = new Test();
-    this.editorService.addListenerAfterDgFetch(
+    this.editorService.addListenerToEvent(
       this,
       (target) => {
         target.connect();
       },
-      'init'
+      'diagram_fetch'
     );
     this.addListenerToEvent(this, (target) => {
       target.injectionQueue = [];

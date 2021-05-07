@@ -1,10 +1,12 @@
 import { AfterViewChecked, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
-import { CommonService } from '../../services/common/common.service';
+import { DiagramObject_General } from 'src/app/components/models/DiagramObjects/DiagramObject_General';
+import { CommonService, MSG_TYPE } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
 import { DiagramObjectComponent } from '../diagram-object/diagram-object.component';
 import { PackageObject } from "src/app/components/models/DiagramObjects/PackageObject";
+import { LogInteractive_I } from 'src/app/components/models/socket/interface/LogInteractive_I';
+import { ICON } from 'src/app/components/models/management/ICON';
 @Component({
   selector: 'app-package-object',
   templateUrl: './package-object.component.html',
@@ -14,7 +16,7 @@ export class PackageObjectComponent extends DiagramObjectComponent
   implements OnInit, AfterViewChecked {
   @Input()
   model: PackageObject;
-  @Input() public general: SimpleClass_General;
+  @Input() public general: DiagramObject_General;
   //@ViewChild('texta') textarea: ElementRef<HTMLTextAreaElement>;
   constructor(
     protected socket: EditorSocketControllerService,
@@ -23,12 +25,18 @@ export class PackageObjectComponent extends DiagramObjectComponent
   ) {
     super(socket, commonService, editorService);
   }
+  iconEnumToSrc(icon: ICON): string {
+    switch (icon) {
+      case ICON.PROJECT_FOLDER: return "../../../../../../assets/svg/management/box.svg";
+      case ICON.PROJECT_CLASS: return "../../../../../../assets/svg/management/class.svg";
+    }
+  }
   updateScales(scale): void {
     this.updateFont();
   }
   updateModel(model: any, action_id: string, msg?: string): void {
     super.updateModel(model, action_id, msg);
-    this.model.elements = model.elements
+    this.model.elements = model.elements;
   }
   updateFont() {
     /*if (!this.textarea) return;
@@ -51,6 +59,15 @@ export class PackageObjectComponent extends DiagramObjectComponent
   inputClick(e) {
     this.model.edit = true;
   }
+  deleteSelfFromParent() {
+    // console.log("HAHAHAHAH NEM TUDSZ TÖRÖLNI")
+
+  }
+  deleteMessageToServer() {
+    this.commonService.putLog("You can not delete this one", MSG_TYPE.ERROR, this)
+    console.log("HAHAHAHAH NEM TUDSZ TÖRÖLNI")
+  }
+
   updateHeight() {
     /*if (!this.textarea) return;
     this.textarea.nativeElement.style.height = '';

@@ -10,7 +10,6 @@ export class Line extends DynamicSerialObject {
   static sortBreakPoints(l: Line) {
     l.breaks = l.breaks.sort((a, b) => a.index - b.index);
   }
-  id: string;
   lineType: LineType;
   object_start_id: string;
   object_end_id: string;
@@ -21,6 +20,15 @@ export class Line extends DynamicSerialObject {
     this.id = uniqId();
     this._type = 'Line';
     this.lineType = new LineType(lt);
+  }
+  public static setLineDash(l, ctx) {
+    if (l.lineType.type == LINE_TYPE.DEPENDENCY ||
+      l.lineType.type == LINE_TYPE.INTERFACE || l.lineType.type == "DEPENDENCY" ||
+      l.lineType.type == "INTERFACE"
+    ) {
+      ctx.setLineDash([12, 15]);
+    } else
+      ctx.setLineDash([0, 0]);
   }
   public static clone(l): Line {
     let l2 = new Line(l.lineType.type);

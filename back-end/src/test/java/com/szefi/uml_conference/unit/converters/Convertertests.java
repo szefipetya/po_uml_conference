@@ -10,6 +10,8 @@ import com.szefi.uml_conference.editor.model.do_related.line.BreakPoint;
 import com.szefi.uml_conference.model.converter.BreakPointListConverter;
 import com.szefi.uml_conference.model.converter.PackageElementsListConverter;
 import java.util.List;
+
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

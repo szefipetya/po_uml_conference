@@ -1,0 +1,29 @@
+2021-05-06 12:22:11.189 CEST [14916] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-06 12:22:11.215 CEST [14916] LOG:  listening on IPv6 address "::", port 8102
+2021-05-06 12:22:11.216 CEST [14916] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-06 12:22:11.545 CEST [29936] LOG:  database system was interrupted; last known up at 2021-05-05 23:08:30 CEST
+2021-05-06 12:22:17.493 CEST [29936] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-06 12:22:17.566 CEST [29936] LOG:  redo starts at 0/3B3D240
+2021-05-06 12:22:17.568 CEST [29936] LOG:  invalid record length at 0/3B3D328: wanted 24, got 0
+2021-05-06 12:22:17.568 CEST [29936] LOG:  redo done at 0/3B3D2F0
+2021-05-06 12:22:19.499 CEST [14916] LOG:  database system is ready to accept connections
+2021-05-06 15:55:39.582 CEST [24512] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.582 CEST [20004] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.582 CEST [24664] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.583 CEST [20660] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.583 CEST [32700] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.583 CEST [21848] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.583 CEST [4180] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.583 CEST [17728] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.583 CEST [31180] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 15:55:39.584 CEST [29960] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-06 22:48:41.890 CEST [14916] LOG:  background worker "logical replication launcher" (PID 12280) was terminated by exception 0xC000013A
+2021-05-06 22:48:41.890 CEST [14916] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-06 22:48:41.938 CEST [14916] LOG:  terminating any other active server processes
+2021-05-06 22:48:43.015 CEST [14916] LOG:  all server processes terminated; reinitializing
+2021-05-06 22:48:43.249 CEST [2084] LOG:  database system was interrupted; last known up at 2021-05-06 12:27:34 CEST
+2021-05-06 22:49:08.253 CEST [2084] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-06 22:49:08.262 CEST [2084] LOG:  redo starts at 0/3C514E0
+2021-05-06 22:49:08.263 CEST [2084] LOG:  invalid record length at 0/3C515C8: wanted 24, got 0
+2021-05-06 22:49:08.263 CEST [2084] LOG:  redo done at 0/3C51590
+2021-05-06 22:49:11.320 CEST [14916] LOG:  database system is ready to accept connections

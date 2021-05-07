@@ -132,6 +132,7 @@ export class LeftPanelComponentComponent implements OnInit {
     folder.clientModel.edit = true;
     folder._type = 'folder';
     this.actualFolder.files.push(folder);
+    this.recentlyAddedFile = folder
     console.log("file pushed")
   }
   onCreateProjectClick() {
@@ -140,6 +141,7 @@ export class LeftPanelComponentComponent implements OnInit {
     folder._type = 'project';
     folder.icon = ICON.PROJECT
     this.actualFolder.files.push(folder);
+    this.recentlyAddedFile = folder
     console.log("file pushed")
   }
   onDeleteClick() {
@@ -152,12 +154,23 @@ export class LeftPanelComponentComponent implements OnInit {
     })
   }
   fileFocusEventHandler(param) {
-    if (param.type == 'folder') {
-      this.createFolderToActual(param.name);
-    } else if (param.type == 'project') {
-      this.createProjectToActual(param.name);
-    }
+    if (this.actualFolder._type == 'projectFolderDto') {
+      this.createProjectFolderToActual(param.name);
+    } else
+      if (param.type == 'folder') {
+        this.createFolderToActual(param.name);
+      } else if (param.type == 'project') {
+        this.createProjectToActual(param.name);
+      }
     console.log('actual files', this.actualFolder.files)
+  }
+  recentlyAddedFile: any = null;
+  deleteRecentlyAddedFile() {
+    if (this.recentlyAddedFile) {
+      this.actualFolder.files = this.actualFolder.files.filter(f => f != this.recentlyAddedFile);
+      this.recentlyAddedFile = null;
+    }
+
   }
   fileDestroyHandler(param) {
     console.log('refilter')
@@ -181,7 +194,19 @@ export class LeftPanelComponentComponent implements OnInit {
       .get<FileResponse>(environment.api_url_http + endP.management + endP.create_folder + this.actualFolder.id + "?name=" + name.trim(), {
         headers: { 'Authorization': 'Bearer ' + getCookie("jwt_token") }
       })
-      .pipe(catchError(this.handleError<FileResponse>(this, 'getDiagram', null)))
+      .pipe(catchError(this.handleError<FileResponse>(this, 'createFolder', null)))
+      .subscribe((r) => {
+        console.log('folder arrived', r)
+        if (r)
+          this.setActualFolder(r)
+      })
+  }
+  createProjectFolderToActual(name: string) {
+    this.http
+      .get<FileResponse>(environment.api_url_http + endP.project_management + endP.create_folder + this.actualFolder.id + "?name=" + name.trim(), {
+        headers: { 'Authorization': 'Bearer ' + getCookie("jwt_token") }
+      })
+      .pipe(catchError(this.handleError<FileResponse>(this, 'createFolder', null)))
       .subscribe((r) => {
         console.log('folder arrived', r)
         if (r)
@@ -190,10 +215,10 @@ export class LeftPanelComponentComponent implements OnInit {
   }
   deleteFile(id, _type) {
     this.fileService.deleteFile(id, _type)
-      .pipe(catchError(this.handleError<FileResponse>(this, 'getFile', null)))
+      .pipe(catchError(this.handleError<FileResponse>(this, 'delFile', null)))
       .subscribe((r) => {
         if (r?.file._type) {
-          this.setActualFolder(r)
+          this.getFile(r.file.id, r.file._type)
         }
         console.log('file arrived', r)
         if (r) this.errorMsg = '';
@@ -238,10 +263,12 @@ export class LeftPanelComponentComponent implements OnInit {
       console.error(error); // log to console instead
       if (error.error.errorMsg) {
         view.errorMsg = JSON.stringify(error.error.errorMsg);
-        this.setActualFolder(error.error)
+        if (error.error.file._type == 'projectFolderDto') {
+          this.setActualProjectFolder(error.error);
+        }
       }
       else view.errorMsg = JSON.stringify(error.error);
-
+      this.deleteRecentlyAddedFile();
       view.snackBar.open(view.errorMsg, "Error", { duration: 2000 });
       // TODO: better job of transforming error for user consumption
       console.log(`${operation} failed: ${error.message}`);

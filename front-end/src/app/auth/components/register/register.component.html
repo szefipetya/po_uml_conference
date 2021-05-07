@@ -2,21 +2,41 @@
   <div class="col">
     <div class="row">
       <div class="col-md-6 offset-md-3 mt-4">
-        <h3>Register New Employer</h3>
-        <form>
+        <h3>Registration</h3>
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
           <div class="form-group">
             <label for="registerUsername">Username</label>
             <input
+              ngModel
+              required
+              #first="ngModel"
               type="text"
+              name="username"
               class="form-control"
               id="registerUsername"
               placeholder="Enter username"
             />
           </div>
           <div class="form-group">
+            <label for="registerName">Name</label>
+            <input
+              ngModel
+              #first="ngModel"
+              type="text"
+              name="name"
+              class="form-control"
+              id="registerName"
+              placeholder="Enter Full Name"
+            />
+          </div>
+          <div class="form-group">
             <label for="registerEmail">Email</label>
             <input
+              ngModel
+              required
+              #first="ngModel"
               type="email"
+              name="email"
               class="form-control"
               id="registerEmail"
               placeholder="Enter email"
@@ -25,16 +45,38 @@
           <div class="form-group">
             <label for="registerPassword">Password</label>
             <input
+              ngModel
+              required
+              #first="ngModel"
               type="password"
+              name="password"
               class="form-control"
               id="registerPassword"
               placeholder="Password"
             />
           </div>
-          <button type="submit" class="btn btn-primary mt-3">
-            Register <i class="fas fa-sign-in-alt"></i>
+          <div class="form-group">
+            <label for="registerPassword2">Repeat password</label>
+            <input
+              ngModel
+              required
+              #first="ngModel"
+              type="password"
+              name="password2"
+              class="form-control"
+              id="registerPassword2"
+              placeholder="Password Password again"
+            />
+          </div>
+          <button type="submit" class="btn-load btn btn-primary mt-2">
+            <div class="submit-text">Register</div>
+            <div class="lds-hourglass" *ngIf="this.isLoading"></div>
+            <i class="fas fa-sign-in-alt"></i>
           </button>
         </form>
+        <div class="errors">
+          <pre>{{ this.responseMsg }}</pre>
+        </div>
       </div>
     </div>
   </div>

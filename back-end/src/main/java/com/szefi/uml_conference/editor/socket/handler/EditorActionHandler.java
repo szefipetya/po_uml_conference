@@ -83,13 +83,16 @@ public class EditorActionHandler extends TextWebSocketHandler {
               if(u.getActionSocket().equals(session)){
                  D.log("user authenticating with "+message.getPayload(),this.getClass());
                   SocketAuthenticationRequest req=mapper.readValue(message.getPayload(), SocketAuthenticationRequest.class);
-                  MyUserDetails userDets=socketSecutiryService.authenticateRequest(req);
+                  MyUserDetails userDets=socketSecutiryService.authenticateAndAuthorizeRequest(req);
                   if(userDets!=null){
-                    this.sessionService.autoProcessRequest(socketSecutiryService.authenticateRequest(req),u,req);  u.getActionSocket().sendMessage(new TextMessage(u.getSession_jwt()));
+                   String jwt= this.sessionService.autoProcessRequest(socketSecutiryService.authenticateAndAuthorizeRequest(req),u,req); 
+                    u.getActionSocket().sendMessage(new TextMessage(jwt));
                     System.out.println("user authenticated");
                   }
                   else{
+                      
                       D.log("user authorization failed: access blocked.",this.getClass());
+                      session.close(CloseStatus.NORMAL);
                   }
    
                    System.out.println(initMap.get(session));

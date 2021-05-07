@@ -6,7 +6,6 @@ import { Rect } from './Rect';
 export class DiagramObject extends DynamicSerialObject {
   dimensionModel: Rect;
   scaledModel: DiagramObject_Scaled;
-  min_height: number;
   z: number;
   name: string;
   viewModel: DiagramObjectComponent; //ignored in rest

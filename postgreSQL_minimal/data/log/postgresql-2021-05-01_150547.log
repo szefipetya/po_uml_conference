@@ -1,0 +1,100 @@
+2021-05-01 15:05:47.990 CEST [13220] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 15:05:47.992 CEST [13220] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 15:05:47.992 CEST [13220] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 15:05:48.045 CEST [132] LOG:  database system was interrupted; last known up at 2021-05-01 15:05:25 CEST
+2021-05-01 15:05:48.196 CEST [14844] FATAL:  the database system is starting up
+2021-05-01 15:05:48.233 CEST [15168] FATAL:  the database system is starting up
+2021-05-01 15:05:48.269 CEST [10604] FATAL:  the database system is starting up
+2021-05-01 15:05:48.310 CEST [15768] FATAL:  the database system is starting up
+2021-05-01 15:05:48.367 CEST [12524] FATAL:  the database system is starting up
+2021-05-01 15:05:48.424 CEST [11124] FATAL:  the database system is starting up
+2021-05-01 15:05:48.462 CEST [10632] FATAL:  the database system is starting up
+2021-05-01 15:05:48.499 CEST [8592] FATAL:  the database system is starting up
+2021-05-01 15:05:48.536 CEST [132] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:05:48.539 CEST [132] LOG:  invalid record length at 0/250CEC0: wanted 24, got 0
+2021-05-01 15:05:48.539 CEST [132] LOG:  redo is not required
+2021-05-01 15:05:48.545 CEST [14636] FATAL:  the database system is starting up
+2021-05-01 15:05:48.568 CEST [13220] LOG:  database system is ready to accept connections
+2021-05-01 15:05:48.626 CEST [4180] FATAL:  the database system is starting up
+2021-05-01 15:06:31.358 CEST [7020] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.358 CEST [11364] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.359 CEST [16232] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.360 CEST [16368] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.361 CEST [12676] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.369 CEST [13444] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.370 CEST [13612] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.370 CEST [4232] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.373 CEST [15896] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:31.374 CEST [1396] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:06:33.180 CEST [13220] LOG:  server process (PID 14560) was terminated by exception 0xC000013A
+2021-05-01 15:06:33.180 CEST [13220] DETAIL:  Failed process was running: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_stat_activity WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Total",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Active",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Commits",
+	   (SELECT sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Rollbacks"
+	) 
+2021-05-01 15:06:33.180 CEST [13220] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:06:33.180 CEST [13220] LOG:  terminating any other active server processes
+2021-05-01 15:06:33.186 CEST [13220] LOG:  statistics collector process (PID 14824) was terminated by exception 0xC000013A
+2021-05-01 15:06:33.186 CEST [13220] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:06:33.189 CEST [13220] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:06:33.329 CEST [7124] LOG:  database system was interrupted; last known up at 2021-05-01 15:05:48 CEST
+2021-05-01 15:06:33.420 CEST [15932] FATAL:  the database system is in recovery mode
+2021-05-01 15:06:33.785 CEST [7124] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:06:33.788 CEST [7124] LOG:  redo starts at 0/250CF38
+2021-05-01 15:06:33.882 CEST [7124] LOG:  invalid record length at 0/25FFEB8: wanted 24, got 0
+2021-05-01 15:06:33.882 CEST [7124] LOG:  redo done at 0/25FFE80
+2021-05-01 15:06:33.948 CEST [13220] LOG:  database system is ready to accept connections
+2021-05-01 15:06:34.193 CEST [13220] LOG:  background worker "logical replication launcher" (PID 12380) was terminated by exception 0xC000013A
+2021-05-01 15:06:34.193 CEST [13220] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:06:34.193 CEST [13220] LOG:  terminating any other active server processes
+2021-05-01 15:06:34.197 CEST [13220] LOG:  statistics collector process (PID 4688) was terminated by exception 0xC000013A
+2021-05-01 15:06:34.197 CEST [13220] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:06:34.199 CEST [13220] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:06:34.237 CEST [1116] LOG:  database system was interrupted; last known up at 2021-05-01 15:06:33 CEST
+2021-05-01 15:06:34.424 CEST [13432] FATAL:  the database system is in recovery mode
+2021-05-01 15:06:34.630 CEST [1116] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:06:34.632 CEST [1116] LOG:  invalid record length at 0/25FFF30: wanted 24, got 0
+2021-05-01 15:06:34.633 CEST [1116] LOG:  redo is not required
+2021-05-01 15:06:34.659 CEST [13220] LOG:  database system is ready to accept connections
+2021-05-01 15:06:35.255 CEST [13220] LOG:  server process (PID 16316) was terminated by exception 0xC000013A
+2021-05-01 15:06:35.255 CEST [13220] DETAIL:  Failed process was running: 
+	        SELECT
+	            oid as id, rolname as name, rolsuper as is_superuser,
+	            CASE WHEN rolsuper THEN true ELSE rolcreaterole END as
+	            can_create_role,
+	            CASE WHEN rolsuper THEN true ELSE rolcreatedb END as can_create_db
+	        FROM
+	            pg_catalog.pg_roles
+	        WHERE
+	            rolname = current_user
+2021-05-01 15:06:35.255 CEST [13220] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:06:35.256 CEST [13220] LOG:  terminating any other active server processes
+2021-05-01 15:06:35.261 CEST [9008] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:06:35.261 CEST [9008] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:06:35.261 CEST [9008] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:06:35.264 CEST [13220] LOG:  statistics collector process (PID 9096) was terminated by exception 0xC000013A
+2021-05-01 15:06:35.264 CEST [13220] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:06:35.265 CEST [13220] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:06:35.303 CEST [15712] LOG:  database system was interrupted; last known up at 2021-05-01 15:06:34 CEST
+2021-05-01 15:06:35.420 CEST [16044] FATAL:  the database system is in recovery mode
+2021-05-01 15:06:35.673 CEST [15712] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:06:35.676 CEST [15712] LOG:  invalid record length at 0/25FFFA8: wanted 24, got 0
+2021-05-01 15:06:35.676 CEST [15712] LOG:  redo is not required
+2021-05-01 15:06:35.700 CEST [13220] LOG:  database system is ready to accept connections
+2021-05-01 15:06:38.278 CEST [13220] LOG:  received fast shutdown request
+2021-05-01 15:06:38.282 CEST [13220] LOG:  aborting any active transactions
+2021-05-01 15:06:38.282 CEST [1208] ERROR:  canceling statement due to user request
+2021-05-01 15:06:38.283 CEST [5044] FATAL:  terminating connection due to administrator command
+2021-05-01 15:06:38.283 CEST [12084] ERROR:  canceling statement due to user request
+2021-05-01 15:06:38.287 CEST [13220] LOG:  background worker "logical replication launcher" (PID 1208) exited with exit code 1
+2021-05-01 15:06:38.293 CEST [7052] LOG:  shutting down
+2021-05-01 15:06:38.315 CEST [13220] LOG:  database system is shut down

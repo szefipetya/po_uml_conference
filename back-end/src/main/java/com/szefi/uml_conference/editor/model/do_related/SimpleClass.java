@@ -6,6 +6,7 @@
 package com.szefi.uml_conference.editor.model.do_related;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
@@ -61,6 +62,21 @@ public class SimpleClass extends DiagramObject implements DynamicSerialContainer
         this.titleModel = titleModel;
     }
     
+    public void prepareConnectionsForSave(DiagramEntity dg){
+         for(SimpleClassElementGroup g: getGroups()){
+                               for(AttributeElement e:g.getAttributes()){
+                                 e.setId(null);
+                                  e.setGroup(g);
+                               }
+                              g.setId(null);
+                              g.setParentClass(this);                 
+                        }
+                          this.getTitleModel().setId(null);
+                          this.getTitleModel().setParent(this);
+                          this.setId(null);
+                  // cls.getDimensionModel().setDgObject(cls);
+                    this.setDiagram(dg);
+    }
     
   @Override
     public void injectSelfToStateMap(Map<Integer, Pair<SessionState, DynamicSerialObject>> sessionItemMap, Map<Integer, Pair<SessionState, DynamicSerialContainer_I>> sessionContainerMap) {

@@ -30,6 +30,7 @@ import com.szefi.uml_conference.management.model.dto.response.FileResponse;
 import com.szefi.uml_conference.management.model.entity.File_cEntity;
 import com.szefi.uml_conference.management.model.entity.FolderEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectEntity;
+import com.szefi.uml_conference.management.model.entity.project.ProjectFileEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
 import com.szefi.uml_conference.model.common.management.ICON;
 import com.szefi.uml_conference.security.model.UserEntity;
@@ -68,6 +69,8 @@ public class ProjectManagementService {
             throw new JwtExpiredException("Error: token expired");
         }
         if(name.equals("")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
+                if(name.equals("~")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
+
         UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
 
         File_cEntity fent = fileRepo.findById(parent_id).get();
@@ -75,7 +78,7 @@ public class ProjectManagementService {
          
         projectToAdd.setName(name);
        // this.diagramRepo.save(projectToAdd.getRootFolder().getDiagram());
-        if (!fent.getOwner().getId().equals(user.getId())) {
+        if (!fent.getOwner().getId().equals(user.getId())  ) {
             throw new UnAuthorizedActionException("Error: You are not te owner of the parend folder");
         }
         if (fent instanceof FolderEntity) {
@@ -86,16 +89,16 @@ public class ProjectManagementService {
             
             //inherit share rules
                 projectToAdd.getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
-                projectToAdd.getRootFolder().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
-                projectToAdd.getRootFolder().getDiagram().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
+              /*  projectToAdd.getRootFolder().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
+                projectToAdd.getRootFolder().getDiagram().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());*/
                          
                       this.fileRepo.save(projectToAdd);
           
             //update on the user side as well
                       parentFolderEnt.getUsersIamSaredWith().stream().forEach((UserEntity u)->{
                           u.getSharedFilesWithMe().add(projectToAdd); 
-                             u.getSharedFilesWithMe().add(projectToAdd.getRootFolder()); 
-                             u.getSharedDiagramsWithMe().add(projectToAdd.getRootFolder().getDiagram()); 
+                          /*   u.getSharedFilesWithMe().add(projectToAdd.getRootFolder()); 
+                             u.getSharedDiagramsWithMe().add(projectToAdd.getRootFolder().getDiagram()); */
                 userRepo.save(u);
                 });
             
@@ -126,16 +129,17 @@ public class ProjectManagementService {
             throw new JwtExpiredException("Error: token expired");
         }
         if(name.equals("")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
-      
+              if(name.equals("~")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
+
         UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
 
         File_cEntity fent = fileRepo.findById(parent_id).get();
         ProjectFolderEntity folderToAdd = new ProjectFolderEntity();
         folderToAdd.setName(name);
-      
+      ProjectFolderEntity pfolder=(ProjectFolderEntity)fent;
 
-        if (!fent.getOwner().getId().equals(user.getId())) {
-            throw new UnAuthorizedActionException("Error: You are not te owner of the parend folder");
+        if (!pfolder.getOwner().getId().equals(user.getId())&&!pfolder.getRelatedProject().getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(user.getId()))) {
+            throw new UnAuthorizedActionException("Error: You are not te owner of the project or not invited");
         }
         if (fent instanceof ProjectFolderEntity) {
             ProjectFolderEntity parentFolderEnt = (ProjectFolderEntity) fent;
@@ -151,17 +155,17 @@ public class ProjectManagementService {
             folderToAdd.setDiagram(dg);
             
           //inherit share rules
-                folderToAdd.getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
-                folderToAdd.getDiagram().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
+              /* folderToAdd.getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
+                folderToAdd.getDiagram().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());*/
                     
                       this.fileRepo.save(folderToAdd);
            parentFolderEnt= this.fileRepo.save(parentFolderEnt);
             //update on the user side as well
-                      parentFolderEnt.getUsersIamSaredWith().stream().forEach((UserEntity u)->{
+                     /* parentFolderEnt.getUsersIamSaredWith().stream().forEach((UserEntity u)->{
                           u.getSharedFilesWithMe().add(folderToAdd);    
                           u.getSharedDiagramsWithMe().add(folderToAdd.getDiagram());
                 userRepo.save(u);
-                });
+                });*/
            
             injectPackageObjectToParentDiagram(parentFolderEnt, folderToAdd);
           
@@ -263,9 +267,9 @@ public class ProjectManagementService {
      
      try {
             File_cEntity ent= fileRepo.findById(id).get();
-         
-            if ( ent.getOwner().getId().equals(user.getId())
-                       ||ent.getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(user.getId()))) {
+            
+            if ( ((ProjectFileEntity)ent).getRelatedProject().getOwner().getId().equals(user.getId())
+                       ||((ProjectFileEntity)ent).getRelatedProject().getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(user.getId()))) {
                    ProjectFolderDto dto = new ProjectFolderDto((ProjectFolderEntity)ent);
                 FileResponse resp= new FileResponse(ent,dto,user);
               
@@ -300,5 +304,32 @@ public class ProjectManagementService {
                         
                   }else throw new UnAuthorizedActionException("you don't have the authority to execute this action");
                  // return null;
+        }
+
+   /* void updateShareRecursivelyOnProjectFolder(ProjectFolderEntity pFolder, UserEntity targetUser) {
+        this.updateShareOnFile(pFolder, targetUser);
+      
+         
+       pFolder.getFiles().stream().forEach(f->{
+               if(f instanceof ProjectFolderEntity)
+            updateShareRecursivelyOnProjectFolder((ProjectFolderEntity)f, targetUser);
+                    }); 
+          
+       
+    }*/
+                  private  void updateShareOnFile(File_cEntity file,UserEntity targetUser){
+           targetUser.getSharedFilesWithMe().add(file);
+          file.getUsersIamSaredWith().add(targetUser);
+            fileRepo.save(file);
+   }
+
+    
+    public void  deleteShareRuleRecursively(ProjectFileEntity ent){
+          fileRepo.deleteShareRulesByFileId(ent.getId());
+            if(ent instanceof ProjectFolderEntity){
+                ((ProjectFolderEntity)ent).getFiles().stream().forEach(f->deleteShareRuleRecursively(f));
+            }
+             fileRepo.deleteById(ent.getId());
+          
         }
 }

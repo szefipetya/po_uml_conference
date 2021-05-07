@@ -1,0 +1,1 @@
+"./postgreSQL_minimal/bin/pg_ctl.exe" start -D  "./postgreSQL_minimal/data"

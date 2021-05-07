@@ -45,7 +45,7 @@ public class FolderDto extends File_cDto{
         List<File_cEntity> resList=new ArrayList();
         resList.addAll(p_files);
         for(File_cEntity f:p_files){ 
-            if(f instanceof ProjectEntity||f.getName().equals("~")||f instanceof ProjectFolderEntity){
+            if(f.getName().equals("~")||f instanceof ProjectFolderEntity){
                   resList.remove(f);  
                 }
             if(f.getParentFolder()!=null){ 

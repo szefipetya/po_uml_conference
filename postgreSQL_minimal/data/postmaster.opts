@@ -1,0 +1,1 @@
+c:/#DEV/#SZAKDOLI/#PROJEKT/postgreSQL_minimal/bin/postgres.exe "-D" "./postgreSQL_minimal/data"

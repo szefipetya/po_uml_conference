@@ -29,7 +29,6 @@ import com.szefi.uml_conference.security.model.User_PublicDto;
         include=JsonTypeInfo.As.PROPERTY,
         property="_type")
 @JsonSubTypes({
-      
         @JsonSubTypes.Type(value=FileHeader_I.class, name="file"),
         @JsonSubTypes.Type(value=FolderDto.class, name="FolderDto"),
         @JsonSubTypes.Type(value=FolderHeaderDto.class, name="folder"),

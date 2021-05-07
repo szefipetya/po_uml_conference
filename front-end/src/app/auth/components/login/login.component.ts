@@ -22,9 +22,6 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
   }
   sendLogin(authReq: AuthRequest) {
-
-
-
     return this.http.post(environment.api_url_http + 'login', authReq, {
       observe: 'response'
     }).pipe(tap(
@@ -59,6 +56,8 @@ export class LoginComponent implements OnInit {
         component.responseMsg = "Error: Server endpoint unreachable"
       } else if (error.status == 0) {
         component.responseMsg = "Error: Server unreachable"
+      } else {
+        component.responseMsg = error.error;
       }
     }
     // Return an observable with a user-facing error message.

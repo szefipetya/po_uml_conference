@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -44,6 +45,7 @@ public class PackageObject extends DiagramObject {
      //   @LazyCollection(LazyCollectionOption.FALSE)
 
   // @OneToMany(cascade = CascadeType.ALL,mappedBy = "parent")
+    @Column(length = 10000)
      @Convert(converter = PackageElementsListConverter.class)
     private List<PackageElement> elements=new ArrayList<>();    
 

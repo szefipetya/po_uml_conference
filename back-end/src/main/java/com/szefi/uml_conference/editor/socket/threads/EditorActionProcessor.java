@@ -382,6 +382,7 @@ try{
             }
 }catch(Exception ex){
     D.log("EditorActionProcessor thread catched an exception:\n"+ex.getMessage(),ex.getClass(),DLEVEL.ERR);
+    ex.printStackTrace();
 }
             // if(action==null) continue;   
 

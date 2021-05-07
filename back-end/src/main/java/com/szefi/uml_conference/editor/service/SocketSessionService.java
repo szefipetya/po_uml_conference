@@ -119,7 +119,7 @@ public class SocketSessionService {
  
     @Autowired
     UserRepository userRepo;//temp
- @EventListener(ApplicationReadyEvent.class)
+ //@EventListener(ApplicationReadyEvent.class)
     public void init() {
         try {
           //  EditorSession session=new EditorSession();
@@ -208,7 +208,7 @@ public class SocketSessionService {
        return this.tokenToSession(token).getUserSockets();
    }
    
-    public EditorSession autoProcessRequest( MyUserDetails details,UserWebSocket userSocket,SocketAuthenticationRequest req) {
+    public String autoProcessRequest( MyUserDetails details,UserWebSocket userSocket,SocketAuthenticationRequest req) {
         //step 1 ://find a diagram that matches the req.getDiagram_id()
                   //if not found, create a new session and load the diagram from the database.
        //step 2: Inject the user to the session with  a session Token as an identificator. This enables one users to connect to multiple sessions.
@@ -239,7 +239,7 @@ public class SocketSessionService {
       
           sessions.add(s);
       }
-      return s;
+      return userSocket.getSession_jwt();
     }
     
     public Pair<UserWebSocket,EditorSession> findSessionForNativeSocketAndReturnUserSocket(SOCKET type,WebSocketSession socket){
@@ -270,19 +270,20 @@ public class SocketSessionService {
             D.log("Session "+s.getId()+" have been deleted due to userCount=0", this.getClass(),DLEVEL.INFO);
         }
     }
-    public void injectClassHeaderToParentsPackageObject(Integer class_id){
-        SimpleClass clas=(SimpleClass)objectRepo.findById(class_id).get();
+    public void injectClassHeaderToParentsPackageObject(SimpleClass clas){
+        //SimpleClass clas=(SimpleClass)objectRepo.findById(class_id).get();
       if(clas.getDiagram().getRelatedFolder().getParentProjectFolder()!=null){
        Optional<PackageObject> savedPackageOpt=clas.getDiagram().getRelatedFolder().getParentProjectFolder().getDiagram().getDgObjects().stream().map(obj->{
         if(obj instanceof PackageObject){
         PackageObject pack=(PackageObject)obj;
+        pack=(PackageObject)objectRepo.findById(pack.getId()).get();
         if(pack.getTitleModel().getName().equals( clas.getDiagram().getRelatedFolder().getName()))
         {
               PackageElement classPackageModel=new PackageElement();
                           classPackageModel.setName(clas.getTitleModel().getName());
                           classPackageModel.setIcon(ICON.PROJECT_CLASS);
                          // classPackageModel.setParent(pack);
-                          classPackageModel.setReferencedObjectId(class_id);
+                          classPackageModel.setReferencedObjectId(clas.getId());
                           pack.getElements().add(classPackageModel);
                         return objectRepo.save(pack);
         }
@@ -298,7 +299,7 @@ public class SocketSessionService {
     
       public void updateClassHeaderToParentsPackageObject(Integer class_id){
         SimpleClass clas=(SimpleClass)objectRepo.findById(class_id).get();
-      
+      if(clas.getDiagram().getRelatedFolder().getParentProjectFolder()!=null){
        Optional<PackageObject> savedPackageOpt=clas.getDiagram().getRelatedFolder().getParentProjectFolder().getDiagram().getDgObjects().stream().map(obj->{
         if(obj instanceof PackageObject){
         PackageObject pack=(PackageObject)obj;
@@ -313,10 +314,10 @@ public class SocketSessionService {
         }
             }
         return null;
-        }).findFirst();
+        }).filter(l->l!=null).findFirst();
        if(savedPackageOpt.isPresent())
           sendObjectToSessionIfExists(savedPackageOpt.get(),  clas.getDiagram().getRelatedFolder().getParentProjectFolder().getDiagram().getId());
-       
+      }
     }
       
        public void deleteClassSoRemoveItFromParentPackageObject(PackageObject savedPackageOpt){
@@ -339,7 +340,11 @@ public class SocketSessionService {
             }
         return null;
         }).findFirst();*/
+            try{
            savedPackageOpt= this.objectRepo.save(savedPackageOpt);
+            }catch(Exception e){
+                D.log(e.getMessage());
+            }
            //diagramRepo.save(savedPackageOpt.getDiagram());
           sendObjectToSessionIfExists(savedPackageOpt,  savedPackageOpt.getDiagram().getId());
       

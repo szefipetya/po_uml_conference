@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -44,7 +45,7 @@ public class Line extends DynamicSerialObject implements AutoSessionInjectable_I
  private Integer object_end_id;
 //@LazyCollection(LazyCollectionOption.FALSE)
  //@OneToMany(mappedBy = "line",cascade=CascadeType.ALL)
- 
+ @Column(length = 5000)
 @Convert(converter = BreakPointListConverter.class)
  private List<BreakPoint> breaks;
  

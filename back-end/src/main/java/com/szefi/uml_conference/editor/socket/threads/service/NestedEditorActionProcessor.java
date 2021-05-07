@@ -269,7 +269,7 @@ NestedEditorActionProcessor(){
            
                 break;
   case S_INJECT_CLASS_HEADER_TO_PACKAGE:
-      this.service.injectClassHeaderToParentsPackageObject(action.getTarget().getTarget_id());
+      this.service.injectClassHeaderToParentsPackageObject((SimpleClass)((ServerSideEditorAction)action).getLoad());
      // this.service.injectClassHeaderToParentsPackageObject((SimpleClass)((ServerSideEditorAction)action).getLoad());
       //.S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE
       break;

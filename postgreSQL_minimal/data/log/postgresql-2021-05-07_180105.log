@@ -1,0 +1,34 @@
+2021-05-07 18:01:05.888 CEST [31724] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-07 18:01:05.896 CEST [31724] LOG:  listening on IPv6 address "::", port 8102
+2021-05-07 18:01:05.896 CEST [31724] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-07 18:01:05.983 CEST [12192] LOG:  database system was interrupted; last known up at 2021-05-06 22:49:11 CEST
+2021-05-07 18:01:08.109 CEST [12192] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-07 18:01:08.113 CEST [12192] LOG:  redo starts at 0/3C51640
+2021-05-07 18:01:08.113 CEST [12192] LOG:  invalid record length at 0/3C51678: wanted 24, got 0
+2021-05-07 18:01:08.114 CEST [12192] LOG:  redo done at 0/3C51640
+2021-05-07 18:01:08.149 CEST [31724] LOG:  database system is ready to accept connections
+2021-05-07 23:57:03.536 CEST [31724] LOG:  server process (PID 30472) was terminated by exception 0xC000013A
+2021-05-07 23:57:03.536 CEST [31724] DETAIL:  Failed process was running: SET application_name = 'PostgreSQL JDBC Driver'
+2021-05-07 23:57:03.536 CEST [31724] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-07 23:57:03.537 CEST [31724] LOG:  terminating any other active server processes
+2021-05-07 23:57:03.562 CEST [15216] WARNING:  terminating connection because of crash of another server process
+2021-05-07 23:57:03.562 CEST [15216] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-07 23:57:03.562 CEST [15216] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-07 23:57:03.563 CEST [18884] WARNING:  terminating connection because of crash of another server process
+2021-05-07 23:57:03.563 CEST [18884] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-07 23:57:03.563 CEST [18884] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-07 23:57:03.564 CEST [21848] WARNING:  terminating connection because of crash of another server process
+2021-05-07 23:57:03.564 CEST [21848] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-07 23:57:03.564 CEST [21848] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-07 23:57:03.564 CEST [35640] WARNING:  terminating connection because of crash of another server process
+2021-05-07 23:57:03.564 CEST [35640] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-07 23:57:03.564 CEST [35640] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-07 23:57:03.600 CEST [13516] WARNING:  terminating connection because of crash of another server process
+2021-05-07 23:57:03.600 CEST [13516] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-07 23:57:03.600 CEST [13516] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-07 23:57:03.665 CEST [31724] LOG:  all server processes terminated; reinitializing
+2021-05-07 23:57:03.707 CEST [29380] LOG:  database system was interrupted; last known up at 2021-05-07 23:26:10 CEST
+2021-05-07 23:57:04.239 CEST [29380] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-07 23:57:04.243 CEST [29380] LOG:  redo starts at 0/3D87D90
+2021-05-07 23:57:04.244 CEST [29380] LOG:  invalid record length at 0/3D87E78: wanted 24, got 0
+2021-05-07 23:57:04.244 CEST [29380] LOG:  redo done at 0/3D87E40

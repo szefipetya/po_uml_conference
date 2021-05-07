@@ -1,0 +1,109 @@
+2021-05-01 15:35:15.864 CEST [15928] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 15:35:15.866 CEST [15928] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 15:35:15.866 CEST [15928] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 15:35:15.919 CEST [14448] LOG:  database system was interrupted; last known up at 2021-05-01 15:33:35 CEST
+2021-05-01 15:35:16.343 CEST [14448] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:35:16.346 CEST [14448] LOG:  invalid record length at 0/2892598: wanted 24, got 0
+2021-05-01 15:35:16.346 CEST [14448] LOG:  redo is not required
+2021-05-01 15:35:16.380 CEST [15928] LOG:  database system is ready to accept connections
+2021-05-01 16:23:14.293 CEST [12604] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.295 CEST [15916] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.296 CEST [2344] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.299 CEST [15964] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.300 CEST [9012] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.303 CEST [15676] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.305 CEST [16500] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.305 CEST [11376] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.307 CEST [1020] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:23:14.311 CEST [3716] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.661 CEST [12044] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.665 CEST [4636] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.675 CEST [14976] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.676 CEST [1108] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.684 CEST [16208] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.684 CEST [17208] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.687 CEST [1396] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.694 CEST [16388] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.694 CEST [17368] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:44:38.694 CEST [8960] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.947 CEST [7508] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.951 CEST [5596] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.952 CEST [16820] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.955 CEST [5644] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.960 CEST [17224] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.961 CEST [17028] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.965 CEST [17000] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.970 CEST [12296] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.970 CEST [14716] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:52:43.974 CEST [8428] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 16:57:43.218 CEST [15928] LOG:  server process (PID 1704) was terminated by exception 0xC000013A
+2021-05-01 16:57:43.218 CEST [15928] DETAIL:  Failed process was running: SET application_name = 'PostgreSQL JDBC Driver'
+2021-05-01 16:57:43.218 CEST [15928] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 16:57:43.219 CEST [15928] LOG:  terminating any other active server processes
+2021-05-01 16:57:43.223 CEST [492] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:57:43.223 CEST [492] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:57:43.223 CEST [492] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:57:43.226 CEST [10432] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:57:43.226 CEST [10432] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:57:43.226 CEST [10432] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:57:43.229 CEST [1788] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:57:43.229 CEST [1788] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:57:43.229 CEST [1788] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:57:43.230 CEST [11044] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:57:43.230 CEST [11044] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:57:43.230 CEST [11044] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:57:43.235 CEST [14340] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:57:43.235 CEST [14340] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:57:43.235 CEST [14340] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:57:43.235 CEST [10168] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:57:43.235 CEST [10168] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:57:43.235 CEST [10168] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:57:43.243 CEST [16448] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:57:43.243 CEST [16448] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:57:43.243 CEST [16448] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:57:43.264 CEST [15928] LOG:  all server processes terminated; reinitializing
+2021-05-01 16:57:43.306 CEST [16324] LOG:  database system was interrupted; last known up at 2021-05-01 16:55:31 CEST
+2021-05-01 16:57:43.807 CEST [16324] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 16:57:43.811 CEST [16324] LOG:  redo starts at 0/2D5F120
+2021-05-01 16:57:43.829 CEST [16324] LOG:  invalid record length at 0/2D6C500: wanted 24, got 0
+2021-05-01 16:57:43.829 CEST [16324] LOG:  redo done at 0/2D6C458
+2021-05-01 16:57:43.880 CEST [15928] LOG:  database system is ready to accept connections
+2021-05-01 16:57:45.246 CEST [15928] LOG:  background worker "logical replication launcher" (PID 14164) was terminated by exception 0xC000013A
+2021-05-01 16:57:45.246 CEST [15928] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 16:57:45.247 CEST [15928] LOG:  terminating any other active server processes
+2021-05-01 16:57:45.251 CEST [15928] LOG:  statistics collector process (PID 14868) was terminated by exception 0xC000013A
+2021-05-01 16:57:45.251 CEST [15928] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 16:57:45.252 CEST [15928] LOG:  all server processes terminated; reinitializing
+2021-05-01 16:57:45.295 CEST [16744] LOG:  database system was interrupted; last known up at 2021-05-01 16:57:43 CEST
+2021-05-01 16:57:45.729 CEST [16744] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 16:57:45.732 CEST [16744] LOG:  invalid record length at 0/2D6C578: wanted 24, got 0
+2021-05-01 16:57:45.732 CEST [16744] LOG:  redo is not required
+2021-05-01 16:57:45.764 CEST [15928] LOG:  database system is ready to accept connections
+2021-05-01 16:59:18.644 CEST [15928] LOG:  server process (PID 6836) was terminated by exception 0xC000013A
+2021-05-01 16:59:18.644 CEST [15928] DETAIL:  Failed process was running: SET application_name = 'PostgreSQL JDBC Driver'
+2021-05-01 16:59:18.644 CEST [15928] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 16:59:18.645 CEST [15928] LOG:  terminating any other active server processes
+2021-05-01 16:59:18.653 CEST [10188] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:59:18.653 CEST [10188] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:59:18.653 CEST [10188] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:59:18.654 CEST [5344] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:59:18.654 CEST [5344] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:59:18.654 CEST [5344] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:59:18.655 CEST [8480] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:59:18.655 CEST [8480] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:59:18.655 CEST [8480] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:59:18.657 CEST [17192] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:59:18.657 CEST [17192] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:59:18.657 CEST [17192] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:59:18.660 CEST [14348] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:59:18.660 CEST [14348] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:59:18.660 CEST [14348] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:59:18.663 CEST [8592] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:59:18.663 CEST [8592] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:59:18.663 CEST [8592] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:59:18.663 CEST [3676] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:59:18.663 CEST [3676] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:59:18.663 CEST [3676] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 16:59:18.666 CEST [17068] WARNING:  terminating connection because of crash of another server process
+2021-05-01 16:59:18.666 CEST [17068] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 16:59:18.666 CEST [17068] HINT:  In a moment you should be able to reconnect to the database and repeat your command.

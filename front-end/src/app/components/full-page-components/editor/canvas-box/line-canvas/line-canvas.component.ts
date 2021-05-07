@@ -5,6 +5,7 @@ import { LineCanvas } from '../../../../models/line/LineCanvas';
 import { clone1, Pair } from '../../../../../utils/utils';
 import {
   AfterContentInit,
+  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
@@ -18,7 +19,7 @@ import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClas
 import { Canvas } from 'src/app/components/models/Diagram/Canvas';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
-import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
+import { DiagramObject_General } from 'src/app/components/models/DiagramObjects/DiagramObject_General';
 import { LINE_HEAD } from 'src/app/components/models/line/LINE_HEAD';
 import { Point } from 'src/app/components/models/line/Point';
 import { LineController } from 'src/app/components/models/line/LineController';
@@ -34,14 +35,14 @@ import { SessionState } from 'src/app/components/models/socket/SessionState';
 import { CommonService, MSG_TYPE } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TYPE';
-
+import { MathHelper } from "./MathHelper";
 @Component({
   selector: 'app-line-canvas',
   templateUrl: './line-canvas.component.html',
   styleUrls: ['./line-canvas.component.scss'],
 })
 export class LineCanvasComponent
-  implements OnInit, AfterContentInit, SessionInteractiveContainer {
+  implements OnInit, AfterViewInit, SessionInteractiveContainer {
   deleteController(cont: LineController) {
     this.editorService.model.lines = this.editorService.model.lines.filter((l) => l.id != cont.getId());
 
@@ -58,16 +59,13 @@ export class LineCanvasComponent
     public editorService: GlobalEditorService,
     private socket: EditorSocketControllerService,
     private commonService: CommonService
-  ) { }
+  ) {
+    this.mathHelper = new MathHelper(this);
+  }
   createItem(model: DynamicSerialObject, extra?: any) {
     this.createLineWithControllerLocally(model as Line);
   }
-  hasItem(target_id: string) {
-    throw new Error('Method not implemented.');
-  }
-  restoreItem(item_id: string, model: DynamicSerialObject) {
-    throw new Error('Method not implemented.');
-  }
+
   deleteItem(item_id: string) {
     // this.editorService.model.lines = this.editorService.model.lines.filter((l) => l.id != item_id);
     this.lineControllers.map((lc) => { if (lc.getId() == item_id) lc.deleteSelfFromParent() });
@@ -107,15 +105,16 @@ export class LineCanvasComponent
   public ctx: CanvasRenderingContext2D;
   @Input() lineCanvasModel: LineCanvas;
   @Input() canvasModel: Canvas;
-  @Input() class_general: SimpleClass_General;
+  @Input() class_general: DiagramObject_General;
   // @Input() dgObjects: DiagramObject[];
   // @Input() lines: Line[]; //does not work because at init, this will be null
   lineControllers: LineController[] = [];
   lineInstance: Line;
-  ngAfterContentInit(): void {
+  selectedLine: Line;
+  ngAfterViewInit(): void {
     setTimeout(() => {
       this.init();
-    }, 1);
+    }, 100);
   }
   lineHeads;
   LINE_WIDTH = 3;
@@ -123,7 +122,7 @@ export class LineCanvasComponent
   LINE_DEFAULT_STROKE = 'black';
   init() {
     this.ctx = this.canvasDOM.nativeElement.getContext('2d');
-    this.ctx.canvas.onload = this.update;
+    //  this.ctx.canvas.onload = this.update;
     let ctx = this.ctx;
     this.ctx.fillStyle = 'red';
     this.ctx.fillRect(0, 0, 5, 5);
@@ -157,6 +156,10 @@ export class LineCanvasComponent
       },
     ];
     this.update();
+    if (this.ctx == null) {
+      console.error('canvas context could not load, retrying...')
+      setTimeout(() => { this.init() }, 100);
+    }
   }
   getLineHeadImg(h: LINE_HEAD): any {
     return this.lineHeads.filter((l) => l.head == h)[0].img;
@@ -171,7 +174,9 @@ export class LineCanvasComponent
     } catch (e) {
       console.error('line endpoints did not found');
       caster?.deleteSelfFromParent();
-      throw new Error("end_object_not_found")
+      //this.update();
+      throw new Error("end_object_not_found");
+
       return null;
     }
 
@@ -196,7 +201,6 @@ export class LineCanvasComponent
   }
   drawMove(e) {
     if (!this.lineInstance?.object_start_id) return;
-
     this.update();
     let ctx = this.ctx;
     ctx.beginPath();
@@ -228,9 +232,6 @@ export class LineCanvasComponent
         (c) => target.dataset.id == c.id
       )[0].id;
       if (this.lineInstance.object_end_id != this.lineInstance.object_start_id) {
-
-
-
         this.createLineWithControllerLocally(this.lineInstance);
         this.lineInit(this.lineInstance);
         this.sendLineCreated(this.lineInstance);
@@ -281,38 +282,15 @@ export class LineCanvasComponent
   }
 
   TO_RADIANS = Math.PI / 180;
-  drawRotatedImage(image, x, y, angle) {
-    // save the current co-ordinate system
-    // before we screw with it
-    let ctx = this.ctx;
-    ctx.save();
-
-    // move to the middle of where we want to draw our image
-    ctx.translate(x, y);
-
-    // rotate around that point, converting our
-    // angle from degrees to radians
-    ctx.rotate(angle * this.TO_RADIANS);
-
-    // draw it up and to the left by half the width
-    // and height of the image
-    ctx.drawImage(image, -(image.width / 2), -(image.height / 2));
-
-    // and restore the co-ords to how they were when we began
-    ctx.restore();
-  }
-  drawWithRotation(angle, fn) {
-    let ctx = this.ctx;
-    ctx.save(); // save current state
-    ctx.rotate(angle); // rotate
-    fn();
-    ctx.restore(); // restore original states (no rotation etc)
-  }
 
   update() {
     this.clear();
     this.lineControllers.map((l) => {
-      l.drawLine();
+      try {
+        l.drawLine();
+      } catch (err) {
+        console.error(err);
+      }
     });
   }
 
@@ -327,10 +305,9 @@ export class LineCanvasComponent
   }
   drawStoredLines() { }
   onMouseDown(e) {
-
     if (
       this.selectedLine &&
-      this.selectedLine == this.getTheLineThatsIntersectingWithCursor(e)
+      this.selectedLine == this.mathHelper.getTheLineThatsIntersectingWithCursor(e)
     ) {
       if (!this.getControllerById(this.selectedLine.id).isAccessible()) return
       this.transformingLine = this.selectedLine;
@@ -346,7 +323,7 @@ export class LineCanvasComponent
         }
       });
       if (!found) {
-        let pair = this.findThe2BreakPointsNearby(this.transformingLine, e);
+        let pair = this.mathHelper.findThe2BreakPointsNearby(this.transformingLine, e);
         //thepairs first thing is the start object itself
         let index = this.transformingLine.breaks_scaled.length;
         try {
@@ -399,6 +376,9 @@ export class LineCanvasComponent
     this.transformingLine = null;
     this.transformingPoint = null;
   }
+  isLineSelected(): boolean {
+    return this.selectedLine != null;
+  }
 
   isTransformingInprogress(): boolean {
     return this.transformingLine != null;
@@ -415,7 +395,7 @@ export class LineCanvasComponent
     }
   }
   onClick(e: MouseEvent) {
-    let newselected = this.getTheLineThatsIntersectingWithCursor(e);
+    let newselected = this.mathHelper.getTheLineThatsIntersectingWithCursor(e);
     if (newselected) {//new selection,
 
       this.getControllerById(newselected.id).editBegin();
@@ -424,340 +404,26 @@ export class LineCanvasComponent
     this.selectedLine = newselected;
     this.update();
   }
-  getTheLineThatsIntersectingWithCursor(e) {
-    let mousePoint = this.getMousePoint(e);
-    let return_p = null;
+  mathHelper: MathHelper;
 
-    let return_line = null;
-    let box = new DiagramObject_Scaled();
-    box.posx_scaled = mousePoint.x - 2;
-    box.posy_scaled = mousePoint.y - 2;
-    box.width_scaled = 4;
-    box.height_scaled = 4;
-
-    this.editorService.model.lines.map((l) => {
-      let prevPoint = new BreakPoint();
-      try {
-
-
-        prevPoint.point = this.getCenter(this.getDgObjectById(l.object_start_id), this.getControllerById(l.id));
-      } catch (error) {
-        console.error(error);
-        return;
-      }
-      if (prevPoint.point) {
-        l.breaks_scaled.map((b) => {
-          return_p = this.getVectorInterSectionWithBox(
-            new Vector(
-              prevPoint?.point.x,
-              prevPoint?.point.y,
-              b.point.x,
-              b.point.y
-            ),
-            box
-          );
-          let pointBox = new DiagramObject_Scaled();
-          pointBox.posx_scaled = b.point.x - 5;
-          pointBox.posy_scaled = b.point.y - 5;
-          pointBox.width_scaled = 10;
-          pointBox.height_scaled = 10;
-          if (
-            this.getVectorInterSectionWithBox(
-              new Vector(
-                b.point.x - 10,
-                b.point.y - 10,
-                b.point.x + 10,
-                b.point.y + 10
-              ),
-              box
-            ).x > 0 ||
-            this.getVectorInterSectionWithBox(
-              new Vector(
-                b.point.x + 10,
-                b.point.y + 10,
-                b.point.x - 10,
-                b.point.y - 10
-              ),
-              box
-            ).x > 0
-          ) {
-            b.edit = true;
-            return_line = l;
-          } else {
-            b.edit = false;
-          }
-          prevPoint = b;
-          if (return_p?.x > 0) {
-            return_line = l;
-          }
-        });
-        let endPoint
-        try {
-          endPoint = this.getCenter(this.getDgObjectById(l.object_end_id), this.getControllerById(l.id));
-        } catch (error) {
-          console.error(error);
-          return;
-        }
-        let ret2;
-        if (return_p?.x > 0) {
-          return_line = l;
-          return;
-        } else {
-          ret2 = this.getVectorInterSectionWithBox(
-            new Vector(
-              prevPoint.point.x,
-              prevPoint.point.y,
-              endPoint.x,
-              endPoint.y
-            ),
-            box
-          );
-          if (ret2?.x > 0) {
-            return_line = l;
-            return;
-          }
-        }
-      }
-
-    });
-
-    return return_line;
+  getMousePoint(e) {
+    var rect = this.canvasDOM.nativeElement.getBoundingClientRect();
+    let mousex = e.clientX - rect.x;
+    let mousey = e.clientY - rect.y;
+    return new Point(mousex, mousey);
   }
-  selectedLine: Line;
-  isLineSelected(): boolean {
-    return this.selectedLine != null;
-  }
-
-
-  strike(stroke_style: string, width: number, p1: Point, p2: Point) {
-    let ctx = this.ctx;
-    ctx.lineWidth = width;
-    ctx.strokeStyle = stroke_style;
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(p2.x, p2.y);
-    ctx.stroke();
-  }
-
-  makeBoxFromCursor(e): DiagramObject_Scaled {
-    let mousePoint = this.getMousePoint(e);
-    let return_p = null;
-
-    let return_line = null;
-    let box = new DiagramObject_Scaled();
-    box.posx_scaled = mousePoint.x - 10;
-    box.posy_scaled = mousePoint.y - 10;
-    box.width_scaled = 20;
-    box.height_scaled = 20;
-    return box;
-  }
-
-  findThe2BreakPointsNearby(
-    l: Line,
-    e: MouseEvent
-  ): Pair<BreakPoint, BreakPoint> {
-    let pair = new Pair<BreakPoint, BreakPoint>(null, null);
-    let box: DiagramObject_Scaled = this.makeBoxFromCursor(e);
-    let prevPoint = new BreakPoint();
-    let p1;
-    try {
-      prevPoint.point = this.getCenter(this.getDgObjectById(l.object_start_id), this.getControllerById(l.id));
-
-    } catch (error) {
-      console.error(error);
-      return;
-    }
-    l.breaks_scaled.map((b) => {
-      p1 = this.getVectorInterSectionWithBox(
-        new Vector(
-          prevPoint?.point.x,
-          prevPoint?.point.y,
-          b.point.x,
-          b.point.y
-        ),
-        box
-      );
-      if (p1.x > 0) {
-        pair.key = prevPoint;
-        pair.value = b;
-        return;
-      }
-      prevPoint = b;
-    });
-    let endPoint;
-    try {
-      endPoint = this.getCenter(this.getDgObjectById(l.object_end_id), this.getControllerById(l.id));
-    } catch (error) {
-      console.error(error);
-      return;
-    }
-
-    let p2 = this.getVectorInterSectionWithBox(
-      new Vector(prevPoint.point.x, prevPoint.point.y, endPoint.x, endPoint.y),
-      box
-    );
-    if (p2?.x > 0) {
-      pair.key = prevPoint;
-      pair.value = new BreakPoint(endPoint.x, endPoint.y);
-    }
-    return pair;
-  }
-
-  getBoxInterSectionWithBox(
-    box: DiagramObject_Scaled,
-    box2: DiagramObject_Scaled
-  ): Point {
-    let t_vec: Vector;
-    t_vec = new Vector();
-    t_vec.sx = box.posx_scaled;
-    t_vec.sy = box.posy_scaled;
-
-    t_vec.ey = t_vec.sy;
-    t_vec.ex =
-      box.posx_scaled + box.width_scaled + this.getClassGeneralDimension();
-
-    let l_vec: Vector;
-    l_vec = new Vector();
-    l_vec.sx = box.posx_scaled;
-    l_vec.sy = box.posy_scaled;
-
-    l_vec.ex = l_vec.sx;
-    l_vec.ey =
-      box.posy_scaled + box.height_scaled + this.getClassGeneralDimension();
-
-    let b_vec: Vector;
-    b_vec = new Vector();
-    b_vec.sx = box.posx_scaled;
-    b_vec.sy =
-      box.posy_scaled + box.height_scaled + this.getClassGeneralDimension();
-
-    b_vec.ex = b_vec.sx + box.width_scaled + this.getClassGeneralDimension();
-    b_vec.ey = b_vec.sy;
-
-    let r_vec: Vector;
-    r_vec = new Vector();
-    r_vec.sx =
-      box.posx_scaled + box.width_scaled + this.getClassGeneralDimension();
-    r_vec.sy = box.posy_scaled;
-
-    r_vec.ex = r_vec.sx;
-    r_vec.ey = r_vec.sy + box.height_scaled + this.getClassGeneralDimension();
-
-    let t2_vec: Vector;
-    t2_vec = new Vector();
-    t2_vec.sx = box2.posx_scaled;
-    t2_vec.sy = box2.posy_scaled;
-
-    t2_vec.ey = t2_vec.sy;
-    t2_vec.ex =
-      box2.posx_scaled + box2.width_scaled + this.getClassGeneralDimension();
-
-    let l2_vec: Vector;
-    l2_vec = new Vector();
-    l2_vec.sx = box2.posx_scaled;
-    l2_vec.sy = box2.posy_scaled;
-
-    l2_vec.ex = l2_vec.sx;
-    l2_vec.ey =
-      box2.posy_scaled + box2.height_scaled + this.getClassGeneralDimension();
-
-    let b2_vec: Vector;
-    b2_vec = new Vector();
-    b2_vec.sx = box2.posx_scaled;
-    b2_vec.sy =
-      box2.posy_scaled + box2.height_scaled + this.getClassGeneralDimension();
-
-    b2_vec.ex = b2_vec.sx + box2.width_scaled + this.getClassGeneralDimension();
-    b2_vec.ey = b2_vec.sy;
-
-    let r2_vec: Vector;
-    r2_vec = new Vector();
-    r2_vec.sx =
-      box2.posx_scaled + box2.width_scaled + this.getClassGeneralDimension();
-    r2_vec.sy = box2.posy_scaled;
-
-    r2_vec.ex = r2_vec.sx;
-    r2_vec.ey =
-      r2_vec.sy + box2.height_scaled + this.getClassGeneralDimension();
-
-    // if the lines intersect, the result contains the x and y of the intersection (treating the lines as infinite) and booleans for whether line segment 1 or line segment 2 contain the point
-
-    let vecs: Vector[] = [];
-    vecs.push(t_vec, l_vec, b_vec, r_vec);
-    let vecs2: Vector[] = [];
-    vecs.push(t2_vec, l2_vec, b2_vec, r2_vec);
-    // [t_vec, l_vec, b_vec, r_vec];
-    let p_return = new Point(0, 0);
-    vecs.forEach((v) => {
-      vecs2.forEach((v2) => {
-        let crossP = this.calcSegmentCross(v2, v);
-
-        if (crossP != null) p_return = crossP;
-      });
-    });
-    return p_return;
-  }
-  getVectorInterSectionWithBox(
-    lineVec: Vector,
-    box: DiagramObject_Scaled
-  ): Point {
-    let t_vec: Vector;
-    t_vec = new Vector();
-    t_vec.sx = box.posx_scaled;
-    t_vec.sy = box.posy_scaled;
-
-    t_vec.ey = t_vec.sy;
-    t_vec.ex =
-      box.posx_scaled + box.width_scaled + this.getClassGeneralDimension();
-
-    let l_vec: Vector;
-    l_vec = new Vector();
-    l_vec.sx = box.posx_scaled;
-    l_vec.sy = box.posy_scaled;
-
-    l_vec.ex = l_vec.sx;
-    l_vec.ey =
-      box.posy_scaled + box.height_scaled + this.getClassGeneralDimension();
-
-    let b_vec: Vector;
-    b_vec = new Vector();
-    b_vec.sx = box.posx_scaled;
-    b_vec.sy =
-      box.posy_scaled + box.height_scaled + this.getClassGeneralDimension();
-
-    b_vec.ex = b_vec.sx + box.width_scaled + this.getClassGeneralDimension();
-    b_vec.ey = b_vec.sy;
-
-    let r_vec: Vector;
-    r_vec = new Vector();
-    r_vec.sx =
-      box.posx_scaled + box.width_scaled + this.getClassGeneralDimension();
-    r_vec.sy = box.posy_scaled;
-
-    r_vec.ex = r_vec.sx;
-    r_vec.ey = r_vec.sy + box.height_scaled + this.getClassGeneralDimension();
-
-    // if the lines intersect, the result contains the x and y of the intersection (treating the lines as infinite) and booleans for whether line segment 1 or line segment 2 contain the point
-
-    let vecs: Vector[] = [];
-    vecs.push(t_vec, l_vec, b_vec, r_vec);
-    // [t_vec, l_vec, b_vec, r_vec];
-    let p_return = new Point(0, 0);
-    vecs.forEach((v) => {
-      let crossP = this.calcSegmentCross(lineVec, v);
-      if (crossP != null) p_return = crossP;
-    });
-    return p_return;
-  }
-
   ngOnInit(): void {
     this.socket.registerContainer(GlobalEditorService.L_ROOT_ID, this);
     this.socket.addListenerToEvent(this, (t) => {
       t.update();
     }, 'update');
 
-    this.editorService.addListenerAfterDgFetch(this, (target) => {
+    this.editorService.addListenerToEvent(this, (target) => {
+      target.lineControllers = [];
+      if (!this.ctx) this.init();
       console.log('MODEL', target.editorService.model);
       target.editorService.model.lines.map((l) => {
+
 
         Line.upScaleBreakPoints(l, target.editorService.clientModel.canvas.scale);
 
@@ -766,71 +432,8 @@ export class LineCanvasComponent
       });
       console.log('lines');
       console.log('objects', target.dgObjects);
-      //target.update();
-    });
-  }
-
-  calcSegmentCross(v: Vector, lineVec: Vector) {
-    var denominator,
-      a,
-      b,
-      numerator1,
-      numerator2,
-      result: Point = {
-        x: null,
-        y: null,
-      };
-    denominator =
-      (v.ey - v.sy) * (lineVec.ex - lineVec.sx) -
-      (v.ex - v.sx) * (lineVec.ey - lineVec.sy);
-    if (denominator == 0) {
-      return result;
-    }
-    a = lineVec.sy - v.sy;
-    b = lineVec.sx - v.sx;
-    numerator1 = (v.ex - v.sx) * a - (v.ey - v.sy) * b;
-    numerator2 = (lineVec.ex - lineVec.sx) * a - (lineVec.ey - lineVec.sy) * b;
-    a = numerator1 / denominator;
-    b = numerator2 / denominator;
-
-    // if we cast these lines infinitely in both directions, they intersect here:
-    result.x = lineVec.sx + a * (lineVec.ex - lineVec.sx);
-    result.y = lineVec.sy + a * (lineVec.ey - lineVec.sy);
-
-    // if line1 is a segment and line2 is a segment as well, they intersect if:
-    if (a > 0 && a < 1 && b > 0 && b < 1) {
-
-      return new Point(result.x, result.y);
-    }
-
-    return null;
-  }
-  getLineIntersectionWithBox(l1: Line, box: DiagramObject_Scaled): Point {
-    //checkLineIntersection(line1StartX, line1StartY, line1EndX, line1EndY, line2StartX, line2StartY, line2EndX, line2EndY) {
-    let lineVec = new Vector();
-    try {
-      let p1s = this.getCenter(this.getDgObjectById(l1.object_start_id), this.getControllerById(l1.id));
-      let line1StartX = p1s.x;
-      let line1StartY = p1s.y;
-
-      let p1e = this.getCenter(this.getDgObjectById(l1.object_end_id), this.getControllerById(l1.id));
-      let line1EndX = p1e.x;
-      let line1EndY = p1e.y;
-
-      lineVec.sx = line1StartX;
-      lineVec.ex = line1EndX;
-      lineVec.sy = line1StartY;
-      lineVec.ey = line1EndY;
-    } catch (error) {
-      console.error(error);
-      console.log(error);
-      return null;
-    }
-
-
-
-    return this.getVectorInterSectionWithBox(lineVec, box);
-    //a 4 oldalra ki kéne számolni
+      target.update();
+    }, 'diagram_fetch');
   }
   getVectorOfLine(l: Line) {
     let v = new Vector();
@@ -840,10 +443,10 @@ export class LineCanvasComponent
     v.ey = this.getDgObjectById(l.object_end_id).scaledModel.posy_scaled;
     return v;
   }
-  getMousePoint(e) {
-    var rect = this.canvasDOM.nativeElement.getBoundingClientRect();
-    let mousex = e.clientX - rect.x;
-    let mousey = e.clientY - rect.y;
-    return new Point(mousex, mousey);
+  hasItem(target_id: string) {
+    throw new Error('Method not implemented.');
+  }
+  restoreItem(item_id: string, model: DynamicSerialObject) {
+    throw new Error('Method not implemented.');
   }
 }

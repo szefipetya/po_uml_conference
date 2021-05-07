@@ -1,0 +1,56 @@
+2021-05-01 17:46:07.960 CEST [9188] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 17:46:07.962 CEST [9188] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 17:46:07.962 CEST [9188] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 17:46:08.037 CEST [11788] LOG:  database system was interrupted; last known up at 2021-05-01 17:43:07 CEST
+2021-05-01 17:46:08.482 CEST [11788] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 17:46:08.487 CEST [11788] LOG:  redo starts at 0/2FBDE70
+2021-05-01 17:46:08.589 CEST [11788] LOG:  invalid record length at 0/30FC920: wanted 24, got 0
+2021-05-01 17:46:08.590 CEST [11788] LOG:  redo done at 0/30FC8E8
+2021-05-01 17:46:08.707 CEST [9188] LOG:  database system is ready to accept connections
+2021-05-01 17:59:41.615 CEST [15428] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.619 CEST [11836] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.620 CEST [4156] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.631 CEST [11720] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.640 CEST [9892] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.654 CEST [16084] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.654 CEST [15896] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.664 CEST [14596] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.664 CEST [16492] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 17:59:41.672 CEST [1416] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:42.916 CEST [2724] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.033 CEST [14996] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.072 CEST [3516] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.072 CEST [17148] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.033 CEST [7620] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.100 CEST [10336] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.100 CEST [16020] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.103 CEST [17264] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.104 CEST [12296] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:25:43.144 CEST [15720] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 18:51:13.639 CEST [2368] ERROR:  update or delete on table "diagram_entity" violates foreign key constraint "fkbx9x89afhq446qmq7ic32yvjb" on table "diagram_share_table"
+2021-05-01 18:51:13.639 CEST [2368] DETAIL:  Key (id)=(27) is still referenced from table "diagram_share_table".
+2021-05-01 18:51:13.639 CEST [2368] STATEMENT:  delete from diagram_entity where id=$1
+2021-05-01 18:51:53.795 CEST [2368] ERROR:  update or delete on table "diagram_entity" violates foreign key constraint "fkbx9x89afhq446qmq7ic32yvjb" on table "diagram_share_table"
+2021-05-01 18:51:53.795 CEST [2368] DETAIL:  Key (id)=(27) is still referenced from table "diagram_share_table".
+2021-05-01 18:51:53.795 CEST [2368] STATEMENT:  delete from diagram_entity where id=$1
+2021-05-01 18:51:58.249 CEST [2368] ERROR:  update or delete on table "diagram_entity" violates foreign key constraint "fkbx9x89afhq446qmq7ic32yvjb" on table "diagram_share_table"
+2021-05-01 18:51:58.249 CEST [2368] DETAIL:  Key (id)=(27) is still referenced from table "diagram_share_table".
+2021-05-01 18:51:58.249 CEST [2368] STATEMENT:  delete from diagram_entity where id=$1
+2021-05-01 18:53:01.181 CEST [2368] ERROR:  update or delete on table "diagram_entity" violates foreign key constraint "fkbx9x89afhq446qmq7ic32yvjb" on table "diagram_share_table"
+2021-05-01 18:53:01.181 CEST [2368] DETAIL:  Key (id)=(27) is still referenced from table "diagram_share_table".
+2021-05-01 18:53:01.181 CEST [2368] STATEMENT:  delete from diagram_entity where id=$1
+2021-05-01 21:53:32.139 CEST [19748] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.146 CEST [5868] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.151 CEST [18016] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.153 CEST [19348] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.154 CEST [16604] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.157 CEST [15836] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.157 CEST [18396] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.158 CEST [16344] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.157 CEST [18600] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 21:53:32.139 CEST [20412] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 23:12:08.768 CEST [9188] LOG:  background worker "logical replication launcher" (PID 17200) was terminated by exception 0xC000013A
+2021-05-01 23:12:08.768 CEST [9188] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 23:12:08.974 CEST [9188] LOG:  terminating any other active server processes
+2021-05-01 23:12:09.191 CEST [9188] LOG:  statistics collector process (PID 12964) was terminated by exception 0xC000013A
+2021-05-01 23:12:09.191 CEST [9188] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.

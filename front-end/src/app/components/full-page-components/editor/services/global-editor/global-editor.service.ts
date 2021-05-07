@@ -138,11 +138,12 @@ export class GlobalEditorService {
       t.clientModel.lineCanvas.width = t.clientModel.canvas.width;
       t.clientModel.canvas.height = Math.max((maxheight += 500) * t.clientModel.canvas.scale, window.innerHeight - t.alignment.bottom_dock.height);
       t.clientModel.lineCanvas.height = t.clientModel.canvas.height;
+
       console.log("canvas size updated")
     }, 'canvas_size_update');
     this.init_first();
-
-    //this.init();
+    if (this.getDiagramId())
+      this.initFromServer(this.getDiagramId());
   }
   namespace(str, scope) {
     return scope;
@@ -167,9 +168,8 @@ export class GlobalEditorService {
       console.log('diagram is', JSON.stringify(this.model));
 
 
-      this.afterDgFetchFunctions.map((p) => {
-        p.value(p.key.value);
-      });
+
+      this.triggerEvent('diagram_fetch');
       this.triggerEvent('canvas_size_update');
     }
   }
@@ -198,10 +198,7 @@ export class GlobalEditorService {
   }
   //-----------------------------//target,alias,callback with (target,model params)
   eventListenerFunctions: Pair<Pair<string, any>, Function>[] = [];
-  afterDgFetchFunctions: Pair<Pair<string, any>, Function>[] = [];
-  addListenerAfterDgFetch(target, fn, alias: string = '') {
-    this.afterDgFetchFunctions.push(new Pair(new Pair(alias, target), fn));
-  }
+
   public triggerEvent(wich: string) {
 
     this.eventListenerFunctions.map((p) => {

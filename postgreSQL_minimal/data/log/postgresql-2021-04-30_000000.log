@@ -1,0 +1,5 @@
+2021-04-30 22:04:00.294 CEST [143460] LOG:  received fast shutdown request
+2021-04-30 22:04:00.933 CEST [143460] LOG:  aborting any active transactions
+2021-04-30 22:04:04.320 CEST [143460] LOG:  background worker "logical replication launcher" (PID 146072) exited with exit code 1
+2021-04-30 22:04:05.346 CEST [145320] LOG:  shutting down
+2021-04-30 22:04:07.916 CEST [143460] LOG:  database system is shut down

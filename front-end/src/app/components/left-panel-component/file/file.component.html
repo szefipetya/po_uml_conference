@@ -31,7 +31,16 @@
         <img class="file-icon" src="{{ this.iconLink }}" />
 
         {{ model.name }}
-        <span (click)="openShareDialog()">share </span>
+        <span
+          *ngIf="
+            this.model?._type != 'projectFolder' &&
+            this.model?._type != 'project' &&
+            this.model?._type != 'projectFolderDto' &&
+            this.model?._type != 'projectFolderHeader'
+          "
+          (click)="openShareDialog()"
+          >share
+        </span>
       </div>
       <ng-template #unselected>
         <div class="file">

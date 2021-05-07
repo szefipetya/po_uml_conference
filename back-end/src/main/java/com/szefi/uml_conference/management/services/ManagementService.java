@@ -23,7 +23,10 @@ import com.szefi.uml_conference.management.model.dto.response.FileResponse;
 import com.szefi.uml_conference.management.model.dto.response.PathFile;
 import com.szefi.uml_conference.management.model.entity.File_cEntity;
 import com.szefi.uml_conference.management.model.entity.FolderEntity;
+import com.szefi.uml_conference.management.model.entity.SPECIAL_FOLDER;
+import com.szefi.uml_conference.management.model.entity.project.ProjectEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
+import com.szefi.uml_conference.model.common.management.ICON;
 import com.szefi.uml_conference.security.model.MyUserDetails;
 import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.repository.UserRepository;
@@ -39,6 +42,7 @@ import static jdk.nashorn.internal.runtime.Debug.id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -50,7 +54,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 public class ManagementService {
 
-    @Autowired
+   @Autowired
     UserRepository userRepo;
     @Autowired
     File_cRepository fileRepo;
@@ -83,19 +87,25 @@ public class ManagementService {
         }
         return null;
     }
-   
-        public FileResponse deleteFolder(String jwt, Integer id) throws JwtException, FileTypeConversionException, FileNotFoundException, IllegalDmlActionException, UnAuthorizedActionException {
+        @Transactional
+        public FileResponse deleteFile(String jwt, Integer id) throws JwtException, FileTypeConversionException, FileNotFoundException, IllegalDmlActionException, UnAuthorizedActionException {
               if (jwtService.isTokenExpired(jwt)) {
             throw new JwtExpiredException("Error: token expired");
         } 
                   File_cEntity ent= fileRepo.findById(id).get();
-                  
+                 //TODO: RECURSIVELY DELETE ALL SUBFOLDERS, AND SHARE SZABÁLYOKAT
                   if (ent.getOwner().getId().equals(userService.loadUserByUsername(jwtService.extractUsername(jwt)).getId())) {
-                      
-                        if(ent.getParentFolder()!=null){
+                      boolean canBeDeleted=true;
+                      if(ent instanceof FolderEntity){
+                          FolderEntity fold=(FolderEntity)ent;
+                         canBeDeleted= fold.getSpecial()!=SPECIAL_FOLDER.SHARED&& fold.getSpecial()!=SPECIAL_FOLDER.USER_ROOT;
+                      }
+                        if(ent.getParentFolder()!=null&&canBeDeleted){
                             Integer parent_id=ent.getParentFolder().getId();
                             //delete folder
-                            fileRepo.deleteById(id);
+                             deleteShareRuleRecursively(ent);
+                            fileRepo.delete(ent);
+                      
                             //return parent folderű
                             return getFolder(jwt,parent_id);
                         }else throw new IllegalDmlActionException("This File can not be deleted");
@@ -104,6 +114,19 @@ public class ManagementService {
                        
                   }
                   return null;
+        }
+        @Transactional
+      private void  deleteShareRuleRecursively(File_cEntity ent){
+          fileRepo.deleteShareRulesByFileId(ent.getId());
+            if(ent instanceof FolderEntity){
+                ((FolderEntity)ent).getFiles().stream().forEach(f->deleteShareRuleRecursively(f));
+            }
+            if(ent instanceof ProjectEntity){
+                 ((ProjectEntity)ent).getRelatedFiles().stream().forEach(f->  fileRepo.deleteShareRulesByFileId(f.getId()));
+                     fileRepo.deleteById(ent.getId());
+            }
+        
+            
         }
     public FileResponse getFolder(String jwt, Integer id) throws JwtException, FileTypeConversionException, FileNotFoundException, UnAuthorizedActionException {
 
@@ -138,6 +161,7 @@ public class ManagementService {
             throw new JwtExpiredException("Error: token expired");
         }
         if(name.equals("")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
+        if(name.equals("~")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
         UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
 
         File_cEntity fent = fileRepo.findById(parent_id).get();
@@ -181,32 +205,64 @@ public class ManagementService {
             throw new JwtExpiredException("Error: token expired");
         }
         //UserEntity user=userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
+          File_cEntity ent;
+             UserEntity targetUser ;
         try {
-            File_cEntity ent= fileRepo.findById(req.getFile_id()).get();
+             ent= fileRepo.findById(req.getFile_id()).get();
                //  UserEntity user = userRepo.findByUserName(jwtService.extractUsername(req.getAuth_jwt())).get();
-               
-        UserEntity targetUser = userRepo.findByUserName(req.getTarget_userName()).get();
-               
+              } catch (java.util.NoSuchElementException ex) {
+            throw new FileNotFoundException("requested folder with id=" + req.getFile_id()+ " not found");
+        }   try{
+         targetUser = userRepo.findByUserName(req.getTarget_userName()).get();
+             if(ent instanceof ProjectEntity && ent.getParentFolder().isIs_root()) throw new FileNotFoundException("Project share directly from root is not supported");
+             if(ent instanceof ProjectFolderEntity ) throw new FileNotFoundException("This file tyle is not shareable");
+        }catch (java.util.NoSuchElementException ex) {
+            throw new FileNotFoundException("user with name \"" +req.getTarget_userName()+ "\" not found");
+        } 
                  
 
         //    if (ent.getOwner().getId().equals(userService.loadUserByUsername(jwtService.extractUsername(jwt)).getId())||ent.getUsersIamSaredWith().) {
         MyUserDetails userDets=userService.loadUserByUsername(jwtService.extractUsername(req.getAuth_jwt()));
         if(     ent.getOwner().getId().equals(userDets.getId())
                        ){   
+            
+            //recursiveli add 
            targetUser.getSharedFilesWithMe().add(ent);
           ent.getUsersIamSaredWith().add(targetUser);
+        
+               updateShareRecursively(ent, targetUser);
+          
+           
           //fileRepo.save(ent);
           userRepo.save(targetUser);
                 return req;
             }
-        } catch (java.util.NoSuchElementException ex) {
-            throw new FileNotFoundException("requested folder with id=" + req.getFile_id()+ " not found");
-        } 
+       
          throw new UnAuthorizedActionException("you don't have access to this file") ;
          
          
           
     }
+   private void updateShareRecursively(File_cEntity file,UserEntity targetUser){
+         updateShareOnFile(file, targetUser);
+        if(file instanceof FolderEntity){
+         
+         ((FolderEntity)file).getFiles().stream().forEach(f->
+            updateShareRecursively(f, targetUser)
+         ); 
+          }
+       
+       /* if(file instanceof ProjectEntity){
+            
+            projectService.updateShareRecursivelyOnProjectFolder(((ProjectEntity)file).getRootFolder(),targetUser);
+        }*/
+        
+   }
+   private  void updateShareOnFile(File_cEntity file,UserEntity targetUser){
+           targetUser.getSharedFilesWithMe().add(file);
+          file.getUsersIamSaredWith().add(targetUser);
+            fileRepo.save(file);
+   }
    
   
   

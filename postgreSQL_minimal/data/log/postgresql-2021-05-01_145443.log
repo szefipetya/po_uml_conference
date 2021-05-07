@@ -1,0 +1,64 @@
+2021-05-01 14:54:43.933 CEST [16184] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 14:54:43.935 CEST [16184] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 14:54:43.935 CEST [16184] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 14:54:43.992 CEST [7728] LOG:  database system was shut down at 2021-05-01 14:54:25 CEST
+2021-05-01 14:54:44.013 CEST [16184] LOG:  database system is ready to accept connections
+2021-05-01 14:54:44.014 CEST [13484] FATAL:  the database system is starting up
+2021-05-01 14:54:50.314 CEST [16184] LOG:  server process (PID 7364) was terminated by exception 0xC000013A
+2021-05-01 14:54:50.314 CEST [16184] DETAIL:  Failed process was running: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_stat_activity WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Total",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Active",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Commits",
+	   (SELECT sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Rollbacks"
+	) 
+2021-05-01 14:54:50.314 CEST [16184] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:54:50.314 CEST [16184] LOG:  terminating any other active server processes
+2021-05-01 14:54:50.319 CEST [15380] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:54:50.319 CEST [15380] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:54:50.319 CEST [15380] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:54:50.321 CEST [16184] LOG:  statistics collector process (PID 16088) was terminated by exception 0xC000013A
+2021-05-01 14:54:50.321 CEST [16184] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:54:50.323 CEST [16184] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:54:50.362 CEST [15716] LOG:  database system was interrupted; last known up at 2021-05-01 14:54:43 CEST
+2021-05-01 14:54:50.778 CEST [15716] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:54:50.781 CEST [15716] LOG:  invalid record length at 0/1FC3C90: wanted 24, got 0
+2021-05-01 14:54:50.781 CEST [15716] LOG:  redo is not required
+2021-05-01 14:54:50.805 CEST [16184] LOG:  database system is ready to accept connections
+2021-05-01 14:54:51.843 CEST [16184] LOG:  background worker "logical replication launcher" (PID 8240) was terminated by exception 0xC000013A
+2021-05-01 14:54:51.843 CEST [16184] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:54:51.843 CEST [16184] LOG:  terminating any other active server processes
+2021-05-01 14:54:51.845 CEST [16184] LOG:  statistics collector process (PID 15608) was terminated by exception 0xC000013A
+2021-05-01 14:54:51.845 CEST [16184] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:54:51.848 CEST [16184] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:54:51.888 CEST [3768] LOG:  database system was interrupted; last known up at 2021-05-01 14:54:50 CEST
+2021-05-01 14:54:52.284 CEST [3768] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:54:52.287 CEST [3768] LOG:  invalid record length at 0/1FC3D08: wanted 24, got 0
+2021-05-01 14:54:52.287 CEST [3768] LOG:  redo is not required
+2021-05-01 14:54:52.322 CEST [16184] LOG:  database system is ready to accept connections
+2021-05-01 14:54:53.802 CEST [16184] LOG:  statistics collector process (PID 10620) was terminated by exception 0xC000013A
+2021-05-01 14:54:53.802 CEST [16184] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:54:53.804 CEST [16184] LOG:  background worker "logical replication launcher" (PID 12828) was terminated by exception 0xC000013A
+2021-05-01 14:54:53.804 CEST [16184] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:54:53.804 CEST [16184] LOG:  terminating any other active server processes
+2021-05-01 14:54:53.809 CEST [16184] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:54:53.847 CEST [16292] LOG:  database system was interrupted; last known up at 2021-05-01 14:54:52 CEST
+2021-05-01 14:54:54.226 CEST [16292] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:54:54.229 CEST [16292] LOG:  invalid record length at 0/1FC3D80: wanted 24, got 0
+2021-05-01 14:54:54.229 CEST [16292] LOG:  redo is not required
+2021-05-01 14:54:54.251 CEST [16184] LOG:  database system is ready to accept connections
+2021-05-01 14:54:57.554 CEST [16184] LOG:  received fast shutdown request
+2021-05-01 14:54:57.559 CEST [16076] ERROR:  canceling statement due to user request
+2021-05-01 14:54:57.559 CEST [13648] ERROR:  canceling statement due to user request
+2021-05-01 14:54:57.561 CEST [16184] LOG:  aborting any active transactions
+2021-05-01 14:54:57.563 CEST [16184] LOG:  background worker "logical replication launcher" (PID 13648) exited with exit code 1
+2021-05-01 14:54:57.781 CEST [16076] ERROR:  canceling statement due to user request
+2021-05-01 14:54:57.788 CEST [9100] LOG:  shutting down
+2021-05-01 14:54:57.807 CEST [16184] LOG:  database system is shut down

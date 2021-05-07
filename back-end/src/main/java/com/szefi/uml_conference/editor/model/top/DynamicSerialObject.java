@@ -59,7 +59,6 @@ public class DynamicSerialObject implements AutoSessionInjectable_I {
     @Id
     @GeneratedValue
     private Integer id;
-    // @Convert(converter = MapConverter.class)
       @ElementCollection
           @LazyCollection(LazyCollectionOption.FALSE)
     @MapKeyColumn(name="extra_map")

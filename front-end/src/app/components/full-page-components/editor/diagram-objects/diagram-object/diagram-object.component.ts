@@ -7,11 +7,12 @@ import {
 } from '@angular/core';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/DiagramObject_Scaled';
-import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
+import { DiagramObject_General } from 'src/app/components/models/DiagramObjects/DiagramObject_General';
 import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
 import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
 import { EditorAction } from 'src/app/components/models/socket/EditorAction';
 import { CallbackItem } from 'src/app/components/models/socket/interface/CallbackItem';
+import { LogInteractive_I } from 'src/app/components/models/socket/interface/LogInteractive_I';
 import { SessionInteractiveItem } from 'src/app/components/models/socket/interface/SessionInteractiveItem';
 import { SessionState } from 'src/app/components/models/socket/SessionState';
 import { soft_copy } from 'src/app/utils/utils';
@@ -161,7 +162,7 @@ export class DiagramObjectComponent
   }
   @Input() public contentTemplate: TemplateRef<any>;
   @Input() public model: DiagramObject;
-  @Input() public general: SimpleClass_General;
+  @Input() public general: DiagramObject_General;
 
   ngAfterContentInit(): void {
     //  this.model.viewModel = this;

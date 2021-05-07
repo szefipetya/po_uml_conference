@@ -170,7 +170,7 @@ export class ActionSocket implements SocketWrapper {
                 resp.target_type,
                 { sessionState: JSON.parse(resp.action.extra.sessionState) }
               );
-            sc?.createItem(load, resp.action.extra);
+            sc.createItem(load, resp.action.extra);
           }
           console.log(sc);
 
@@ -186,7 +186,6 @@ export class ActionSocket implements SocketWrapper {
   }
   onopen(m: any) {
     console.log('Connected: ' + m);
-
     setTimeout(() => this.parent.socket.send(JSON.stringify(new SocketAuthenticationRequest(getCookie("jwt_token"), this.parent.service.getDiagramId())), 50));
   }
   getItem(id) {

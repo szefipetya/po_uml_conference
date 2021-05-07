@@ -3,7 +3,7 @@ import { SessionInteractiveItem } from '../interface/SessionInteractiveItem';
 import { SessionState } from '../SessionState';
 import { EditorAction } from '../EditorAction';
 import { EditorSocketControllerService } from '../../../full-page-components/editor/services/editor-socket-controller/editor-socket-controller.service';
-import { uniqId } from '../../../utils/utils';
+import { uniqId } from '../../../../utils/utils';
 import {
   CommonService,
   MSG_TYPE,
@@ -11,7 +11,8 @@ import {
 import { ACTION_TYPE } from '../ACTION_TYPE';
 import { DynamicSerialObject } from '../../common/DynamicSerialObject';
 import { SessionInteractiveContainer } from '../interface/SessionInteractiveContainer';
-export abstract class InterActiveContainerBase
+import { InteractiveItemBase } from "./InteractiveItemBase";
+export abstract class InterActiveContainerBase extends InteractiveItemBase
   implements SessionInteractiveContainer {
   model: DynamicSerialObject;
   //session requirements
@@ -22,7 +23,7 @@ export abstract class InterActiveContainerBase
   constructor(
     protected socket: EditorSocketControllerService,
     protected commonService: CommonService
-  ) { }
+  ) { super(socket, commonService); }
   createItem(model: DynamicSerialObject, extra?: any) {
     throw new Error('Method not implemented.');
   }
@@ -42,7 +43,7 @@ export abstract class InterActiveContainerBase
     return this.model.id;
   }
   //Session funcions---------------------------------
-  updateState(state: SessionState, callback_action_id = ''): void {
+  /*updateState(state: SessionState, callback_action_id = ''): void {
     if (state == undefined) return;
     console.log('state to be inserted', state);
     this.callback_queue = this.callback_queue.filter(
@@ -114,18 +115,7 @@ export abstract class InterActiveContainerBase
     this.render();
   }
   abstract getParentId(): string;
-  /*sendCreateMessageToServer() {
-    let action: EditorAction = new EditorAction(
-      this.model.id,
-      this.model._type,
-      this.getParentId()
-    );
-    //action.extra = { old_id: id };
-    action.action = ACTION_TYPE.CREATE;
-    let vm = this.model.viewModel;
-    action.json = JSON.stringify(this.model);
-    this.model.viewModel = vm;
-  }*/
+
   render(): void { }
   //DML functions-v-v-v-v-v-v-v-v-v-v-
   deleteAsync(parent_id: string) {
@@ -192,5 +182,5 @@ export abstract class InterActiveContainerBase
 
     return true;
   }
-  abstract disableEdit(): void;
+  abstract disableEdit(): void;*/
 }

@@ -1,0 +1,1 @@
+start cmd.exe /k "set PATH=%PATH%;c:\Program Files\PostgreSQL\13\bin"

@@ -235,15 +235,32 @@ export class AttributeComponent
     return l;
   };
   setNameAndType = (e, l) => {
-    let splitted = e.target.value.split(':');
-    this.model.name = splitted[0].trim();
-    if (l) {
-      this.model.name = this.model.name.substr(1);
+    if (this.isTitle) { this.model.name = e.target.value.trim() } else {
+      let splitted = e.target.value.split(':');
+      let namebuilded = "";
+      for (let i = 0; i < splitted.length - 1; i++) {
+        namebuilded += splitted[i];
+        if (i < splitted.length - 2) namebuilded += ':';
+        console.log(splitted[i])
+      }
+      this.name = namebuilded;
+      this.model.name = namebuilded.trim();
+      if (l) {
+        this.model.name = this.model.name.substr(1);
+      }
+      if (namebuilded == '') {
+        this.model.name = e.target.value.trim()
+        this.name = e.target.value.trim()
+      }
+
+      console.log('builded vs normal', namebuilded, e.target.value)
+
+      if (splitted[1]) this.model.attr_type = splitted[splitted.length - 1].trim();
+      else {
+        this.model.attr_type = '';
+      }
     }
-    if (splitted[1]) this.model.attr_type = splitted[1].trim();
-    else {
-      this.model.attr_type = '';
-    }
+
   };
   onInput = (e) => {
     console.log(this.model);
@@ -345,6 +362,24 @@ export class AttributeComponent
           //ATTRIBUTE
           let l = false;
 
+
+          let splitted = strfull.split(':');
+          let namebuilded = "";
+          for (let i = 0; i < splitted.length - 1; i++) {
+            namebuilded += splitted[i]
+            if (i < splitted.length - 2) namebuilded += ':';
+            //  console.log(splitted[i])
+          }
+          this.name = namebuilded;
+          if (namebuilded == '') {
+            this.name = this.showedText;
+          }
+          this.str = this.showedText.includes(':');
+          this.type = splitted[splitted.length - 1];
+
+          this.type_dispayed;
+          this.str_displayed;
+
           let rescale = this.elementScale;
           let charwidth = this.parent.parent.general.fontsize_scaled / rescale;
           let textwidth =
@@ -356,17 +391,16 @@ export class AttributeComponent
               this.parent.parent.general.border_scaled) *
             2;
           if (textwidth > width) {
-            this.showedText = strfull.substr(
+            console.log("nagyobb");
+            let typelen = 0;
+            if (this.type_dispayed) typelen = this.type_dispayed.length;
+            this.name = (this.name + this.str + this.type).substr(
               0,
-              strfull.length - Math.round((textwidth - width) / charwidth)
+              strfull.length - Math.round((textwidth - width) / charwidth) - typelen - 1
             );
             l = true;
           }
-          this.name = this.showedText.split(':')[0];
-          this.str = this.showedText.includes(':');
-          this.type = this.showedText.split(':')[1];
-          this.type_dispayed;
-          this.str_displayed;
+
           if (this.str) {
             this.str_displayed = ':';
           } else this.str_displayed = '';
@@ -377,6 +411,8 @@ export class AttributeComponent
           if (l) {
             this.dots += '...';
           }
+
+
         }
       }
     }

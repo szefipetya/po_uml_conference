@@ -66,7 +66,7 @@ export class SessionSocket implements SocketWrapper {
       let it = this.parent.service.itemViewModelMap.find(
         (v) => v.key == r.target_id
       );
-      if (it) it.value.updateState(r.sessionState);
+      if (it) { it.value.updateState(r.sessionState); }
       else console.error('No view for SessionState:', r);
     });
     this.parent.socket.onmessage = this.parent.onmessage;

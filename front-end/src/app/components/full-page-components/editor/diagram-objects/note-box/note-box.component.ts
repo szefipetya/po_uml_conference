@@ -6,7 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
+import { DiagramObject_General } from 'src/app/components/models/DiagramObjects/DiagramObject_General';
 import { NoteBox } from '../../../../models/DiagramObjects/NoteBox';
 import { CommonService } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
@@ -22,7 +22,7 @@ export class NoteBoxComponent
   implements OnInit, AfterViewChecked {
   @Input()
   model: NoteBox;
-  @Input() public general: SimpleClass_General;
+  @Input() public general: DiagramObject_General;
   @ViewChild('texta') textarea: ElementRef<HTMLTextAreaElement>;
   constructor(
     protected socket: EditorSocketControllerService,

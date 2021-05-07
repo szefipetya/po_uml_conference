@@ -1,0 +1,36 @@
+2021-05-05 22:58:09.004 CEST [32672] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-05 22:58:09.006 CEST [32672] LOG:  listening on IPv6 address "::", port 8102
+2021-05-05 22:58:09.007 CEST [32672] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-05 22:58:09.178 CEST [31368] LOG:  database system was interrupted; last known up at 2021-05-04 21:57:20 CEST
+2021-05-05 22:58:10.669 CEST [31368] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-05 22:58:10.675 CEST [31368] LOG:  redo starts at 0/38DC458
+2021-05-05 22:58:10.676 CEST [31368] LOG:  invalid record length at 0/38DC540: wanted 24, got 0
+2021-05-05 22:58:10.676 CEST [31368] LOG:  redo done at 0/38DC508
+2021-05-05 22:58:10.788 CEST [32672] LOG:  database system is ready to accept connections
+2021-05-05 23:06:41.869 CEST [3284] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.871 CEST [25504] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.871 CEST [33672] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.873 CEST [19720] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.873 CEST [32276] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.873 CEST [30916] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.878 CEST [32268] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.903 CEST [21792] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.909 CEST [32196] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:06:41.909 CEST [27744] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.067 CEST [1108] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.072 CEST [33020] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.072 CEST [1652] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.084 CEST [29716] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.088 CEST [33432] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.104 CEST [29476] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.104 CEST [12004] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.108 CEST [9716] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.116 CEST [33376] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:21:09.117 CEST [29092] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-05 23:22:24.268 CEST [32672] LOG:  background worker "logical replication launcher" (PID 28168) was terminated by exception 0xC000013A
+2021-05-05 23:22:24.268 CEST [32672] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-05 23:22:24.269 CEST [32672] LOG:  terminating any other active server processes
+2021-05-05 23:22:24.272 CEST [32672] LOG:  statistics collector process (PID 13240) was terminated by exception 0xC000013A
+2021-05-05 23:22:24.272 CEST [32672] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-05 23:22:24.303 CEST [32672] LOG:  all server processes terminated; reinitializing
+2021-05-05 23:22:24.363 CEST [23756] LOG:  database system was interrupted; last known up at 2021-05-05 23:08:30 CEST

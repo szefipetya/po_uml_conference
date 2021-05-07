@@ -12,7 +12,7 @@ import { DiagramObject_Scaled } from 'src/app/components/models/DiagramObjects/D
 import { Element_c } from 'src/app/components/models/DiagramObjects/Element_c';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
 import { SimpleClassElementGroup } from 'src/app/components/models/DiagramObjects/SimpleClassElementGroup';
-import { SimpleClass_General } from 'src/app/components/models/DiagramObjects/SimpleClass_General';
+import { DiagramObject_General } from 'src/app/components/models/DiagramObjects/DiagramObject_General';
 import { ACTION_TYPE } from 'src/app/components/models/socket/ACTION_TYPE';
 import { InteractiveItemBase } from 'src/app/components/models/socket/bases/InteractiveItemBase';
 import { EditorAction } from 'src/app/components/models/socket/EditorAction';
@@ -157,7 +157,7 @@ export class SimpleClassComponent
   }
   // editorService;
   @Input() public model: SimpleClass;
-  @Input() public general: SimpleClass_General;
+  @Input() public general: DiagramObject_General;
 
   ngAfterContentInit(): void {
     this.model.viewModel = this;

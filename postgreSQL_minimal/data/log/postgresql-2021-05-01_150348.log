@@ -1,0 +1,53 @@
+2021-05-01 15:03:48.973 CEST [13128] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 15:03:48.974 CEST [13128] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 15:03:48.975 CEST [13128] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 15:03:49.025 CEST [10756] LOG:  database system was shut down at 2021-05-01 15:02:25 CEST
+2021-05-01 15:03:49.043 CEST [13128] LOG:  database system is ready to accept connections
+2021-05-01 15:04:41.767 CEST [14976] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.772 CEST [15720] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.772 CEST [15496] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.772 CEST [15912] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.780 CEST [10792] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.781 CEST [5796] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.785 CEST [9632] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.789 CEST [15828] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.790 CEST [9972] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:04:41.793 CEST [11272] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 15:05:23.651 CEST [13128] LOG:  server process (PID 15052) was terminated by exception 0xC000013A
+2021-05-01 15:05:23.651 CEST [13128] DETAIL:  Failed process was running: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_stat_activity WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Total",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Active",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Commits",
+	   (SELECT sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Rollbacks"
+	) 
+2021-05-01 15:05:23.651 CEST [13128] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:05:23.651 CEST [13128] LOG:  terminating any other active server processes
+2021-05-01 15:05:23.657 CEST [13128] LOG:  statistics collector process (PID 10168) was terminated by exception 0xC000013A
+2021-05-01 15:05:23.657 CEST [13128] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:05:23.660 CEST [13128] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:05:23.701 CEST [2272] LOG:  database system was interrupted; last known up at 2021-05-01 15:03:49 CEST
+2021-05-01 15:05:24.014 CEST [10260] FATAL:  the database system is in recovery mode
+2021-05-01 15:05:24.116 CEST [2272] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:05:24.119 CEST [2272] LOG:  redo starts at 0/23B5E18
+2021-05-01 15:05:24.216 CEST [2272] LOG:  invalid record length at 0/250CDD0: wanted 24, got 0
+2021-05-01 15:05:24.216 CEST [2272] LOG:  redo done at 0/250CD98
+2021-05-01 15:05:24.289 CEST [13128] LOG:  database system is ready to accept connections
+2021-05-01 15:05:24.935 CEST [13128] LOG:  background worker "logical replication launcher" (PID 10216) was terminated by exception 0xC000013A
+2021-05-01 15:05:24.935 CEST [13128] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:05:24.935 CEST [13128] LOG:  terminating any other active server processes
+2021-05-01 15:05:24.940 CEST [13128] LOG:  statistics collector process (PID 1988) was terminated by exception 0xC000013A
+2021-05-01 15:05:24.940 CEST [13128] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:05:24.941 CEST [13128] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:05:24.980 CEST [6444] LOG:  database system was interrupted; last known up at 2021-05-01 15:05:24 CEST
+2021-05-01 15:05:25.019 CEST [15256] FATAL:  the database system is in recovery mode
+2021-05-01 15:05:25.353 CEST [6444] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:05:25.356 CEST [6444] LOG:  invalid record length at 0/250CE48: wanted 24, got 0
+2021-05-01 15:05:25.356 CEST [6444] LOG:  redo is not required

@@ -1,5 +1,5 @@
 import { Canvas } from './canvas';
-import { SimpleClass_General } from '../DiagramObjects/SimpleClass_General';
+import { DiagramObject_General } from '../DiagramObjects/DiagramObject_General';
 import { SimpleClass } from '../DiagramObjects/SimpleClass';
 import { DiagramObject_Scaled } from '../DiagramObjects/DiagramObject_Scaled';
 import { User } from '../User';

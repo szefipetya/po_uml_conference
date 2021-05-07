@@ -1,0 +1,126 @@
+2021-05-01 14:58:39.367 CEST [13788] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 14:58:39.375 CEST [13788] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 14:58:39.375 CEST [13788] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 14:58:39.420 CEST [9968] LOG:  database system was shut down at 2021-05-01 14:58:12 CEST
+2021-05-01 14:58:39.444 CEST [13788] LOG:  database system is ready to accept connections
+2021-05-01 14:59:30.026 CEST [15312] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.030 CEST [10560] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.030 CEST [7380] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.069 CEST [11364] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.070 CEST [12388] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.079 CEST [8948] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.079 CEST [6484] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.085 CEST [5284] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.092 CEST [9704] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:30.094 CEST [15416] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:59:34.019 CEST [13788] LOG:  server process (PID 7172) was terminated by exception 0xC000013A
+2021-05-01 14:59:34.019 CEST [13788] DETAIL:  Failed process was running: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_stat_activity WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Total",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Active",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Commits",
+	   (SELECT sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Rollbacks"
+	) 
+2021-05-01 14:59:34.019 CEST [13788] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:59:34.020 CEST [13788] LOG:  terminating any other active server processes
+2021-05-01 14:59:34.026 CEST [11644] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:59:34.026 CEST [11644] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:59:34.026 CEST [11644] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:59:34.031 CEST [13788] LOG:  statistics collector process (PID 1420) was terminated by exception 0xC000013A
+2021-05-01 14:59:34.031 CEST [13788] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:59:34.032 CEST [13788] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:59:34.178 CEST [1792] LOG:  database system was interrupted; last known up at 2021-05-01 14:58:39 CEST
+2021-05-01 14:59:34.589 CEST [1792] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:59:34.592 CEST [1792] LOG:  redo starts at 0/20B13E0
+2021-05-01 14:59:34.679 CEST [1792] LOG:  invalid record length at 0/21A1108: wanted 24, got 0
+2021-05-01 14:59:34.679 CEST [1792] LOG:  redo done at 0/21A10D0
+2021-05-01 14:59:34.746 CEST [13788] LOG:  database system is ready to accept connections
+2021-05-01 14:59:36.878 CEST [13788] LOG:  server process (PID 10160) was terminated by exception 0xC000013A
+2021-05-01 14:59:36.878 CEST [13788] DETAIL:  Failed process was running: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_stat_activity WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Total",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Active",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Commits",
+	   (SELECT sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Rollbacks"
+	) 
+2021-05-01 14:59:36.878 CEST [13788] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:59:36.879 CEST [13788] LOG:  terminating any other active server processes
+2021-05-01 14:59:36.884 CEST [14616] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:59:36.884 CEST [14616] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:59:36.884 CEST [14616] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:59:36.886 CEST [13788] LOG:  statistics collector process (PID 15468) was terminated by exception 0xC000013A
+2021-05-01 14:59:36.886 CEST [13788] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:59:36.890 CEST [13788] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:59:37.025 CEST [7672] FATAL:  the database system is in recovery mode
+2021-05-01 14:59:37.029 CEST [15148] LOG:  database system was interrupted; last known up at 2021-05-01 14:59:34 CEST
+2021-05-01 14:59:37.400 CEST [15148] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:59:37.403 CEST [15148] LOG:  invalid record length at 0/21A1180: wanted 24, got 0
+2021-05-01 14:59:37.403 CEST [15148] LOG:  redo is not required
+2021-05-01 14:59:37.429 CEST [13788] LOG:  database system is ready to accept connections
+2021-05-01 14:59:38.529 CEST [13788] LOG:  server process (PID 11380) was terminated by exception 0xC000013A
+2021-05-01 14:59:38.529 CEST [13788] DETAIL:  Failed process was running: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_stat_activity WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Total",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Active",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Commits",
+	   (SELECT sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Rollbacks"
+	) 
+2021-05-01 14:59:38.529 CEST [13788] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:59:38.530 CEST [13788] LOG:  terminating any other active server processes
+2021-05-01 14:59:38.535 CEST [3676] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:59:38.535 CEST [3676] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:59:38.535 CEST [3676] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:59:38.539 CEST [13788] LOG:  statistics collector process (PID 16304) was terminated by exception 0xC000013A
+2021-05-01 14:59:38.539 CEST [13788] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:59:38.541 CEST [13788] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:59:38.579 CEST [15852] LOG:  database system was interrupted; last known up at 2021-05-01 14:59:37 CEST
+2021-05-01 14:59:38.971 CEST [15852] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:59:38.975 CEST [15852] LOG:  invalid record length at 0/21A11F8: wanted 24, got 0
+2021-05-01 14:59:38.975 CEST [15852] LOG:  redo is not required
+2021-05-01 14:59:39.006 CEST [13788] LOG:  database system is ready to accept connections
+2021-05-01 14:59:39.020 CEST [9408] FATAL:  the database system is in recovery mode
+2021-05-01 14:59:40.627 CEST [13788] LOG:  server process (PID 9008) was terminated by exception 0xC000013A
+2021-05-01 14:59:40.627 CEST [13788] DETAIL:  Failed process was running: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_stat_activity WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Total",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Active",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Commits",
+	   (SELECT sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Rollbacks"
+	) 
+2021-05-01 14:59:40.627 CEST [13788] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:59:40.627 CEST [13788] LOG:  terminating any other active server processes
+2021-05-01 14:59:40.632 CEST [6684] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:59:40.632 CEST [6684] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:59:40.632 CEST [6684] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:59:40.634 CEST [13788] LOG:  statistics collector process (PID 15940) was terminated by exception 0xC000013A
+2021-05-01 14:59:40.634 CEST [13788] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:59:40.636 CEST [13788] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:59:40.675 CEST [13068] LOG:  database system was interrupted; last known up at 2021-05-01 14:59:38 CEST

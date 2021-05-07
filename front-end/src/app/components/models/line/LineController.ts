@@ -9,6 +9,7 @@ import { EditorAction } from '../socket/EditorAction';
 import { BreakPoint } from './BreakPoint';
 import { Line } from './Line';
 import { LineCanvas } from './LineCanvas';
+import { Point } from './Point';
 import { Vector } from './Vector';
 export class LineController extends InteractiveItemBase {
   lineCanvasComponent: LineCanvasComponent;
@@ -52,8 +53,36 @@ export class LineController extends InteractiveItemBase {
   getParentId(): string {
     return GlobalEditorService.L_ROOT_ID;
   }
-  deleteSelfFromParent(): void {
 
+  drawRotatedImage(image, x, y, angle) {
+    // save the current co-ordinate system
+    // before we screw with it
+    let ctx = this.lineCanvasComponent.ctx;
+    ctx.save();
+
+    // move to the middle of where we want to draw our image
+    ctx.translate(x, y);
+
+    // rotate around that point, converting our
+    // angle from degrees to radians
+    ctx.rotate(angle * this.lineCanvasComponent.TO_RADIANS);
+
+    // draw it up and to the left by half the width
+    // and height of the image
+    ctx.drawImage(image, -(image.width / 2), -(image.height / 2));
+
+    // and restore the co-ords to how they were when we began
+    ctx.restore();
+  }
+  drawWithRotation(angle, fn) {
+    let ctx = this.lineCanvasComponent.ctx;
+    ctx.save(); // save current state
+    ctx.rotate(angle); // rotate
+    fn();
+    ctx.restore(); // restore original states (no rotation etc)
+  }
+
+  deleteSelfFromParent(): void {
     this.socket.unregister(this);
     this.lineCanvasComponent.deleteController(this);
   }
@@ -63,13 +92,24 @@ export class LineController extends InteractiveItemBase {
   disableEdit(): void {
     console.error('disableEdit not implemented.');
   }
+  strike(stroke_style: string, width: number, p1: Point, p2: Point) {
+    let ctx = this.lineCanvasComponent.ctx;
+    ctx.lineWidth = width;
+    ctx.strokeStyle = stroke_style;
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+  }
 
   drawLine() {
     if (this.model?.object_start_id && this.model?.object_end_id) {
       let vec: Vector = new Vector();
 
       let ctx = this.lineCanvasComponent.ctx;
+
       ctx.beginPath();
+      Line.setLineDash(this.model, ctx);
+      console.log("setlinedash")
       let spt;
       try {
         spt = this.lineCanvasComponent.getCenter(this.lineCanvasComponent.getDgObjectById(this.model.object_start_id), this);
@@ -81,7 +121,7 @@ export class LineController extends InteractiveItemBase {
       prevPoint.point = spt;
       this.model.breaks_scaled.map((breakPoint) => {
         if (this.lineCanvasComponent.selectedLine == this.model) {
-          this.lineCanvasComponent.strike(
+          this.strike(
             this.lineCanvasComponent.LINE_SELECTED_STROKE, this.lineCanvasComponent.LINE_WIDTH * 2, prevPoint.point, breakPoint.point
           );
           ctx.moveTo(breakPoint.point.x, breakPoint.point.y);
@@ -100,14 +140,14 @@ export class LineController extends InteractiveItemBase {
         //draw default line
         //  console.log("lockers", this.sessionState?.lockerUser_id, " --- ", this.editorservice.getUser().id)
         if (this.sessionState?.lockerUser_id != '-1' && this.sessionState?.lockerUser_id != this.editorService.getUser().id) {
-          this.lineCanvasComponent.strike(
+          this.strike(
             "red",
             this.lineCanvasComponent.LINE_WIDTH * 3,
             prevPoint.point,
             breakPoint.point
           );
         }
-        this.lineCanvasComponent.strike(
+        this.strike(
           this.lineCanvasComponent.LINE_DEFAULT_STROKE,
           this.lineCanvasComponent.LINE_WIDTH,
           prevPoint.point,
@@ -120,7 +160,7 @@ export class LineController extends InteractiveItemBase {
 
       //draw outline if selected
       if (this.lineCanvasComponent.selectedLine == this.model) {
-        this.lineCanvasComponent.strike(
+        this.strike(
           this.lineCanvasComponent.LINE_SELECTED_STROKE,
           this.lineCanvasComponent.LINE_WIDTH * 2,
           prevPoint.point,
@@ -128,14 +168,14 @@ export class LineController extends InteractiveItemBase {
         );
       }//if locked
       if (this.sessionState?.lockerUser_id != '-1' && this.sessionState?.lockerUser_id != this.editorService.getUser().id) {
-        this.lineCanvasComponent.strike(
+        this.strike(
           "red",
           this.lineCanvasComponent.LINE_WIDTH * 2,
           prevPoint.point,
           ept
         );
       }
-      this.lineCanvasComponent.strike(
+      this.strike(
         this.lineCanvasComponent.LINE_DEFAULT_STROKE,
         this.lineCanvasComponent.LINE_WIDTH,
         prevPoint.point,
@@ -152,12 +192,12 @@ export class LineController extends InteractiveItemBase {
       let angleDeg = (angleRad * 180) / Math.PI + 90;
       if (ept.x < prevPoint.point.x) angleDeg += 180;
       let img = this.lineCanvasComponent.getLineHeadImg(this.model.lineType.endHead);
-      let p = this.lineCanvasComponent.getVectorInterSectionWithBox(
+      let p = this.lineCanvasComponent.mathHelper.getVectorInterSectionWithBox(
         new Vector(prevPoint.point.x, prevPoint.point.y, ept.x, ept.y),
         this.lineCanvasComponent.getDgObjectById(this.model.object_end_id).scaledModel
       );
       if (img)
-        this.lineCanvasComponent.drawRotatedImage(img, p.x, p.y, angleDeg);
+        this.drawRotatedImage(img, p.x, p.y, angleDeg);
     }
   }
 }

@@ -106,6 +106,7 @@ public class JwtUtilService {
     public Boolean blackListToken(String token) throws JwtParseException{
         if(!isTokenExpired(token)){
             JwtEntity ent=new JwtEntity(token);
+            ent.setExpiration(extractExpiration(token));
          blackJwtsRepo.save(ent);
          return true;
         }

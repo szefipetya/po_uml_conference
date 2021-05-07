@@ -1,0 +1,54 @@
+2021-05-01 11:24:09.534 CEST [2564] FATAL:  database "postgresql" does not exist
+2021-05-01 11:24:13.572 CEST [3528] FATAL:  database "postgresql" does not exist
+2021-05-01 11:24:41.890 CEST [12480] ERROR:  relation "hibernate_sequence" does not exist at character 17
+2021-05-01 11:24:41.890 CEST [12480] STATEMENT:  select nextval ('hibernate_sequence')
+2021-05-01 11:25:33.129 CEST [6256] ERROR:  relation "hibernate_sequence" does not exist at character 17
+2021-05-01 11:25:33.129 CEST [6256] STATEMENT:  select nextval ('hibernate_sequence')
+2021-05-01 11:30:49.918 CEST [9124] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.922 CEST [6964] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.925 CEST [2360] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.935 CEST [9168] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.936 CEST [1712] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.951 CEST [13952] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.952 CEST [12900] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.961 CEST [7556] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.962 CEST [10576] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:30:49.971 CEST [2568] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.232 CEST [14300] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.240 CEST [6352] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.256 CEST [3336] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.257 CEST [6592] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.260 CEST [11840] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.262 CEST [9484] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.268 CEST [11988] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.271 CEST [11508] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.271 CEST [7744] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 11:37:45.279 CEST [9980] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.796 CEST [7172] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.797 CEST [13504] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.798 CEST [3384] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.798 CEST [6064] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.804 CEST [14280] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.811 CEST [10200] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.814 CEST [4980] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.815 CEST [9712] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.815 CEST [4936] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 13:44:18.816 CEST [4248] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-01 14:24:31.503 CEST [6664] LOG:  could not open file "postmaster.pid": No such file or directory
+2021-05-01 14:24:31.520 CEST [6664] LOG:  performing immediate shutdown because data directory lock file is invalid
+2021-05-01 14:24:31.521 CEST [6664] LOG:  received immediate shutdown request
+2021-05-01 14:24:31.522 CEST [6664] LOG:  could not open file "postmaster.pid": No such file or directory
+2021-05-01 14:24:31.560 CEST [10208] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:24:31.560 CEST [10208] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:24:31.560 CEST [10208] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:24:31.561 CEST [4312] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:24:31.561 CEST [4312] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:24:31.561 CEST [4312] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:24:31.697 CEST [9776] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:24:31.697 CEST [9776] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:24:31.697 CEST [9776] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:24:32.121 CEST [7388] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:24:32.121 CEST [7388] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:24:32.121 CEST [7388] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:24:32.165 CEST [13996] FATAL:  the database system is shutting down
+2021-05-01 14:24:32.186 CEST [6664] LOG:  database system is shut down

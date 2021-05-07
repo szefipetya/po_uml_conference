@@ -54,6 +54,7 @@ export class CommonService {
         return 'crimson';
       case MSG_TYPE.WARNING:
         return 'orange';
+      default: return 'white'
     }
   }
 }

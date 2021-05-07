@@ -83,6 +83,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     this.commonService.putLog(msg, type, this);
   }
   highlightMe(on: boolean, color: string): void {
+    console.log('highlight', this)
     if (on) this.box_shadow = ' 0px 0px 21px 1px ' + color;
     else this.box_shadow = '';
   }

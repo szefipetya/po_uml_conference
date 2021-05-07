@@ -1,0 +1,25 @@
+2021-05-01 15:01:05.659 CEST [15568] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 15:01:05.660 CEST [15568] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 15:01:05.661 CEST [15568] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 15:01:05.715 CEST [16152] LOG:  database system was interrupted; last known up at 2021-05-01 15:01:01 CEST
+2021-05-01 15:01:06.080 CEST [16152] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:01:06.083 CEST [16152] LOG:  invalid record length at 0/22A5F30: wanted 24, got 0
+2021-05-01 15:01:06.084 CEST [16152] LOG:  redo is not required
+2021-05-01 15:01:06.107 CEST [15568] LOG:  database system is ready to accept connections
+2021-05-01 15:01:30.077 CEST [15568] LOG:  received fast shutdown request
+2021-05-01 15:01:30.081 CEST [16380] ERROR:  canceling statement due to user request
+2021-05-01 15:01:30.084 CEST [15568] LOG:  aborting any active transactions
+2021-05-01 15:01:30.084 CEST [8200] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.087 CEST [8176] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.089 CEST [15892] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.090 CEST [11364] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.095 CEST [15912] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.096 CEST [15568] LOG:  background worker "logical replication launcher" (PID 16380) exited with exit code 1
+2021-05-01 15:01:30.096 CEST [15260] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.098 CEST [7408] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.102 CEST [15940] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.103 CEST [15772] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.104 CEST [15340] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.111 CEST [10252] FATAL:  terminating connection due to administrator command
+2021-05-01 15:01:30.124 CEST [13720] LOG:  shutting down
+2021-05-01 15:01:30.185 CEST [15568] LOG:  database system is shut down

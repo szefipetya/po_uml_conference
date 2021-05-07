@@ -1,0 +1,108 @@
+2021-05-01 14:59:48.239 CEST [10560] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 14:59:48.241 CEST [10560] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 14:59:48.242 CEST [10560] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 14:59:48.346 CEST [4980] LOG:  database system was interrupted; last known up at 2021-05-01 14:59:38 CEST
+2021-05-01 14:59:48.602 CEST [14448] FATAL:  the database system is starting up
+2021-05-01 14:59:48.663 CEST [1396] FATAL:  the database system is starting up
+2021-05-01 14:59:48.737 CEST [6612] FATAL:  the database system is starting up
+2021-05-01 14:59:48.781 CEST [4980] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:59:48.784 CEST [4980] LOG:  invalid record length at 0/21A1270: wanted 24, got 0
+2021-05-01 14:59:48.785 CEST [4980] LOG:  redo is not required
+2021-05-01 14:59:48.807 CEST [15676] FATAL:  the database system is starting up
+2021-05-01 14:59:48.809 CEST [10560] LOG:  database system is ready to accept connections
+2021-05-01 15:00:54.341 CEST [10560] LOG:  server process (PID 15060) was terminated by exception 0xC000013A
+2021-05-01 15:00:54.341 CEST [10560] DETAIL:  Failed process was running: SET application_name = 'PostgreSQL JDBC Driver'
+2021-05-01 15:00:54.341 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:00:54.342 CEST [10560] LOG:  terminating any other active server processes
+2021-05-01 15:00:54.347 CEST [8240] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.347 CEST [8240] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.347 CEST [8240] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.348 CEST [14436] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.348 CEST [14436] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.348 CEST [14436] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.349 CEST [8892] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.349 CEST [8892] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.349 CEST [8892] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.350 CEST [11104] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.350 CEST [11104] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.350 CEST [11104] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.352 CEST [14312] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.352 CEST [14312] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.352 CEST [14312] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.356 CEST [16092] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.356 CEST [16092] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.356 CEST [16092] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.360 CEST [15968] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.360 CEST [15968] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.360 CEST [15968] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.365 CEST [5032] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.365 CEST [5032] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.365 CEST [5032] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.366 CEST [8480] WARNING:  terminating connection because of crash of another server process
+2021-05-01 15:00:54.366 CEST [8480] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 15:00:54.366 CEST [8480] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 15:00:54.378 CEST [10560] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:00:54.420 CEST [15052] LOG:  database system was interrupted; last known up at 2021-05-01 14:59:48 CEST
+2021-05-01 15:00:54.811 CEST [15052] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:00:54.813 CEST [15052] LOG:  redo starts at 0/21A12E8
+2021-05-01 15:00:54.900 CEST [15052] LOG:  invalid record length at 0/22A5C60: wanted 24, got 0
+2021-05-01 15:00:54.900 CEST [15052] LOG:  redo done at 0/22A5C28
+2021-05-01 15:00:54.967 CEST [10560] LOG:  database system is ready to accept connections
+2021-05-01 15:00:56.235 CEST [10560] LOG:  background worker "logical replication launcher" (PID 14428) was terminated by exception 0xC000013A
+2021-05-01 15:00:56.235 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:00:56.235 CEST [10560] LOG:  terminating any other active server processes
+2021-05-01 15:00:56.241 CEST [10560] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:00:56.278 CEST [14704] LOG:  database system was interrupted; last known up at 2021-05-01 15:00:54 CEST
+2021-05-01 15:00:56.675 CEST [14704] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:00:56.678 CEST [14704] LOG:  invalid record length at 0/22A5CD8: wanted 24, got 0
+2021-05-01 15:00:56.678 CEST [14704] LOG:  redo is not required
+2021-05-01 15:00:56.705 CEST [10560] LOG:  database system is ready to accept connections
+2021-05-01 15:00:57.658 CEST [10560] LOG:  background worker "logical replication launcher" (PID 8328) was terminated by exception 0xC000013A
+2021-05-01 15:00:57.658 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:00:57.659 CEST [10560] LOG:  terminating any other active server processes
+2021-05-01 15:00:57.662 CEST [10560] LOG:  statistics collector process (PID 13548) was terminated by exception 0xC000013A
+2021-05-01 15:00:57.662 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:00:57.664 CEST [10560] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:00:57.810 CEST [7596] LOG:  database system was interrupted; last known up at 2021-05-01 15:00:56 CEST
+2021-05-01 15:00:58.190 CEST [7596] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:00:58.193 CEST [7596] LOG:  invalid record length at 0/22A5D50: wanted 24, got 0
+2021-05-01 15:00:58.193 CEST [7596] LOG:  redo is not required
+2021-05-01 15:00:58.221 CEST [10560] LOG:  database system is ready to accept connections
+2021-05-01 15:00:59.860 CEST [10560] LOG:  background worker "logical replication launcher" (PID 14556) was terminated by exception 0xC000013A
+2021-05-01 15:00:59.860 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:00:59.860 CEST [10560] LOG:  terminating any other active server processes
+2021-05-01 15:00:59.863 CEST [10560] LOG:  statistics collector process (PID 4748) was terminated by exception 0xC000013A
+2021-05-01 15:00:59.863 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:00:59.866 CEST [10560] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:00:59.904 CEST [15884] LOG:  database system was interrupted; last known up at 2021-05-01 15:00:58 CEST
+2021-05-01 15:01:00.280 CEST [15884] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:01:00.283 CEST [15884] LOG:  invalid record length at 0/22A5DC8: wanted 24, got 0
+2021-05-01 15:01:00.283 CEST [15884] LOG:  redo is not required
+2021-05-01 15:01:00.311 CEST [10560] LOG:  database system is ready to accept connections
+2021-05-01 15:01:00.398 CEST [10560] LOG:  background worker "logical replication launcher" (PID 14584) was terminated by exception 0xC000013A
+2021-05-01 15:01:00.398 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:01:00.398 CEST [10560] LOG:  terminating any other active server processes
+2021-05-01 15:01:00.402 CEST [10560] LOG:  statistics collector process (PID 12044) was terminated by exception 0xC000013A
+2021-05-01 15:01:00.402 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:01:00.405 CEST [10560] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:01:00.443 CEST [1396] LOG:  database system was interrupted; last known up at 2021-05-01 15:01:00 CEST
+2021-05-01 15:01:00.788 CEST [1396] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:01:00.790 CEST [1396] LOG:  invalid record length at 0/22A5E40: wanted 24, got 0
+2021-05-01 15:01:00.791 CEST [1396] LOG:  redo is not required
+2021-05-01 15:01:00.841 CEST [10560] LOG:  database system is ready to accept connections
+2021-05-01 15:01:00.886 CEST [10560] LOG:  background worker "logical replication launcher" (PID 2208) was terminated by exception 0xC000013A
+2021-05-01 15:01:00.886 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:01:00.886 CEST [10560] LOG:  terminating any other active server processes
+2021-05-01 15:01:00.891 CEST [10560] LOG:  statistics collector process (PID 16096) was terminated by exception 0xC000013A
+2021-05-01 15:01:00.891 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:01:00.892 CEST [10560] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:01:00.931 CEST [15964] LOG:  database system was interrupted; last known up at 2021-05-01 15:01:00 CEST
+2021-05-01 15:01:01.321 CEST [15964] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 15:01:01.323 CEST [15964] LOG:  invalid record length at 0/22A5EB8: wanted 24, got 0
+2021-05-01 15:01:01.324 CEST [15964] LOG:  redo is not required
+2021-05-01 15:01:01.352 CEST [10560] LOG:  database system is ready to accept connections
+2021-05-01 15:01:01.453 CEST [10560] LOG:  WAL writer process (PID 14764) was terminated by exception 0xC000013A
+2021-05-01 15:01:01.453 CEST [10560] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 15:01:01.453 CEST [10560] LOG:  terminating any other active server processes
+2021-05-01 15:01:01.460 CEST [10560] LOG:  all server processes terminated; reinitializing
+2021-05-01 15:01:01.499 CEST [14036] LOG:  database system was interrupted; last known up at 2021-05-01 15:01:01 CEST

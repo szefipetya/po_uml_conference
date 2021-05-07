@@ -1,5 +1,9 @@
 <ng-template #contentc>
-  <div (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)">
+  <div
+    (mousedown)="onMouseDown($event)"
+    (mouseup)="onMouseUp($event)"
+    [style.box-shadow]="this.box_shadow"
+  >
     <!-- {{ this.model.titleModel.name }} -->
     <app-attribute
       [parent]="this"
@@ -16,12 +20,15 @@
       {{ this.isLocked() }} {{ this.isLoading() }}
     </div>
     Elements:
-    <div *ngFor="let item of this.model.elements">
-      {{ item.icon + " " + item.name }}
+    <div *ngFor="let item of this.model.elements" class="m-0">
+      <pre
+        class="m-0"
+      ><img class="file-icon" src="{{ this.iconEnumToSrc(item.icon) }}" />{{item.name}}</pre>
     </div>
   </div>
 </ng-template>
 <app-diagram-object
+  [style.box-shadow]="this.box_shadow"
   [contentTemplate]="contentc"
   [model]="this.model"
   [general]="this.general"

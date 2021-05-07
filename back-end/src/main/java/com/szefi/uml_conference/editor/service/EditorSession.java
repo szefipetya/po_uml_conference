@@ -132,6 +132,10 @@ DiagramRepository diagramRepo;
      
      /*MAIN SESSION DECLARATION*/
     /*MAIN SESSION LOGIC*/
+    /**
+    * Deletes the locks that have been locked by the user, 
+    @return the unlocked items id's in a list
+     */
      public List<Integer> deleteLocksRelatedToUser(Integer user_id){
         List<Integer> ret=new ArrayList<>();
      for( Map.Entry<Integer,Pair<SessionState,DynamicSerialObject>> e : sessionItemMap.entrySet()){
@@ -203,47 +207,39 @@ DiagramRepository diagramRepo;
            throw new NotFoundException("item with id"+id+"does not exist in the session");
           return s.getLockerUser_id().equals(user_id);
     }
+    
+private void  injectAndLockAfterCreate(Integer user_id,DynamicSerialObject obj){
+      obj.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);
+                 getSessionStateById(obj.getId()).setExtra(new HashMap<>());
+              getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+user_id);
+                   SessionState state=getSessionStateById(obj.getId());
+            state.setDraft(true);
+            this.lockObjectById(obj.getId(), user_id, this.generateCommonLock());
+    }
+
+
     //returning new item's id
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public DynamicSerialObject createItemForContainer(Integer user_id,Integer cont_id,DynamicSerialObject obj){
+    public DynamicSerialObject createItemForContainer(Integer user_id,Integer cont_id,DynamicSerialObject obj) throws NotFoundException{
         Pair<SessionState,DynamicSerialContainer_I> s= this.sessionContainerMap.get(cont_id);
          
         if(s!=null){
             DynamicSerialContainer_I cont=s.getSecond();
-         
-           // obj.setId(rand_id);
-          //obj.setId(null);
-                
-          //obj gets an id.
-         //   cont.container().add(obj);
            try{
             if(obj instanceof AttributeElement){              
                 AttributeElement casted=(AttributeElement)obj; 
                 casted.setEdit(false);
-               
                    casted.setGroup((SimpleClassElementGroup)cont); 
                    casted=objectRepo.save(casted);//id injected  
                    cont.container().add(casted);
-                 //SimpleClassElementGroup gr=objectRepo.save((SimpleClassElementGroup)cont);
-                 
-               //  obj=gr.get
-               // objectRepo.save((SimpleClassElementGroup)cont);//update function will save it
-                //objectRepo.save((SimpleClassElementGroup)cont);
                obj=casted;
             }}
            catch(org.springframework.orm.jpa.JpaObjectRetrievalFailureException ex)
            {
                System.err.println(ex);
            }
-            this.sessionItemMap.put(obj.getId(),Pair.of(new SessionState(),obj)); 
-            this.lockObjectById(obj.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
-            SessionState state=getSessionStateById(obj.getId());
-            state.setDraft(true);
-            state.setLockerUser_id(user_id);
-            System.out.println("obj created and locked for"+user_id);
-              getSessionStateById(obj.getId()).setExtra(new HashMap<>());
-              getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:"+user_id);
-              
+          
+              injectAndLockAfterCreate(user_id, obj);
              //   this.dg= this.diagramRepo.save(this.dg); 
             return obj;
             //the object has no parent, therefore the container is the diagram itself
@@ -258,28 +254,11 @@ DiagramRepository diagramRepo;
              
                     if(dgo instanceof SimpleClass){
                         SimpleClass cls=(SimpleClass)dgo;
-                          for(SimpleClassElementGroup g: cls.getGroups()){
-                        
-                               for(AttributeElement e:g.getAttributes()){
-                                 e.setId(null);
-                                  e.setGroup(g);
-                               }
-                              g.setId(null);
-                              g.setParentClass(cls);
-                                
-                        }
-                       
-                          cls.getTitleModel().setId(null);
-                          cls.getTitleModel().setParent(cls);
-                          cls.setId(null);
-                         
-                        
-                  // cls.getDimensionModel().setDgObject(cls);
-                    cls.setDiagram(dg);
+                         cls.prepareConnectionsForSave(dg);
                          cls=this.objectRepo.saveAndFlush(cls);
                          
                      dgo=cls;
-                        this.lockObjectById(cls.getTitleModel().getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+                        this.lockObjectById(cls.getTitleModel().getId(), user_id, this.generateCommonLock());
                     try {
                         doSomethingWithClassHeaderToParentPackageObject(cls,ACTION_TYPE.S_INJECT_CLASS_HEADER_TO_PACKAGE);
                     } catch (JsonProcessingException ex) {
@@ -287,21 +266,11 @@ DiagramRepository diagramRepo;
                     }
                     }  else{  
                        dgo.setId(null);
-                  //    dgo.getDimensionModel().setId(null);
-                       //  dgo.getDimensionModel().setDgObject(dgo);
-                        
                      dgo.setDiagram(dg);
-                     
                      this.dg.getDgObjects().add(dgo);
                      dgo=  this.objectRepo.save(dgo);
                     }
-                     
-                        dgo.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);
-                 getSessionStateById(dgo.getId()).setExtra(new HashMap<>());
-              getSessionStateById(dgo.getId()).getExtra().put("placeholder", "c:"+user_id);
-                   SessionState state=getSessionStateById(dgo.getId());
-            state.setDraft(true);
-            this.lockObjectById(dgo.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+                     this.injectAndLockAfterCreate(user_id, obj);        
                 obj=dgo;
               }    
                     
@@ -312,23 +281,14 @@ DiagramRepository diagramRepo;
             return null;
         }else if(cont_id.equals(SocketSessionService.L_ROOT_ID)){
             if(obj instanceof AutoSessionInjectable_I){
-                AutoSessionInjectable_I casted=(AutoSessionInjectable_I)obj;
-         
-               
-           
-            
-            System.out.println("obj created and locked for"+user_id);
-           
+            System.out.println("obj created and locked for"+user_id);         
               if(obj instanceof Line){ 
                   Line l=(Line)obj;  
                   l.setId(null);
                   l.getLineType().setLine(l); 
                   (l).setDiagram(dg);
                      l= this.objectRepo.save(l);
-               
              
-                  
-              
                l.injectSelfToStateMap(this.sessionItemMap,this.sessionContainerMap);   
                getSessionStateById(l.getId()).setExtra(new HashMap<>());
               getSessionStateById(l.getId()).getExtra().put("placeholder", "c:"+user_id);
@@ -340,7 +300,12 @@ DiagramRepository diagramRepo;
             }      
         }
      //  this.dg= this.diagramRepo.save(this.dg);
-      return null;
+     throw new NotFoundException("container with id "+cont_id+" not found!");
+     // return null;
+    }
+
+    private LOCK_TYPE[] generateCommonLock(){
+         return new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE};
     }
     /**
      Transaction need to be flushed before using this to work properly
@@ -360,7 +325,6 @@ DiagramRepository diagramRepo;
 
     @Transactional(propagation=Propagation.REQUIRES_NEW)
     public Pair<SessionState,DynamicSerialObject> updateObjectAndUnlock(DynamicSerialObject obj,Integer user_id) throws NullPointerException,NotFoundException {
-       
        
           SessionState s=this.getSessionStateById(obj.getId());
           if(s!=null){
@@ -782,7 +746,10 @@ DiagramRepository diagramRepo;
     }
    
    public UserWebSocket getUserByJwt(String session_jwt){
-       return this.userSockets.stream().filter(s->s.getSession_jwt().equals(session_jwt)).findFirst().get();
+
+       Optional<UserWebSocket> opt= this.userSockets.stream().filter(s->s.getSession_jwt().equals(session_jwt)).findFirst();
+               if(opt.isPresent()) return opt.get();
+               return null;
    }
     public List<UserWebSocket> getUserById (Integer id){
        return this.userSockets.stream().filter(s->s.getUser_id().equals(id)).collect(Collectors.toList());

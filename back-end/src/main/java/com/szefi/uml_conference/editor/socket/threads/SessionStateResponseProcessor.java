@@ -2,6 +2,8 @@ package com.szefi.uml_conference.editor.socket.threads;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.szefi.uml_conference.D;
+import com.szefi.uml_conference.DLEVEL;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.Response.RESPONSE_SCOPE;
 import com.szefi.uml_conference.editor.model.socket.Response.SessionStateResponse;
@@ -45,6 +47,7 @@ ObjectMapper mapper;
 @Override
     public void run() {
         while(!isClosed){
+            try{
                   System.out.println("waiting for response item");
             SessionStateResponse response=null;
             try {
@@ -62,7 +65,7 @@ ObjectMapper mapper;
                 System.out.println(s.getUser_id());
                 if(response.getScope()==RESPONSE_SCOPE.PUBLIC||s.getUser_id().equals(response.getTarget_user_id())){
                     try {
-                        if(s.getStateSocket().isOpen()){
+                        if(s.getStateSocket()!=null&&s.getStateSocket().isOpen()){
                         s.getStateSocket().sendMessage(new TextMessage(mapper.writeValueAsString(response)));
                         System.out.println("stateresponse sent to user "+s.getUser_id());
                             if(response.getScope()==RESPONSE_SCOPE.PRIVATE) break;
@@ -75,13 +78,10 @@ ObjectMapper mapper;
             }
                 
                 
-           /*     try {
-            System.out.println("sending msg to a user");         
-                    
-                //    s.getSocket().sendMessage(new TextMessage( mapper.writeValueAsString(action)));
-                } catch (IOException ex) {
-                    Logger.getLogger(ActionResponseProcessor.class.getName()).log(Level.SEVERE, null, ex);
-                }*/
+            }catch(Exception e){
+                D.log("SessionStateResponseProcessor catched an exception:", this.getClass(), DLEVEL.DEBUG);
+                e.printStackTrace();
+            }
             
         }
     }

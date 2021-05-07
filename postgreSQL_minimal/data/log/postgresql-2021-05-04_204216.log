@@ -1,0 +1,100 @@
+2021-05-04 20:42:16.364 CEST [3056] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-04 20:42:16.366 CEST [3056] LOG:  listening on IPv6 address "::", port 8102
+2021-05-04 20:42:16.366 CEST [3056] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-04 20:42:16.591 CEST [13892] LOG:  database system was interrupted; last known up at 2021-05-01 18:56:10 CEST
+2021-05-04 20:42:17.889 CEST [13892] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-04 20:42:17.894 CEST [13892] LOG:  redo starts at 0/3615A20
+2021-05-04 20:42:17.894 CEST [13892] LOG:  invalid record length at 0/3615B08: wanted 24, got 0
+2021-05-04 20:42:17.894 CEST [13892] LOG:  redo done at 0/3615AD0
+2021-05-04 20:42:17.993 CEST [3056] LOG:  database system is ready to accept connections
+2021-05-04 21:23:04.388 CEST [4980] ERROR:  syntax error at or near "2" at character 1
+2021-05-04 21:23:04.388 CEST [4980] STATEMENT:  2
+2021-05-04 21:23:23.501 CEST [4980] ERROR:  function "delete_old_rows" already exists with same argument types
+2021-05-04 21:23:23.501 CEST [4980] STATEMENT:  CREATE FUNCTION delete_old_rows() RETURNS trigger
+	    LANGUAGE plpgsql
+	    AS $$
+	BEGIN
+	  DELETE FROM black_jwt WHERE expiration < NOW() + INTERVAL '2 days';
+	  RETURN NULL;
+	END;
+	$$;
+2021-05-04 21:23:33.808 CEST [4980] ERROR:  syntax error at or near "UPDATE" at character 11
+2021-05-04 21:23:33.808 CEST [4980] STATEMENT:  CREATE or UPDATE FUNCTION delete_old_rows() RETURNS trigger
+	    LANGUAGE plpgsql
+	    AS $$
+	BEGIN
+	  DELETE FROM black_jwt WHERE expiration < NOW() + INTERVAL '2 days';
+	  RETURN NULL;
+	END;
+	$$;
+2021-05-04 21:23:46.262 CEST [4980] ERROR:  syntax error at or near "(" at character 32
+2021-05-04 21:23:46.262 CEST [4980] STATEMENT:  UPDATE FUNCTION delete_old_rows() RETURNS trigger
+	    LANGUAGE plpgsql
+	    AS $$
+	BEGIN
+	  DELETE FROM black_jwt WHERE expiration < NOW() + INTERVAL '2 days';
+	  RETURN NULL;
+	END;
+	$$;
+2021-05-04 21:31:30.963 CEST [4980] ERROR:  function "delete_old_rows2" already exists with same argument types
+2021-05-04 21:31:30.963 CEST [4980] STATEMENT:  CREATE FUNCTION delete_old_rows2() RETURNS trigger
+	    LANGUAGE plpgsql
+	    AS $delete_old_rows2$
+	BEGIN
+	  DELETE FROM black_jwt WHERE expiration > NOW();
+	  RETURN NULL;
+	END;
+	$delete_old_rows2$;
+	
+	
+	CREATE TRIGGER delete_old_rows2_trigger BEFORE INSERT OR UPDATE ON black_jwt
+	    FOR EACH ROW EXECUTE PROCEDURE delete_old_rows2();
+2021-05-04 21:36:32.295 CEST [9964] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.296 CEST [18364] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.305 CEST [16056] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.305 CEST [25020] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.305 CEST [20248] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.316 CEST [15176] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.316 CEST [28088] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.316 CEST [25740] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.317 CEST [18824] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:36:32.326 CEST [17620] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 21:43:22.197 CEST [4980] ERROR:  relation "emp" does not exist
+2021-05-04 21:43:22.197 CEST [4980] STATEMENT:  CREATE FUNCTION emp_stamp() RETURNS trigger AS $emp_stamp$
+	    BEGIN
+	      DELETE FROM black_jwt WHERE expiration > NOW();
+	  RETURN NULL;
+	    END;
+	$emp_stamp$ LANGUAGE plpgsql;
+	
+	CREATE TRIGGER emp_stamp BEFORE INSERT OR UPDATE ON emp
+	    FOR EACH ROW EXECUTE PROCEDURE emp_stamp();
+2021-05-04 21:48:37.160 CEST [4980] ERROR:  syntax error at or near "AFTER" at character 26
+2021-05-04 21:48:37.160 CEST [4980] STATEMENT:  UPDATE TRIGGER emp_stamp AFTER INSERT OR UPDATE ON black_jwt
+	    FOR EACH ROW EXECUTE PROCEDURE emp_stamp();
+2021-05-04 21:50:33.179 CEST [27768] ERROR:  cannot drop function emp_stamp() because other objects depend on it
+2021-05-04 21:50:33.179 CEST [27768] DETAIL:  trigger emp_stamp on table black_jwt depends on function emp_stamp()
+2021-05-04 21:50:33.179 CEST [27768] HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+2021-05-04 21:50:33.179 CEST [27768] STATEMENT:  
+	DROP FUNCTION public.emp_stamp();
+	
+2021-05-04 21:51:05.173 CEST [27768] ERROR:  cannot drop function emp_stamp() because other objects depend on it
+2021-05-04 21:51:05.173 CEST [27768] DETAIL:  trigger emp_stamp on table black_jwt depends on function emp_stamp()
+2021-05-04 21:51:05.173 CEST [27768] HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+2021-05-04 21:51:05.173 CEST [27768] STATEMENT:  
+	DROP FUNCTION public.emp_stamp();
+	
+2021-05-04 22:24:56.333 CEST [27768] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-04 22:24:58.134 CEST [3056] LOG:  server process (PID 22260) was terminated by exception 0xC000013A
+2021-05-04 22:24:58.134 CEST [3056] DETAIL:  Failed process was running: SET application_name = 'PostgreSQL JDBC Driver'
+2021-05-04 22:24:58.134 CEST [3056] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-04 22:24:58.158 CEST [3056] LOG:  terminating any other active server processes
+2021-05-04 22:24:58.362 CEST [17608] WARNING:  terminating connection because of crash of another server process
+2021-05-04 22:24:58.362 CEST [17608] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-04 22:24:58.362 CEST [17608] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-04 22:24:58.570 CEST [3056] LOG:  all server processes terminated; reinitializing
+2021-05-04 22:24:58.814 CEST [20680] LOG:  database system was interrupted; last known up at 2021-05-04 21:57:20 CEST
+2021-05-04 22:25:01.717 CEST [3056] LOG:  startup process (PID 20680) was terminated by exception 0xC000013A
+2021-05-04 22:25:01.717 CEST [3056] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-04 22:25:01.717 CEST [3056] LOG:  aborting startup due to startup process failure
+2021-05-04 22:25:01.720 CEST [3056] LOG:  database system is shut down

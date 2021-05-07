@@ -3,7 +3,7 @@
     {{ this.getModel().group_name }}
   </div>
   <span style="position: absolute" [style.left]="this.model">
-    {{ this.sessionState != null }}{{ this.isLoading() }}
+    {{ this.isLoading() }}
   </span>
   <app-attribute
     *ngFor="let item of this.getModel().attributes"

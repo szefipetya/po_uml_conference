@@ -33,14 +33,15 @@ public class SocketSecurityService {
     @Autowired
     DiagramRepository diagramRepository;
     //test:rossz id-t megadni.
-        public MyUserDetails authenticateRequest(SocketAuthenticationRequest req) throws JwtParseException{
+        public MyUserDetails authenticateAndAuthorizeRequest(SocketAuthenticationRequest req) throws JwtParseException{
             MyUserDetails userDets=  userDetService.loadUserByUsername(jwtService.extractUsername(req.getAuth_jwt()));
             if(jwtService.validateToken(req.getAuth_jwt(),userDets)){
                 DiagramEntity ent= diagramRepository.findById(req.getDiagram_id()).get();
+                
                if(ent!=null
                        &&ent.getOwner()!=null
                        &&(ent.getOwner().getId().equals(userDets.getId())
-                       ||ent.getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(userDets.getId()))
+                       ||ent.getRelatedFolder().getRelatedProject().getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(userDets.getId()))
                        ))
                     return userDets;    
             }

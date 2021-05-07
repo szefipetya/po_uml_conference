@@ -342,11 +342,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   fullWidth: number;
   fullHeight: number;
   setup() {
-    const p = new Promise(async (resolve, reject) => {
-      if (this.editorService.getDiagramId())
-        await this.editorService.initFromServer(this.editorService.getDiagramId());
-      await resolve('success');
-    });
+
     this.editorService.addListenerToEvent(this, (t) => {
       t.fullWidth = document.querySelector('html').clientWidth;
       t.fullHeight = document.querySelector('html').clientHeight;
@@ -358,9 +354,6 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
         t.fullHeight - t.editorService.alignment.bottom_dock.height;
       t.socket.registerContainer(t.getId(), t);
     }, 'canvas_size_update')
-
-
-
   }
   editorService: GlobalEditorService;
   constructor(
@@ -666,9 +659,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   }
   onClick(e) {
     console.log('CLICKKK');
-    /* if (e.target.className == 'attribute') {
-      e.target.click();
-    }*/
+
     this.lineCanvasComponent.onClick(e);
   }
   onMouseUp(e) {
@@ -840,7 +831,6 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
         y: this.drawedClassY,
       },
       extra: { old_id: this.drawedClassId, draft: true },
-      min_height: 75,
       viewModel: null,
       scaledModel: {
         posx_scaled: x,
@@ -917,7 +907,6 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
         y: this.drawedClassY,
       },
       extra: { old_id: this.drawedClassId, draft: true },
-      min_height: 75,
       viewModel: null,
       scaledModel: {
         posx_scaled: x,
@@ -943,8 +932,6 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
     }, 50);
     this.drawedClassPositionSpecified = true;
   }
-
-
   sendDiagramObjectCreateMessage(obj: DiagramObject) {
     let action: EditorAction = new EditorAction(obj.id, obj._type, GlobalEditorService.ROOT_ID);
     action.extra = { old_id: obj.id, create_method: 'nested' };

@@ -1,0 +1,81 @@
+2021-05-01 14:24:37.210 CEST [9192] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-01 14:24:37.211 CEST [9192] LOG:  listening on IPv6 address "::", port 8102
+2021-05-01 14:24:37.212 CEST [9192] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-01 14:24:37.261 CEST [10496] LOG:  database system was interrupted; last known up at 2021-05-01 14:06:11 CEST
+2021-05-01 14:24:37.603 CEST [11912] FATAL:  the database system is starting up
+2021-05-01 14:24:37.663 CEST [13032] FATAL:  the database system is starting up
+2021-05-01 14:24:37.817 CEST [10496] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:24:37.821 CEST [10496] LOG:  redo starts at 0/1B8B110
+2021-05-01 14:24:37.822 CEST [10496] LOG:  invalid record length at 0/1B8B1F8: wanted 24, got 0
+2021-05-01 14:24:37.822 CEST [10496] LOG:  redo done at 0/1B8B1C0
+2021-05-01 14:24:37.832 CEST [6060] FATAL:  the database system is starting up
+2021-05-01 14:24:37.853 CEST [9192] LOG:  database system is ready to accept connections
+2021-05-01 14:48:43.420 CEST [9192] LOG:  server process (PID 1872) was terminated by exception 0xC000013A
+2021-05-01 14:48:43.420 CEST [9192] DETAIL:  Failed process was running: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_stat_activity WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Total",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Active",
+	   (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_database WHERE oid = 13442))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Commits",
+	   (SELECT sum(xact_rollback) FROM pg_stat_database WHERE datname = (SELECT datname FROM pg_database WHERE oid = 13442)) AS "Rollbacks"
+	) 
+2021-05-01 14:48:43.420 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:43.421 CEST [9192] LOG:  terminating any other active server processes
+2021-05-01 14:48:43.426 CEST [14596] WARNING:  terminating connection because of crash of another server process
+2021-05-01 14:48:43.426 CEST [14596] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-05-01 14:48:43.426 CEST [14596] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-05-01 14:48:43.427 CEST [9192] LOG:  statistics collector process (PID 1060) was terminated by exception 0xC000013A
+2021-05-01 14:48:43.427 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:43.430 CEST [9192] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:48:43.468 CEST [15948] LOG:  database system was interrupted; last known up at 2021-05-01 14:44:58 CEST
+2021-05-01 14:48:43.874 CEST [15948] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:48:43.877 CEST [15948] LOG:  redo starts at 0/1EA95E8
+2021-05-01 14:48:43.877 CEST [15948] LOG:  invalid record length at 0/1EA96D0: wanted 24, got 0
+2021-05-01 14:48:43.878 CEST [15948] LOG:  redo done at 0/1EA9698
+2021-05-01 14:48:43.903 CEST [9192] LOG:  database system is ready to accept connections
+2021-05-01 14:48:47.139 CEST [9192] LOG:  background worker "logical replication launcher" (PID 16024) was terminated by exception 0xC000013A
+2021-05-01 14:48:47.139 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:47.140 CEST [9192] LOG:  terminating any other active server processes
+2021-05-01 14:48:47.142 CEST [9192] LOG:  statistics collector process (PID 16016) was terminated by exception 0xC000013A
+2021-05-01 14:48:47.142 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:47.146 CEST [9192] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:48:47.191 CEST [16132] LOG:  database system was interrupted; last known up at 2021-05-01 14:48:43 CEST
+2021-05-01 14:48:47.568 CEST [16132] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:48:47.571 CEST [16132] LOG:  invalid record length at 0/1EA9748: wanted 24, got 0
+2021-05-01 14:48:47.572 CEST [16132] LOG:  redo is not required
+2021-05-01 14:48:47.600 CEST [9192] LOG:  database system is ready to accept connections
+2021-05-01 14:48:51.053 CEST [9192] LOG:  background worker "logical replication launcher" (PID 16220) was terminated by exception 0xC000013A
+2021-05-01 14:48:51.053 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:51.054 CEST [9192] LOG:  terminating any other active server processes
+2021-05-01 14:48:51.058 CEST [9192] LOG:  statistics collector process (PID 16212) was terminated by exception 0xC000013A
+2021-05-01 14:48:51.058 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:51.060 CEST [9192] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:48:51.098 CEST [16304] LOG:  database system was interrupted; last known up at 2021-05-01 14:48:47 CEST
+2021-05-01 14:48:51.474 CEST [16304] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:48:51.477 CEST [16304] LOG:  invalid record length at 0/1EA97C0: wanted 24, got 0
+2021-05-01 14:48:51.477 CEST [16304] LOG:  redo is not required
+2021-05-01 14:48:51.503 CEST [9192] LOG:  database system is ready to accept connections
+2021-05-01 14:48:52.539 CEST [9192] LOG:  background worker "logical replication launcher" (PID 16376) was terminated by exception 0xC000013A
+2021-05-01 14:48:52.539 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:52.540 CEST [9192] LOG:  terminating any other active server processes
+2021-05-01 14:48:52.543 CEST [9192] LOG:  statistics collector process (PID 16368) was terminated by exception 0xC000013A
+2021-05-01 14:48:52.543 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:52.544 CEST [9192] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:48:52.582 CEST [15340] LOG:  database system was interrupted; last known up at 2021-05-01 14:48:51 CEST
+2021-05-01 14:48:52.979 CEST [15340] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-01 14:48:52.981 CEST [15340] LOG:  invalid record length at 0/1EA9838: wanted 24, got 0
+2021-05-01 14:48:52.982 CEST [15340] LOG:  redo is not required
+2021-05-01 14:48:53.042 CEST [9192] LOG:  database system is ready to accept connections
+2021-05-01 14:48:55.039 CEST [9192] LOG:  background worker "logical replication launcher" (PID 5284) was terminated by exception 0xC000013A
+2021-05-01 14:48:55.039 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:55.039 CEST [9192] LOG:  terminating any other active server processes
+2021-05-01 14:48:55.042 CEST [9192] LOG:  statistics collector process (PID 8116) was terminated by exception 0xC000013A
+2021-05-01 14:48:55.042 CEST [9192] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-01 14:48:55.045 CEST [9192] LOG:  all server processes terminated; reinitializing
+2021-05-01 14:48:55.082 CEST [15424] LOG:  database system was interrupted; last known up at 2021-05-01 14:48:52 CEST

@@ -88,7 +88,7 @@ public class ManagementController {
             @PathVariable(value = "id") String folder_id
     ) {
         try {
-            return ResponseEntity.ok(service.deleteFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
+            return ResponseEntity.ok(service.deleteFile(authHeader.substring(7), Integer.valueOf(folder_id)));
             //return service.getRootFolderByUserId()
         } catch (JwtException|UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
@@ -197,6 +197,21 @@ public class ManagementController {
     ) {
         try {
             return ResponseEntity.ok(projectService.deleteProjectFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileTypeConversionException | FileNotFoundException |IllegalDmlActionException | UnAuthorizedActionException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } 
+    }
+    
+          @DeleteMapping("project/{id}")
+    public ResponseEntity<?> deleteProject(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id
+    ) {
+        try {
+            return ResponseEntity.ok(service.deleteFile(authHeader.substring(7), Integer.valueOf(folder_id)));
             //return service.getRootFolderByUserId()
         } catch (JwtException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

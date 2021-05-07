@@ -1,5 +1,6 @@
 package com.szefi.uml_conference.controller;
 
+import com.szefi.uml_conference._exceptions.InvalidInputFormatException;
 import com.szefi.uml_conference.editor.model.diagram.Diagram;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.management.model.dto.FolderDto;
@@ -8,6 +9,7 @@ import com.szefi.uml_conference.security.model.auth.LogoutRequest;
 import com.szefi.uml_conference.security.service.JwtAuthRequestHandlerService;
 
 import com.szefi.uml_conference.editor.service.SocketSessionService;
+import com.szefi.uml_conference.security.model.auth.RegistrationRequest;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,16 +45,13 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author peti and tomi
  */
-@RequestMapping("/")
+
 @RestController
 public class ApiController {
-
-   @Autowired
-   JwtAuthRequestHandlerService jwtAuthService;
     @Autowired
     SocketSessionService eService;
     
-    @GetMapping("get/dg/{id}")
+    @GetMapping("/get/dg/{id}")
     public ResponseEntity<?> getOne(@PathVariable("id") String id)  {
         try{
         return ResponseEntity.ok(eService.getDiagramById(Integer.valueOf(id)));
@@ -61,43 +60,8 @@ public class ApiController {
         }
     }
      
-        @GetMapping("/")
-    public String home() {
-        return ("<h1>Welcome</h1>");
-    }
-       @PostMapping("/test")
-    public String test() {
-        return ("<h1>Welcome test</h1>");
-    }
+  
 
-    @GetMapping("/user")
-    public String user() {
-        return ("<h1>Welcome User</h1>");
-    }
-
-    @GetMapping("/admin")
-    public String admin() {
-        return ("<h1>Welcome Admin</h1>");
-    }
-    
-    
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationJwt(@RequestBody AuthRequest req) throws Exception {
-       try{
-            return ResponseEntity.ok( jwtAuthService.jwtAuth(req));
-       }catch(BadCredentialsException ex){
-           return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-       }
-    }
-     @PostMapping("/log_me_out")//angular miatt van ez, bugos
-    public ResponseEntity<?> logoutWithJwt(@RequestBody LogoutRequest token) throws Exception {
-      try{
-            return ResponseEntity.ok( jwtAuthService.jwtLogout(token.getJwt_token()));
-       }catch(BadCredentialsException ex){
-           return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-       }
-    
-    }
 /*
     @DELETE
     @Path("delete/{id}")

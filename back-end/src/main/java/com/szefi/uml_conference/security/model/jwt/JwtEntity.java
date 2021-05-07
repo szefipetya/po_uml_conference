@@ -5,6 +5,7 @@
  */
 package com.szefi.uml_conference.security.model.jwt;
 
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -25,6 +26,15 @@ public class JwtEntity {
     BlackListedJwtCollectorEntity collector;
 
     private String token="";
+    private Date expiration;
+
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Date expiration) {
+        this.expiration = expiration;
+    }
 
     public BlackListedJwtCollectorEntity getCollector() {
         return collector;

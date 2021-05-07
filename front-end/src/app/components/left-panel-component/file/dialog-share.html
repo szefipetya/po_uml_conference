@@ -1,12 +1,18 @@
-<h1 mat-dialog-title>Share</h1>
+<h1 mat-dialog-title>Share folder with a friend</h1>
 <div mat-dialog-content>
-  <p>What's your favorite animal?</p>
   <mat-form-field>
-    <h3>Favorite Animal</h3>
+    <legend>username</legend>
     <input matInput [(ngModel)]="data.target_userName" />
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button
+    mat-button
+    [mat-dialog-close]="data"
+    cdkFocusInitial
+    class="btn-primary"
+  >
+    Share
+  </button>
 </div>

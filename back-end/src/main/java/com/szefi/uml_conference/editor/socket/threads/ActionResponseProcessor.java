@@ -2,6 +2,8 @@ package com.szefi.uml_conference.editor.socket.threads;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.szefi.uml_conference.D;
+import com.szefi.uml_conference.DLEVEL;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.Response.EditorActionResponse;
 import com.szefi.uml_conference.editor.model.socket.Response.RESPONSE_SCOPE;
@@ -47,7 +49,8 @@ ObjectMapper mapper;
 @Override
     public void run() {
         while(!isClosed){
-                  System.out.println("waiting for response item");
+            try{
+               //  System.out.println("waiting for response item");
             EditorActionResponse response=null;
             try {
                 response = actionResponseQueue.take();
@@ -55,10 +58,10 @@ ObjectMapper mapper;
                 Logger.getLogger(ActionResponseProcessor.class.getName()).log(Level.SEVERE, null, ex);
             }
             if(response==null) continue;
-            System.out.println("response taken");
+          //  System.out.println("response taken");
           //  System.out.println(response.getAction().get);
            // System.out.println(response.getSessionState().getLockerUser_id());
-            System.out.println("----");
+           // System.out.println("----");
            
             for(UserWebSocket s:response.getTargetsUsers()){
                 System.out.println(s.getUser_id());
@@ -74,17 +77,13 @@ ObjectMapper mapper;
                     }
                 
                     }
-            }
-                
-                
-           /*     try {
-            System.out.println("sending msg to a user");         
-                    
-                //    s.getSocket().sendMessage(new TextMessage( mapper.writeValueAsString(action)));
-                } catch (IOException ex) {
-                    Logger.getLogger(ActionResponseProcessor.class.getName()).log(Level.SEVERE, null, ex);
-                }*/
             
+            
+        }
+            }catch(Exception e){
+                D.log("EditorActionResponseProcessor catched an exception:", this.getClass(), DLEVEL.DEBUG);
+                e.printStackTrace();
+            }
         }
     }
     

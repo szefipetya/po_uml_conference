@@ -40,7 +40,8 @@ export class FileComponent implements OnInit, AfterViewInit {
     switch (this.model.icon) {
       case ICON.FOLDER: this.iconLink = "../../../../assets/svg/management/folder_normal.svg"; break;
       case ICON.PROJECT: this.iconLink = "../../../../assets/svg/management/folder_project.svg"; break;
-      case ICON.PROJECT_FOLDER: this.iconLink = "../../../../assets/svg/management/folder_normal.svg"; break;
+      case ICON.PROJECT_FOLDER: this.iconLink = "../../../../assets/svg/management/box.svg"; break;
+      case ICON.PROJECT_CLASS: this.iconLink = "../../../../assets/svg/management/class.svg"; break;
     }
   }
   ngAfterViewInit() {
@@ -97,8 +98,10 @@ export class FileComponent implements OnInit, AfterViewInit {
     return (error: HttpErrorResponse): Observable<T> => {
       // TODO: send the error to remote logging infrastructure
       console.error(error); // log to console instead
-
-      view.snack.open(JSON.stringify(error.error.error), "Error", { duration: 2000 });
+      if (error.error.error)
+        view.snack.open(JSON.stringify(error.error.error), "Error", { duration: 2000 });
+      else
+        view.snack.open(JSON.stringify(error.error), "Error", { duration: 2000 });
       // TODO: better job of transforming error for user consumption
       console.log(`${operation} failed: ${error.message}`);
 
@@ -111,6 +114,7 @@ export class FileComponent implements OnInit, AfterViewInit {
     if (this.nestedFiles)
       this.nestedFiles.map(n => { n.viewModel.deselectNested() })
   }
+
   onfocusOut(e) {
     console.log(this.model)
     this.save(e.target.value);
@@ -134,6 +138,7 @@ export class FileComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed', result);
+      if (!result) return
       this.fileService.shareFile(result).pipe(catchError(this.handleError<FileResponse>(this, 'share', null)))
         .subscribe((r: FileShareRequest) => {
           if (r) {
@@ -175,7 +180,9 @@ export class ShareDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: FileShareRequest) { }
 
   onNoClick(): void {
+    this.data = null;
     this.dialogRef.close();
+
   }
 
 }

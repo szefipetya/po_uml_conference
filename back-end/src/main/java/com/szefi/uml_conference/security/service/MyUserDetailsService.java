@@ -24,6 +24,7 @@ import com.szefi.uml_conference.security.model.ROLE;
 import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.repository.UserRepository;
 import com.szefi.uml_conference.security.model.MyUserDetails;
+import com.szefi.uml_conference.security.model.auth.RegistrationRequest;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -68,7 +69,7 @@ public class MyUserDetailsService implements UserDetailsService {
           UserEntity user=new UserEntity();
            user.setName("Peter");
            user.setUserName("user");
-           user.setPassword("pass");
+           user.setPassword("pass1");
          
            user.setRoles(new ArrayList<ROLE>() {{
                 add(ROLE.ROLE_USER);
@@ -80,7 +81,7 @@ public class MyUserDetailsService implements UserDetailsService {
              UserEntity user2=new UserEntity();
            user2.setName("User2");
            user2.setUserName("user2");
-           user2.setPassword("pass");
+           user2.setPassword("pass2");
          
            user2.setRoles(new ArrayList<ROLE>() {{
                 add(ROLE.ROLE_USER);
@@ -117,5 +118,9 @@ public class MyUserDetailsService implements UserDetailsService {
         }
         return null;
 
+    }
+
+    boolean validateRegistration(RegistrationRequest req) {
+        return !(this.userRepository.findByUserName(req.getUsername()).isPresent()||this.userRepository.findByEmail(req.getUsername()).isPresent());
     }
 }
