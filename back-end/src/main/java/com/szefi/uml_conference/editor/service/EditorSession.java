@@ -28,7 +28,7 @@ import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.LOCK_TYPE;
 import com.szefi.uml_conference.editor.model.socket.ServerSideEditorAction;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
-import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocketWrapper;
 import com.szefi.uml_conference.editor.model.top.AutoSessionInjectable_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
@@ -36,7 +36,7 @@ import com.szefi.uml_conference.editor.repository.AttributeElementRepository;
 
 import com.szefi.uml_conference.editor.repository.DiagramRepository;
 import com.szefi.uml_conference.editor.repository.DynamicSerialObjectRepository;
-import com.szefi.uml_conference.editor.socket.threads.service.SOCKET;
+import com.szefi.uml_conference.editor.service.socket.threads.service.SOCKET;
 import com.szefi.uml_conference.editor.service.SocketSessionService;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -79,7 +79,7 @@ public class EditorSession {
     BlockingQueue<EditorAction> nestedActionQueue;
      /*MAIN SESSION DECLARATION*/
        DiagramEntity dg;
-    List<UserWebSocket> userSockets=new ArrayList<>();
+    List<UserWebSocketWrapper> userSockets=new ArrayList<>();
     Map<Integer, Pair<SessionState,DynamicSerialObject>> sessionItemMap=new HashMap<>();
     Map<Integer, Pair<SessionState,DynamicSerialContainer_I>> sessionContainerMap=new HashMap<>();
    
@@ -104,8 +104,8 @@ DiagramRepository diagramRepo;
     }
      
      
-   public UserWebSocket getUserSocketByNativeSocket(SOCKET type,WebSocketSession socket){
-       for(UserWebSocket u:userSockets){
+   public UserWebSocketWrapper getUserSocketByNativeSocket(SOCKET type,WebSocketSession socket){
+       for(UserWebSocketWrapper u:userSockets){
            if(type==SOCKET.ACTION)
              if(u.getActionSocket().equals(socket))return u;
            if(type==SOCKET.STATE)
@@ -117,8 +117,8 @@ DiagramRepository diagramRepo;
       @return returns true if the user was present inside
       */
      public boolean userDisconnect(String session_jwt){
-         UserWebSocket toDelete=null;
-       for(UserWebSocket sock:this.userSockets){
+         UserWebSocketWrapper toDelete=null;
+       for(UserWebSocketWrapper sock:this.userSockets){
            if(sock.getSession_jwt().equals(session_jwt)){
             
               toDelete=sock;
@@ -147,7 +147,7 @@ DiagramRepository diagramRepo;
         }
         
     }
-     for(UserWebSocket w:this.getUserById(user_id)){
+     for(UserWebSocketWrapper w:this.getUserById(user_id)){
           this.userSockets.remove(w);
      }
     
@@ -161,7 +161,7 @@ DiagramRepository diagramRepo;
     public  Map<Integer, Pair<SessionState,DynamicSerialObject>> getSessionItemMap() {
         return sessionItemMap;
     }
-    public List<UserWebSocket> getSocketListContainingUserWithId(Integer id){
+    public List<UserWebSocketWrapper> getSocketListContainingUserWithId(Integer id){
         return this.userSockets.stream().filter(u->u.getUser_id().equals(id)).collect(Collectors.toList());
     }
     public SessionState getSessionStateById(Integer id) {
@@ -180,7 +180,7 @@ DiagramRepository diagramRepo;
         if(s!=null){
         //even if someone locked it, and its me, i can still lock it again for myself
            if(s.getLocks().length==0||
-                   (Integer.valueOf(-1).equals(s.getLockerUser_id()) ? user_id == null 
+                   (Integer.valueOf(-1).equals(s.getLockerUser_id()) ? true 
                    : s.getLockerUser_id().equals(user_id)))
            {
                 System.out.println("locks are set for object"+target_id);
@@ -701,7 +701,7 @@ private void  injectAndLockAfterCreate(Integer user_id,DynamicSerialObject obj){
         this.getItemById(o.getId()).update(o);
         //o.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
                EditorAction action=new EditorAction(ACTION_TYPE.UPDATE);
-                               Optional<UserWebSocket> opt=this.getUserSockets().stream().findFirst();
+                               Optional<UserWebSocketWrapper> opt=this.getUserSockets().stream().findFirst();
                                     if(opt.isPresent()){
                                   action.setSession_jwt(opt.get().getSession_jwt());
                                 action.getTarget().setParent_id(SocketSessionService.ROOT_ID);
@@ -745,22 +745,22 @@ private void  injectAndLockAfterCreate(Integer user_id,DynamicSerialObject obj){
         this.sessionContainerMap = sessionContainerMap;
     }
    
-   public UserWebSocket getUserByJwt(String session_jwt){
+   public UserWebSocketWrapper getUserByJwt(String session_jwt){
 
-       Optional<UserWebSocket> opt= this.userSockets.stream().filter(s->s.getSession_jwt().equals(session_jwt)).findFirst();
+       Optional<UserWebSocketWrapper> opt= this.userSockets.stream().filter(s->s.getSession_jwt().equals(session_jwt)).findFirst();
                if(opt.isPresent()) return opt.get();
                return null;
    }
-    public List<UserWebSocket> getUserById (Integer id){
+    public List<UserWebSocketWrapper> getUserById (Integer id){
        return this.userSockets.stream().filter(s->s.getUser_id().equals(id)).collect(Collectors.toList());
    }
 
 
-    public List<UserWebSocket> getUserSockets() {
+    public List<UserWebSocketWrapper> getUserSockets() {
         return userSockets;
     }
 
-    public void setUserSockets(List<UserWebSocket> userSockets) {
+    public void setUserSockets(List<UserWebSocketWrapper> userSockets) {
         this.userSockets = userSockets;
     }
 

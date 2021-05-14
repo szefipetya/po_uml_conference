@@ -1,6 +1,6 @@
 package com.szefi.uml_conference;
 
-import com.szefi.uml_conference.controller.ApiController;
+import com.szefi.uml_conference.editor.controller.ApiController;
 import com.szefi.uml_conference.debug.ApplicatoinStartupRunner;
 
 import java.util.Arrays;

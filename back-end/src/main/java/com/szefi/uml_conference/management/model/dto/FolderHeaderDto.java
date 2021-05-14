@@ -14,7 +14,7 @@ import com.szefi.uml_conference.management.model.entity.FolderEntity;
  * @author h9pbcl
  */
 @JsonTypeName(value = "folder")
-public class FolderHeaderDto extends FileHeaderDto implements FileHeader_I {
+public class FolderHeaderDto extends FileHeaderDto  {
     boolean is_root;
 
     public FolderHeaderDto() {

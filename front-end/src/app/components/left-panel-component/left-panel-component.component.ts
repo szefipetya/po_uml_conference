@@ -262,12 +262,13 @@ export class LeftPanelComponentComponent implements OnInit {
       // TODO: send the error to remote logging infrastructure
       console.error(error); // log to console instead
       if (error.error.errorMsg) {
-        view.errorMsg = JSON.stringify(error.error.errorMsg);
+        view.errorMsg = error.error.errorMsg;
         if (error.error.file._type == 'projectFolderDto') {
           this.setActualProjectFolder(error.error);
         }
       }
-      else view.errorMsg = JSON.stringify(error.error);
+      else view.errorMsg = error.error.error;
+      if (error.error.error == "Forbidden") { view.errorMsg += ". Log in to access your files!" }
       this.deleteRecentlyAddedFile();
       view.snackBar.open(view.errorMsg, "Error", { duration: 2000 });
       // TODO: better job of transforming error for user consumption

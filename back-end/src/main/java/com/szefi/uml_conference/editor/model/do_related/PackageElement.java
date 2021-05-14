@@ -7,7 +7,7 @@ package com.szefi.uml_conference.editor.model.do_related;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.management.model.ICON;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;

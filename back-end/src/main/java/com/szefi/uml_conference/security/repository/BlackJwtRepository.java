@@ -5,7 +5,6 @@
  */
 package com.szefi.uml_conference.security.repository;
 
-import com.szefi.uml_conference.security.model.jwt.BlackListedJwtCollectorEntity;
 import com.szefi.uml_conference.security.model.jwt.JwtEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,13 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author h9pbcl
  */
 @RestController
-@RequestMapping("/project_management")
 public class ProjectManagementController {
 @Autowired ManagementService mService;
     @Autowired
     ProjectManagementService service;
 
-    @RequestMapping(value = "create_project/{id}", method = RequestMethod.GET)//create a project with a parent_id given in param
+    @RequestMapping(value = "/project_management/create_project/{id}", method = RequestMethod.GET)//create a project with a parent_id given in param
     public ResponseEntity<?> createProject(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String parent_id,
@@ -70,7 +70,7 @@ public class ProjectManagementController {
         }
     }
 
-    @RequestMapping(value = "create_folder/{id}", method = RequestMethod.GET)//create a projectfolder with a parent_id given in param
+    @RequestMapping(value = "/project_management/create_folder/{id}", method = RequestMethod.GET)//create a projectfolder with a parent_id given in param
     public ResponseEntity<?> createProjectFolder(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String parent_id,
@@ -98,5 +98,55 @@ public class ProjectManagementController {
         }
 
     }
+    
+    //PROJECT
+ @RequestMapping(value="/management/project/{id}" ,method = RequestMethod.GET)//create a projectfolder with a parent_id given in param
+    public ResponseEntity<?> getProject(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String parent_id
+    ) {
+        try {
+            return ResponseEntity.ok(service.getProject(authHeader.substring(7), Integer.valueOf(parent_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException | UnAuthorizedActionException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileNotFoundException | FileTypeConversionException ex) {
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } 
+         
+    }
+
+
+
+  @GetMapping("/management/projectFolder/{id}")
+    public ResponseEntity<?> getProjectFolder(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id
+    ) {
+        try {
+            return ResponseEntity.ok(service.getProjectFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileTypeConversionException | FileNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }    
+    
+        @DeleteMapping("/management/projectFolder/{id}")
+    public ResponseEntity<?> deleteProjectFolder(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable(value = "id") String folder_id
+    ) {
+        try {
+            return ResponseEntity.ok(service.deleteProjectFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
+            //return service.getRootFolderByUserId()
+        } catch (JwtException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (FileTypeConversionException | FileNotFoundException |IllegalDmlActionException | UnAuthorizedActionException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } 
+    }
+    
 
 }

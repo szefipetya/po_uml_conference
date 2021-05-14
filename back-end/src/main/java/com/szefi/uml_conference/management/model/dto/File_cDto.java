@@ -6,7 +6,7 @@
 package com.szefi.uml_conference.management.model.dto;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.management.model.ICON;
 import com.szefi.uml_conference.management.model.dto.interfaces.FileHeader_I;
 import com.szefi.uml_conference.management.model.dto.project.ProjectDto;
 import com.szefi.uml_conference.management.model.dto.project.ProjectFileDto;
@@ -15,7 +15,6 @@ import com.szefi.uml_conference.management.model.dto.project.ProjectFolderDto;
 import com.szefi.uml_conference.management.model.dto.project.ProjectFolderHeaderDto;
 import com.szefi.uml_conference.management.model.entity.File_cEntity;
 import com.szefi.uml_conference.management.model.entity.FolderEntity;
-import com.szefi.uml_conference.management.model.entity.PermissionEntity;
 import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.model.User_PublicDto;
 import java.util.Date;

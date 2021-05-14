@@ -19,7 +19,7 @@ import com.szefi.uml_conference.editor.model.do_related.line.BreakPoint;
 import com.szefi.uml_conference.editor.model.do_related.line.Line;
 import com.szefi.uml_conference.editor.model.do_related.line.Point;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
-import com.szefi.uml_conference.security.converter.MapConverter;
+import com.szefi.uml_conference.security.model.converter.MapConverter;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Convert;

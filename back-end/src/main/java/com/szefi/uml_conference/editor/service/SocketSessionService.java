@@ -27,7 +27,7 @@ import com.szefi.uml_conference.editor.model.socket.ACTION_TYPE;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.LOCK_TYPE;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
-import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocketWrapper;
 import com.szefi.uml_conference.editor.model.top.AutoSessionInjectable_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.repository.AttributeElementRepository;
@@ -38,10 +38,10 @@ import com.szefi.uml_conference.security.model.MyUserDetails;
 import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.repository.UserRepository;
 import com.szefi.uml_conference.security.service.JwtUtilService;
-import com.szefi.uml_conference.editor.socket.security.model.SocketAuthenticationRequest;
-import com.szefi.uml_conference.editor.socket.threads.SocketThreadManager;
-import com.szefi.uml_conference.editor.socket.threads.service.SOCKET;
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.editor.service.socket.security.model.SocketAuthenticationRequest;
+import com.szefi.uml_conference.editor.service.socket.threads.SocketThreadManager;
+import com.szefi.uml_conference.editor.service.socket.threads.service.SOCKET;
+import com.szefi.uml_conference.management.model.ICON;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -184,7 +184,7 @@ public class SocketSessionService {
 @Autowired JwtUtilService jwtService;
 
 
-    public void onSocketDisconnect(UserWebSocket userSocket){
+    public void onSocketDisconnect(UserWebSocketWrapper userSocket){
         
     }
    public EditorSession getSessionById(Long id){
@@ -204,11 +204,11 @@ public class SocketSessionService {
        return new EditorSession(this.diagramRepo,this.objectRepo,this.nestedActionQueue,attrElementRepo);
    }
 
- public List<UserWebSocket> getUserSocketsByToken(String token) throws JwtParseException{
+ public List<UserWebSocketWrapper> getUserSocketsByToken(String token) throws JwtParseException{
        return this.tokenToSession(token).getUserSockets();
    }
    
-    public String autoProcessRequest( MyUserDetails details,UserWebSocket userSocket,SocketAuthenticationRequest req) {
+    public String autoProcessRequest( MyUserDetails details,UserWebSocketWrapper userSocket,SocketAuthenticationRequest req) {
         //step 1 ://find a diagram that matches the req.getDiagram_id()
                   //if not found, create a new session and load the diagram from the database.
        //step 2: Inject the user to the session with  a session Token as an identificator. This enables one users to connect to multiple sessions.
@@ -242,9 +242,9 @@ public class SocketSessionService {
       return userSocket.getSession_jwt();
     }
     
-    public Pair<UserWebSocket,EditorSession> findSessionForNativeSocketAndReturnUserSocket(SOCKET type,WebSocketSession socket){
+    public Pair<UserWebSocketWrapper,EditorSession> findSessionForNativeSocketAndReturnUserSocket(SOCKET type,WebSocketSession socket){
         for(EditorSession e:sessions){
-           UserWebSocket u=e.getUserSocketByNativeSocket(type,socket);
+           UserWebSocketWrapper u=e.getUserSocketByNativeSocket(type,socket);
            if(u!=null)
            {
             return Pair.of(u,e);

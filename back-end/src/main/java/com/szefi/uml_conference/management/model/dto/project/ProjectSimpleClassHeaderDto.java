@@ -7,7 +7,7 @@ package com.szefi.uml_conference.management.model.dto.project;
 
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFileEntity;
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.management.model.ICON;
 import com.szefi.uml_conference.security.model.User_PublicDto;
 
 /**

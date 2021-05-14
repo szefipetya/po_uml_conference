@@ -6,10 +6,8 @@
 package com.szefi.uml_conference.security.service;
 
 import com.szefi.uml_conference._exceptions.JwtParseException;
-import com.szefi.uml_conference.security.model.jwt.BlackListedJwtCollectorEntity;
 import com.szefi.uml_conference.security.model.jwt.JwtEntity;
 import com.szefi.uml_conference.security.repository.BlackJwtRepository;
-import com.szefi.uml_conference.security.repository.BlackListedJwtCollectorEntityRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -75,10 +73,6 @@ public class JwtUtilService {
         }
                         
                        // return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-                   
-                    
-     
-   
     }
 
     public Boolean isTokenExpired(String token) throws JwtParseException {
@@ -109,9 +103,7 @@ public class JwtUtilService {
             ent.setExpiration(extractExpiration(token));
          blackJwtsRepo.save(ent);
          return true;
-        }
-       
-       
+        }  
       return false;
     }
     public Boolean validateToken(String token, UserDetails userDetails) throws JwtParseException {

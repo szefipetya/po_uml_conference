@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
-import com.szefi.uml_conference.model.converter.PackageElementsListConverter;
-import com.szefi.uml_conference.model.converter.RectConverter;
+import com.szefi.uml_conference.editor.model.converter.PackageElementsListConverter;
+import com.szefi.uml_conference.editor.model.converter.RectConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class PackageObject extends DiagramObject {
      //   @LazyCollection(LazyCollectionOption.FALSE)
 
   // @OneToMany(cascade = CascadeType.ALL,mappedBy = "parent")
-    @Column(length = 10000)
+    @Column(length = 5000)
      @Convert(converter = PackageElementsListConverter.class)
     private List<PackageElement> elements=new ArrayList<>();    
 

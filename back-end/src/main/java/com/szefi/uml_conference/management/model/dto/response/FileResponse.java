@@ -25,7 +25,9 @@ import java.util.List;
  * @author h9pbcl
  */
 public class FileResponse {
-
+   List<PathFile> pathFiles;
+    File_cDto file;
+    String errorMsg="";
     public List<PathFile> getPathFiles() {
         return pathFiles;
     }
@@ -44,10 +46,17 @@ public class FileResponse {
        File_cEntity current=file;
                  int i=0;
                  while(current!=null){
-                    
-                    
+                    boolean l=false;
+                  if(current instanceof ProjectFolderEntity){
+                       ProjectFolderEntity casted=(ProjectFolderEntity)current;
+                       l=casted.getRelatedProject().getUsersIamSaredWith().stream()
+                               .anyMatch(u->u.getId().equals(actionPerformerUser.getId()));
+                      }
                          if(  !current.getOwner().getId().equals(actionPerformerUser.getId())
-                       &&!current.getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(actionPerformerUser.getId()))){
+                       &&!current.getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(actionPerformerUser.getId()))
+                                 && !l
+                                 
+                                 ){
                          //ha a parent folder nem az enyém, és nincs velem megosztva, akkor a sharedfoldert tesszük be a 
                              current=actionPerformerUser.getSharedFolder();
                              //continue;
@@ -114,10 +123,9 @@ public class FileResponse {
         this.errorMsg = errorMsg;
     }
     
-    String errorMsg="";
+    
     public void setFile(File_cDto file) {
         this.file = file;
     }
-    List<PathFile> pathFiles;
-    File_cDto file;
+ 
 }

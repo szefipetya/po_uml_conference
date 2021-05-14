@@ -20,6 +20,10 @@ import javax.persistence.ManyToOne;
 public class AttributeElement extends Element_c  {
    @ManyToOne
     SimpleClassElementGroup group;
+       private String visibility;
+    private String attr_type;
+   private String doc;
+   
 @JsonIgnore
     public SimpleClassElementGroup getGroup() {
         return group;
@@ -29,9 +33,7 @@ public class AttributeElement extends Element_c  {
         this.group = group;
     }
     
-    private String visibility;
-    private String attr_type;
-   private String doc;
+
    
   
     public String getDoc() {

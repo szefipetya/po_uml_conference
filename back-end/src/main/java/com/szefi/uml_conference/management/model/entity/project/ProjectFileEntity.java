@@ -26,16 +26,7 @@ public class ProjectFileEntity extends File_cEntity {
    @ManyToOne
     private ProjectFolderEntity parentProjectFolder;
 
-   @ManyToOne
-    protected ProjectEntity project;
 
-    public ProjectEntity getProject() {
-        return project;
-    }
-
-    public void setProject(ProjectEntity project) {
-        this.project = project;
-    }
 
     
     @ManyToOne

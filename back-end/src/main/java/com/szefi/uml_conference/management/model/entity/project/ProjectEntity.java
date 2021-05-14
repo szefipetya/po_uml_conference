@@ -25,8 +25,7 @@ import javax.persistence.OneToOne;
 @Entity
 public class ProjectEntity extends File_cEntity{
     
-    @OneToMany(mappedBy="project",cascade = CascadeType.ALL)
-    private List<ProjectFileEntity> files;//root files
+ 
 
       @OneToMany(mappedBy="relatedProject",cascade = CascadeType.ALL)
     private List<ProjectFileEntity> relatedFiles;
@@ -39,18 +38,12 @@ public class ProjectEntity extends File_cEntity{
         this.relatedFiles = relatedFiles;
     }
  
-    @OneToOne(mappedBy="project",cascade = CascadeType.REMOVE)
-    private ProjectFolderEntity rootFolder;
-
-    public ProjectFolderEntity getRootFolder() {
-        return rootFolder;
-    }
-
+   
     public ProjectEntity() {
         super();
       
-        files=new ArrayList<>();
-           rootFolder=new ProjectFolderEntity();
+        relatedFiles=new ArrayList<>();
+          ProjectFolderEntity rootFolder=new ProjectFolderEntity();
            DiagramEntity dg=new DiagramEntity();
            dg.setRelatedFolder(rootFolder);
            rootFolder.setDiagram(dg);
@@ -58,18 +51,17 @@ public class ProjectEntity extends File_cEntity{
         rootFolder.setIs_projectRoot(true);
         rootFolder.setName("~");
         rootFolder.setRelatedProject(this);
-        rootFolder.setProject(this);
-        this.files.add(rootFolder);
+        this.relatedFiles.add(rootFolder);
         
     }
     public ProjectEntity(UserEntity owner){
          super();
       
-        files=new ArrayList<>();
+        relatedFiles=new ArrayList<>();
         
         
         
-           rootFolder=new ProjectFolderEntity();
+          ProjectFolderEntity rootFolder=new ProjectFolderEntity();
        
            
            DiagramEntity dg=new DiagramEntity();
@@ -82,21 +74,19 @@ public class ProjectEntity extends File_cEntity{
         rootFolder.setDate(new Date());
         rootFolder.setIs_projectRoot(true);
         rootFolder.setName("~");
-         rootFolder.setProject(this);
         rootFolder.setRelatedProject(this);
         
-        this.files.add(rootFolder);
+        this.relatedFiles.add(rootFolder);
     }
 
-    public void setRootFolder(ProjectFolderEntity rootFolder) {
-        this.rootFolder = rootFolder;
+    public ProjectFolderEntity getRootFolder() {
+      return (ProjectFolderEntity) this.relatedFiles.stream().filter(f->{
+       if(f instanceof ProjectFolderEntity){
+           return ((ProjectFolderEntity)f).isIs_projectRoot();
+       }
+       return false;
+       }).findFirst().get();
     }
-       public List<ProjectFileEntity> getFiles() {
-        return files;
-    }
-
-    public void setFiles(List<ProjectFileEntity> files) {
-        this.files = files;
-    }
+    
     
 }

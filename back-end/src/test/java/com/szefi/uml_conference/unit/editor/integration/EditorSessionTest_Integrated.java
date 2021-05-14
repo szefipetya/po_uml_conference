@@ -17,7 +17,7 @@ import com.szefi.uml_conference.editor.model.do_related.line.Line;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.LOCK_TYPE;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
-import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocket;
+import com.szefi.uml_conference.editor.model.socket.tech.UserWebSocketWrapper;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import com.szefi.uml_conference.editor.repository.AttributeElementRepository;
 import com.szefi.uml_conference.editor.repository.DiagramRepository;
@@ -90,8 +90,8 @@ public class EditorSessionTest_Integrated {
       static ObjectMapper mapper;
  static  EditorSession session;
      
-     UserWebSocket s2;
-     UserWebSocket s;
+     UserWebSocketWrapper s2;
+     UserWebSocketWrapper s;
    
      @BeforeAll
        public static  void setUp() {
@@ -107,10 +107,10 @@ public class EditorSessionTest_Integrated {
        
          session=new EditorSession(diagramRepo, objectRepo,nestedQueue, attrElementRepo);
 
-             s=new UserWebSocket();
+             s=new UserWebSocketWrapper();
             s.setUser_id(1);
         s.setSession_jwt("testjwt");
-           s2=new UserWebSocket();
+           s2=new UserWebSocketWrapper();
         s2.setSession_jwt("testjwt2");
         s2.setUser_id(2);
            session.getUserSockets().add(s);

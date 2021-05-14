@@ -10,7 +10,7 @@ import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.management.model.entity.File_cEntity;
 import com.szefi.uml_conference.management.model.entity.FolderEntity;
 import com.szefi.uml_conference.management.model.entity.SPECIAL_FOLDER;
-import com.szefi.uml_conference.security.converter.RoleListConverter;
+import com.szefi.uml_conference.security.model.converter.RoleListConverter;
 import com.szefi.uml_conference.security.model.ROLE;
 import java.util.ArrayList;
 import java.util.Date;

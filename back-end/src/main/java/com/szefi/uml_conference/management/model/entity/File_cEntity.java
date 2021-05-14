@@ -6,8 +6,7 @@
 package com.szefi.uml_conference.management.model.entity;
 
 import com.szefi.uml_conference.security.model.UserEntity;
-import com.szefi.uml_conference.model.common.management.ICON;
-import com.szefi.uml_conference.model.common.management.Permission;
+import com.szefi.uml_conference.management.model.ICON;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -33,7 +32,7 @@ import org.hibernate.annotations.LazyCollectionOption;
  */
 @Entity
 @Table(name="files")
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy=InheritanceType.JOINED)
 public class File_cEntity implements Serializable {
   //   @GenericGenerator(name = "client_id", strategy = "com.szefi.uml_conference.model.generator.IdGenerator")
   //  @GeneratedValue(generator = "client_id")  
@@ -45,8 +44,7 @@ public class File_cEntity implements Serializable {
     private FolderEntity parentFolder ;
     @ManyToOne
     private UserEntity owner;
-    @ManyToMany(mappedBy = "files")
-    private List<PermissionEntity> permissions;
+  
     private Date date;
     private ICON icon ;  
 
@@ -101,14 +99,7 @@ public class File_cEntity implements Serializable {
     }
 
    
-    public List<PermissionEntity> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(List<PermissionEntity> permissions) {
-        this.permissions = permissions;
-    }
-
+ 
     public Date getDate() {
         return date;
     }

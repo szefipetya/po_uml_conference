@@ -10,6 +10,7 @@ import com.szefi.uml_conference.editor.model.socket.SessionState;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import java.util.Map;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import org.springframework.data.util.Pair;
 
@@ -20,6 +21,7 @@ import org.springframework.data.util.Pair;
 @JsonTypeName(value = "NoteBox")
 @Entity
 public class NoteBox extends DiagramObject {
+        @Column(length = 2000)
     private String content;    
 
     public String getContent() {

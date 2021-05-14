@@ -16,7 +16,7 @@ import com.szefi.uml_conference.management.model.entity.project.ProjectFileEntit
  * @author h9pbcl
  */
 @JsonTypeName(value = "projectFileDto")
-public class ProjectFileDto extends File_cDto implements FileHeader_I {
+public class ProjectFileDto extends File_cDto{
 
     public ProjectFileDto() {
     }

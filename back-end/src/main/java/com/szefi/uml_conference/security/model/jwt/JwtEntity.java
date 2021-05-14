@@ -22,8 +22,7 @@ public class JwtEntity {
     @GeneratedValue
     @Id
     private Integer id;
-    @ManyToOne
-    BlackListedJwtCollectorEntity collector;
+ 
 
     private String token="";
     private Date expiration;
@@ -36,13 +35,7 @@ public class JwtEntity {
         this.expiration = expiration;
     }
 
-    public BlackListedJwtCollectorEntity getCollector() {
-        return collector;
-    }
-
-    public void setCollector(BlackListedJwtCollectorEntity collector) {
-        this.collector = collector;
-    }
+ 
 
     public String getToken() {
         return token;

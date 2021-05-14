@@ -7,8 +7,8 @@ package com.szefi.uml_conference.unit.converters;
 
 import com.szefi.uml_conference.editor.model.do_related.PackageElement;
 import com.szefi.uml_conference.editor.model.do_related.line.BreakPoint;
-import com.szefi.uml_conference.model.converter.BreakPointListConverter;
-import com.szefi.uml_conference.model.converter.PackageElementsListConverter;
+import com.szefi.uml_conference.editor.model.converter.BreakPointListConverter;
+import com.szefi.uml_conference.editor.model.converter.PackageElementsListConverter;
 import java.util.List;
 
 

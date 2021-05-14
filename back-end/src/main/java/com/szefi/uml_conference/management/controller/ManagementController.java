@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author h9pbcl
  */
 @RestController
-@RequestMapping("/management")
+//@RequestMapping("/management")
 public class ManagementController {
 
     @Autowired
@@ -55,7 +55,7 @@ public class ManagementController {
     ProjectManagementService projectService;
 
 
-    @GetMapping("user_root_folder")
+    @GetMapping("/management/user_root_folder")
     public ResponseEntity<?> getUserRootFolder(
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -68,7 +68,7 @@ public class ManagementController {
         // return ResponseEntity.status(HttpStatus.FORBIDDEN).body("inscufficient authorities");
     }
 
-    @GetMapping("folder/{id}")
+    @GetMapping("/management/folder/{id}")
     public ResponseEntity<?> getFolder(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String folder_id
@@ -82,7 +82,7 @@ public class ManagementController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
-      @DeleteMapping("folder/{id}")
+      @DeleteMapping("/management/folder/{id}")
     public ResponseEntity<?> deleteFolder(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String folder_id
@@ -97,7 +97,7 @@ public class ManagementController {
         } 
     }
 
-    @DeleteMapping("FolderDto/{id}")//INTERNAL REDIRECT
+    @DeleteMapping("/management/FolderDto/{id}")//INTERNAL REDIRECT
     public ResponseEntity<?> deleteFolder2(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String folder_id, HttpServletResponse httpResponse
@@ -107,7 +107,7 @@ public class ManagementController {
         return null;
 
     }
-       @GetMapping("FolderDto/{id}")//INTERNAL REDIRECT
+       @GetMapping("/management/FolderDto/{id}")//INTERNAL REDIRECT
     public ResponseEntity<?> getFolder2(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String folder_id, HttpServletResponse httpResponse
@@ -117,7 +117,7 @@ public class ManagementController {
         return null;
 
     }
-     @GetMapping("projectFolderDto/{id}")//INTERNAL REDIRECT
+     @GetMapping("/management/projectFolderDto/{id}")//INTERNAL REDIRECT
     public ResponseEntity<?> getProjectFolder2(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String folder_id, HttpServletResponse httpResponse
@@ -130,7 +130,7 @@ public class ManagementController {
      
      
 
-    @GetMapping("create_folder/{id}")//create a folder with a parent_id given in param
+    @GetMapping("/management/create_folder/{id}")//create a folder with a parent_id given in param
     public ResponseEntity<?> createFolder(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String parent_id,
@@ -157,55 +157,7 @@ public class ManagementController {
         }
     }
     
- @RequestMapping(value="project/{id}" ,method = RequestMethod.GET)//create a projectfolder with a parent_id given in param
-    public ResponseEntity<?> getProject(
-            @RequestHeader(value = "Authorization") String authHeader,
-            @PathVariable(value = "id") String parent_id
-    ) {
-        try {
-            return ResponseEntity.ok(projectService.getProject(authHeader.substring(7), Integer.valueOf(parent_id)));
-            //return service.getRootFolderByUserId()
-        } catch (JwtException | UnAuthorizedActionException ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        } catch (FileNotFoundException | FileTypeConversionException ex) {
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        } 
-         
-    }
-
-//PROJECT
-
-  @GetMapping("projectFolder/{id}")
-    public ResponseEntity<?> getProjectFolder(
-            @RequestHeader(value = "Authorization") String authHeader,
-            @PathVariable(value = "id") String folder_id
-    ) {
-        try {
-            return ResponseEntity.ok(projectService.getProjectFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
-            //return service.getRootFolderByUserId()
-        } catch (JwtException ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        } catch (FileTypeConversionException | FileNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
-    }    
-    
-        @DeleteMapping("projectFolder/{id}")
-    public ResponseEntity<?> deleteProjectFolder(
-            @RequestHeader(value = "Authorization") String authHeader,
-            @PathVariable(value = "id") String folder_id
-    ) {
-        try {
-            return ResponseEntity.ok(projectService.deleteProjectFolder(authHeader.substring(7), Integer.valueOf(folder_id)));
-            //return service.getRootFolderByUserId()
-        } catch (JwtException ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        } catch (FileTypeConversionException | FileNotFoundException |IllegalDmlActionException | UnAuthorizedActionException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        } 
-    }
-    
-          @DeleteMapping("project/{id}")
+          @DeleteMapping("/management/project/{id}")
     public ResponseEntity<?> deleteProject(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable(value = "id") String folder_id
@@ -219,12 +171,12 @@ public class ManagementController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         } 
     }
-     @RequestMapping(value = "/share", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationJwt(@RequestBody FileShareRequest req) {
+     @RequestMapping(value = "/management/share", method = RequestMethod.POST)
+    public ResponseEntity<?> share(@RequestBody FileShareRequest req) {
       
    
         try {
-            return ResponseEntity.ok( service.shareRequest(req));
+            return ResponseEntity.ok( service.shareFile(req));
         } catch (JwtParseException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         } catch (JwtExpiredException ex) {
@@ -233,6 +185,10 @@ public class ManagementController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         } catch (UnAuthorizedActionException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
+        catch(Exception ex){
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+
         }
         
        

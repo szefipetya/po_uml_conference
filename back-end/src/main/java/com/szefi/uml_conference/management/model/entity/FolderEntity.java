@@ -5,7 +5,7 @@
  */
 package com.szefi.uml_conference.management.model.entity;
 
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.management.model.ICON;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;

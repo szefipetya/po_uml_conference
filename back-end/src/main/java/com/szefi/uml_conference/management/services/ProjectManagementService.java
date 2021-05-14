@@ -32,7 +32,7 @@ import com.szefi.uml_conference.management.model.entity.FolderEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFileEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.management.model.ICON;
 import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.repository.UserRepository;
 import com.szefi.uml_conference.security.service.JwtUtilService;
@@ -50,8 +50,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ProjectManagementService {
-      @Autowired
-    UserRepository userRepo;
+  
     @Autowired
     File_cRepository fileRepo;
     @Autowired
@@ -68,16 +67,11 @@ public class ProjectManagementService {
         if (jwtService.isTokenExpired(jwt)) {
             throw new JwtExpiredException("Error: token expired");
         }
-        if(name.equals("")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
-                if(name.equals("~")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
-
-        UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
-
+        if(name.equals("")||name.equals("~")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
+        UserEntity user = userService.loadUserEntityByUsername(jwtService.extractUsername(jwt));
         File_cEntity fent = fileRepo.findById(parent_id).get();
          ProjectEntity projectToAdd = new ProjectEntity(user);
-         
         projectToAdd.setName(name);
-       // this.diagramRepo.save(projectToAdd.getRootFolder().getDiagram());
         if (!fent.getOwner().getId().equals(user.getId())  ) {
             throw new UnAuthorizedActionException("Error: You are not te owner of the parend folder");
         }
@@ -86,29 +80,19 @@ public class ProjectManagementService {
             if(parentFolderEnt.getFiles().stream().filter(f->f.getName().equalsIgnoreCase(name)).collect(Collectors.toList()).size()>0)
                  throw new UnstatisfiedNameException(" name ["+name+"] is used by another file in the folder.");
             parentFolderEnt.addFile(projectToAdd);
-            
             //inherit share rules
-                projectToAdd.getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
-              /*  projectToAdd.getRootFolder().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
-                projectToAdd.getRootFolder().getDiagram().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());*/
-                         
+                projectToAdd.getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());            
                       this.fileRepo.save(projectToAdd);
-          
             //update on the user side as well
                       parentFolderEnt.getUsersIamSaredWith().stream().forEach((UserEntity u)->{
                           u.getSharedFilesWithMe().add(projectToAdd); 
-                          /*   u.getSharedFilesWithMe().add(projectToAdd.getRootFolder()); 
-                             u.getSharedDiagramsWithMe().add(projectToAdd.getRootFolder().getDiagram()); */
-                userRepo.save(u);
+                userService.save(u);
                 });
             
             parentFolderEnt=this.fileRepo.save(parentFolderEnt);
             if (user != null) {
                 FileResponse resp = new FileResponse(parentFolderEnt,new FolderDto(parentFolderEnt),user);
-              
-
                 return resp;
-
             }
         }else{
             throw new IllegalDmlActionException("the parent's type is not a Folder");
@@ -128,24 +112,23 @@ public class ProjectManagementService {
         if (jwtService.isTokenExpired(jwt)) {
             throw new JwtExpiredException("Error: token expired");
         }
-        if(name.equals("")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
-              if(name.equals("~")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
+        if(name.equals("")||name.equals("~")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
 
-        UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
+        UserEntity user =userService.loadUserEntityByUsername(jwtService.extractUsername(jwt));
 
-        File_cEntity fent = fileRepo.findById(parent_id).get();
-        ProjectFolderEntity folderToAdd = new ProjectFolderEntity();
-        folderToAdd.setName(name);
-      ProjectFolderEntity pfolder=(ProjectFolderEntity)fent;
-
+        File_cEntity parentFolder = fileRepo.findById(parent_id).get();
+        ProjectFolderEntity pfolder=(ProjectFolderEntity)parentFolder;
         if (!pfolder.getOwner().getId().equals(user.getId())&&!pfolder.getRelatedProject().getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(user.getId()))) {
             throw new UnAuthorizedActionException("Error: You are not te owner of the project or not invited");
         }
-        if (fent instanceof ProjectFolderEntity) {
-            ProjectFolderEntity parentFolderEnt = (ProjectFolderEntity) fent;
+        
+        ProjectFolderEntity folderToAdd = new ProjectFolderEntity();
+        folderToAdd.setName(name);
+        
+        if (parentFolder instanceof ProjectFolderEntity) {
+            ProjectFolderEntity parentFolderEnt = (ProjectFolderEntity) parentFolder;
             if(parentFolderEnt.getFiles().stream().filter(f->f.getName().equalsIgnoreCase(name)).collect(Collectors.toList()).size()>0)
                  throw new UnstatisfiedNameException(" name ["+name+"] is used by another file in the project folder.");
-             // folderToAdd.setProject(parentFolderEnt.getProject());
             parentFolderEnt.addFile(folderToAdd);
             //add a diagram Entity
            //make a diagram for the projectFolder
@@ -154,29 +137,13 @@ public class ProjectManagementService {
             dg.setRelatedFolder(folderToAdd);
             folderToAdd.setDiagram(dg);
             
-          //inherit share rules
-              /* folderToAdd.getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
-                folderToAdd.getDiagram().getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());*/
-                    
                       this.fileRepo.save(folderToAdd);
            parentFolderEnt= this.fileRepo.save(parentFolderEnt);
-            //update on the user side as well
-                     /* parentFolderEnt.getUsersIamSaredWith().stream().forEach((UserEntity u)->{
-                          u.getSharedFilesWithMe().add(folderToAdd);    
-                          u.getSharedDiagramsWithMe().add(folderToAdd.getDiagram());
-                userRepo.save(u);
-                });*/
-           
             injectPackageObjectToParentDiagram(parentFolderEnt, folderToAdd);
-          
-          //  this.fileRepo.save(parentFolderEnt.getProject());
             if (user != null) {
                 FileResponse resp = 
                         new FileResponse(parentFolderEnt,new ProjectFolderDto(parentFolderEnt),user);
-              
-
                 return resp;
-
             }
         }
         else throw new FileTypeConversionException("The action can't be perforemed on the object, defined by [id="+parent_id+"]");
@@ -194,7 +161,6 @@ public class ProjectManagementService {
           pobject.setTitleModel(title);
           objectRepo.save(pobject);
           parentFolder.getDiagram().getDgObjects().add(pobject);
-          
           this.diagramRepo.save(parentFolder.getDiagram());
           
           try {
@@ -211,7 +177,6 @@ public class ProjectManagementService {
                           PackageElement folderPackageModel=new PackageElement();
                           folderPackageModel.setName(newFolder.getName());
                           folderPackageModel.setIcon(ICON.PROJECT_FOLDER);
-                        //  folderPackageModel.setParent(packageObj);
                           folderPackageModel.setReferencedObjectId(newFolder.getId());
                           packageObj.getElements().add(folderPackageModel);
                         objectRepo.save(packageObj);
@@ -222,22 +187,18 @@ public class ProjectManagementService {
                           } catch (NotFoundException | JsonProcessingException ex) {
                               Logger.getLogger(ProjectManagementService.class.getName()).log(Level.SEVERE, null, ex);
                           }
-       
                       }
-                     
                   }
-              });
-              
-                      
-          }
-          
+              }
+            );                  
+          }    
       }
      public FileResponse getProject(String jwt, Integer id) throws JwtException, FileTypeConversionException, FileNotFoundException, UnAuthorizedActionException {
 
         if (jwtService.isTokenExpired(jwt)) {
             throw new JwtExpiredException("Error: token expired");
         }
-     UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
+     UserEntity user = userService.loadUserEntityByUsername(jwtService.extractUsername(jwt));
      try {
             File_cEntity ent= fileRepo.findById(id).get();
             if(ent instanceof ProjectEntity){
@@ -263,7 +224,7 @@ public class ProjectManagementService {
         if (jwtService.isTokenExpired(jwt)) {
             throw new JwtExpiredException("Error: token expired");
         }
-     UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
+     UserEntity user =userService.loadUserEntityByUsername(jwtService.extractUsername(jwt));
      
      try {
             File_cEntity ent= fileRepo.findById(id).get();
@@ -287,7 +248,7 @@ public class ProjectManagementService {
             throw new JwtExpiredException("Error: token expired");
         } 
                   File_cEntity ent= fileRepo.findById(id).get();
-                       UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
+                       UserEntity user = userService.loadUserEntityByUsername(jwtService.extractUsername(jwt));
                   if (ent.getOwner().getId().equals(userService.loadUserByUsername(jwtService.extractUsername(jwt)).getId())) {
                       if(ent instanceof ProjectFolderEntity){
                       ProjectFolderEntity casted=(ProjectFolderEntity)ent;
@@ -305,31 +266,6 @@ public class ProjectManagementService {
                   }else throw new UnAuthorizedActionException("you don't have the authority to execute this action");
                  // return null;
         }
-
-   /* void updateShareRecursivelyOnProjectFolder(ProjectFolderEntity pFolder, UserEntity targetUser) {
-        this.updateShareOnFile(pFolder, targetUser);
-      
-         
-       pFolder.getFiles().stream().forEach(f->{
-               if(f instanceof ProjectFolderEntity)
-            updateShareRecursivelyOnProjectFolder((ProjectFolderEntity)f, targetUser);
-                    }); 
-          
-       
-    }*/
-                  private  void updateShareOnFile(File_cEntity file,UserEntity targetUser){
-           targetUser.getSharedFilesWithMe().add(file);
-          file.getUsersIamSaredWith().add(targetUser);
-            fileRepo.save(file);
-   }
-
     
-    public void  deleteShareRuleRecursively(ProjectFileEntity ent){
-          fileRepo.deleteShareRulesByFileId(ent.getId());
-            if(ent instanceof ProjectFolderEntity){
-                ((ProjectFolderEntity)ent).getFiles().stream().forEach(f->deleteShareRuleRecursively(f));
-            }
-             fileRepo.deleteById(ent.getId());
-          
-        }
+
 }

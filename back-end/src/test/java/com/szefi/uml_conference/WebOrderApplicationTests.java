@@ -1,7 +1,7 @@
 package com.szefi.uml_conference;
 
 import com.szefi.uml_conference.editor.model.do_related.line.BreakPoint;
-import com.szefi.uml_conference.model.converter.BreakPointListConverter;
+import com.szefi.uml_conference.editor.model.converter.BreakPointListConverter;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

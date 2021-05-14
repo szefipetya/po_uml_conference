@@ -8,7 +8,7 @@ package com.szefi.uml_conference.management.model.dto.interfaces;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.management.model.ICON;
 import com.szefi.uml_conference.management.model.dto.FileHeaderDto;
 import com.szefi.uml_conference.management.model.dto.FolderDto;
 import com.szefi.uml_conference.management.model.dto.FolderHeaderDto;

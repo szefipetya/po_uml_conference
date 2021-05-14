@@ -36,15 +36,20 @@ import java.util.Optional;
 import java.util.logging.Logger;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
-
-    
+@Autowired
+private PasswordEncoder passwordEncoder;
+  
     @Autowired
     UserRepository userRepository;
 
+    public void save(UserEntity user){
+        this.userRepository.save(user);
+    }
     @Override
     public MyUserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Optional<UserEntity> user = userRepository.findByUserName(userName);
@@ -52,7 +57,15 @@ public class MyUserDetailsService implements UserDetailsService {
         return user.map(MyUserDetails::new).get();
     }
      
+      
+    public UserEntity loadUserEntityByUsername(String userName) throws UsernameNotFoundException {
+        Optional<UserEntity> user = userRepository.findByUserName(userName);
+        user.orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
+        return user.get();
+    }
+     
     public UserEntity registerUser(UserEntity newUser) throws UsernameNotFoundException {
+        newUser.setPassword(  passwordEncoder.encode(newUser.getPassword()));
         UserEntity user = userRepository.save(newUser);
         System.out.println("user "+newUser.getName()+" has been registered");
         return user;

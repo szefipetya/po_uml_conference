@@ -26,7 +26,7 @@ import com.szefi.uml_conference.management.model.entity.FolderEntity;
 import com.szefi.uml_conference.management.model.entity.SPECIAL_FOLDER;
 import com.szefi.uml_conference.management.model.entity.project.ProjectEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.management.model.ICON;
 import com.szefi.uml_conference.security.model.MyUserDetails;
 import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.repository.UserRepository;
@@ -54,8 +54,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 public class ManagementService {
 
-   @Autowired
-    UserRepository userRepo;
+ /*  @Autowired
+    UserRepository userRepo;*/
     @Autowired
     File_cRepository fileRepo;
     @Autowired
@@ -71,7 +71,7 @@ public class ManagementService {
     }
 
     public FileResponse getUserRootFolder(String jwt) throws JwtException, UnAuthorizedActionException {
-        UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
+        UserEntity user = userService.loadUserEntityByUsername(jwtService.extractUsername(jwt));
         if (user != null) {
           
             try {
@@ -81,9 +81,7 @@ public class ManagementService {
                 Logger.getLogger(ManagementService.class.getName()).log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(ManagementService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-           
+            }         
         }
         return null;
     }
@@ -109,10 +107,8 @@ public class ManagementService {
                             //return parent folderű
                             return getFolder(jwt,parent_id);
                         }else throw new IllegalDmlActionException("This File can not be deleted");
-                      
-                       
-                       
-                  }
+   
+                }
                   return null;
         }
         @Transactional
@@ -133,15 +129,12 @@ public class ManagementService {
         if (jwtService.isTokenExpired(jwt)) {
             throw new JwtExpiredException("Error: token expired");
         }
-        //UserEntity user=userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
         try {
             File_cEntity ent= fileRepo.findById(id).get();
          
-        //    if (ent.getOwner().getId().equals(userService.loadUserByUsername(jwtService.extractUsername(jwt)).getId())||ent.getUsersIamSaredWith().) {
-        MyUserDetails userDets=userService.loadUserByUsername(jwtService.extractUsername(jwt));
-       UserEntity actionPerformerUser=userRepo.findById(userDets.getId()).get();
-        if(     ent.getOwner().getId().equals(userDets.getId())
-                       ||ent.getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(userDets.getId()))){
+       UserEntity actionPerformerUser=userService.loadUserEntityByUsername(jwtService.extractUsername(jwt));
+        if(     ent.getOwner().getId().equals(actionPerformerUser.getId())
+                       ||ent.getUsersIamSaredWith().stream().anyMatch(u->u.getId().equals(actionPerformerUser.getId()))){
                    FolderDto dto = new FolderDto((FolderEntity)ent);
                 FileResponse resp= new FileResponse(ent,dto,actionPerformerUser);
               
@@ -160,9 +153,8 @@ public class ManagementService {
         if (jwtService.isTokenExpired(jwt)) {
             throw new JwtExpiredException("Error: token expired");
         }
-        if(name.equals("")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
-        if(name.equals("~")) throw new UnstatisfiedNameException(" name ["+name+"] is not vaild");
-        UserEntity user = userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
+        if(name.equals("")||name.equals("~")) throw new UnstatisfiedNameException(" name [\""+name+"\"] is not vaild");
+        UserEntity user = userService.loadUserEntityByUsername(jwtService.extractUsername(jwt));
 
         File_cEntity fent = fileRepo.findById(parent_id).get();
         if(fent instanceof ProjectFolderEntity){
@@ -185,7 +177,7 @@ public class ManagementService {
             this.fileRepo.save(fent);
             //update on the user side as well
                       parentFolderEnt.getUsersIamSaredWith().stream().forEach((UserEntity u)->{u.getSharedFilesWithMe().add(folderToAdd);    
-                userRepo.save(u);
+                userService.save(u);
                 });
       
       
@@ -200,48 +192,37 @@ public class ManagementService {
 
         return null;
     }
-   public FileShareRequest shareRequest(FileShareRequest req) throws JwtParseException, JwtExpiredException, FileNotFoundException, UnAuthorizedActionException{
+   public FileShareRequest shareFile(FileShareRequest req) throws JwtParseException, JwtExpiredException, FileNotFoundException, UnAuthorizedActionException{
           if (jwtService.isTokenExpired(req.getAuth_jwt())) {
             throw new JwtExpiredException("Error: token expired");
         }
-        //UserEntity user=userRepo.findByUserName(jwtService.extractUsername(jwt)).get();
           File_cEntity ent;
              UserEntity targetUser ;
         try {
              ent= fileRepo.findById(req.getFile_id()).get();
-               //  UserEntity user = userRepo.findByUserName(jwtService.extractUsername(req.getAuth_jwt())).get();
               } catch (java.util.NoSuchElementException ex) {
             throw new FileNotFoundException("requested folder with id=" + req.getFile_id()+ " not found");
         }   try{
-         targetUser = userRepo.findByUserName(req.getTarget_userName()).get();
+         targetUser = userService.loadUserEntityByUsername(req.getTarget_userName());
              if(ent instanceof ProjectEntity && ent.getParentFolder().isIs_root()) throw new FileNotFoundException("Project share directly from root is not supported");
              if(ent instanceof ProjectFolderEntity ) throw new FileNotFoundException("This file tyle is not shareable");
         }catch (java.util.NoSuchElementException ex) {
             throw new FileNotFoundException("user with name \"" +req.getTarget_userName()+ "\" not found");
         } 
-                 
-
-        //    if (ent.getOwner().getId().equals(userService.loadUserByUsername(jwtService.extractUsername(jwt)).getId())||ent.getUsersIamSaredWith().) {
         MyUserDetails userDets=userService.loadUserByUsername(jwtService.extractUsername(req.getAuth_jwt()));
         if(     ent.getOwner().getId().equals(userDets.getId())
-                       ){   
-            
-            //recursiveli add 
+                       ){    
+            //add share rules 
            targetUser.getSharedFilesWithMe().add(ent);
           ent.getUsersIamSaredWith().add(targetUser);
-        
-               updateShareRecursively(ent, targetUser);
-          
-           
+          //apply share rules recursively to child files
+               updateShareRecursively(ent, targetUser);         
           //fileRepo.save(ent);
-          userRepo.save(targetUser);
+          userService.save(targetUser);
                 return req;
             }
        
-         throw new UnAuthorizedActionException("you don't have access to this file") ;
-         
-         
-          
+         throw new UnAuthorizedActionException("you don't have access to this file") ;     
     }
    private void updateShareRecursively(File_cEntity file,UserEntity targetUser){
          updateShareOnFile(file, targetUser);
@@ -250,13 +231,7 @@ public class ManagementService {
          ((FolderEntity)file).getFiles().stream().forEach(f->
             updateShareRecursively(f, targetUser)
          ); 
-          }
-       
-       /* if(file instanceof ProjectEntity){
-            
-            projectService.updateShareRecursivelyOnProjectFolder(((ProjectEntity)file).getRootFolder(),targetUser);
-        }*/
-        
+          }        
    }
    private  void updateShareOnFile(File_cEntity file,UserEntity targetUser){
            targetUser.getSharedFilesWithMe().add(file);

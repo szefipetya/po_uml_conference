@@ -6,7 +6,7 @@
 package com.szefi.uml_conference.management.model.dto.project;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.szefi.uml_conference.model.common.management.ICON;
+import com.szefi.uml_conference.management.model.ICON;
 import com.szefi.uml_conference.management.model.dto.FolderHeaderDto;
 import com.szefi.uml_conference.management.model.entity.FolderEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFileEntity;
