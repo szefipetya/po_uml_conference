@@ -42,6 +42,7 @@ import static jdk.nashorn.internal.runtime.Debug.id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,8 +91,8 @@ public class ManagementService {
               if (jwtService.isTokenExpired(jwt)) {
             throw new JwtExpiredException("Error: token expired");
         } 
+              try{
                   File_cEntity ent= fileRepo.findById(id).get();
-                 //TODO: RECURSIVELY DELETE ALL SUBFOLDERS, AND SHARE SZABÁLYOKAT
                   if (ent.getOwner().getId().equals(userService.loadUserByUsername(jwtService.extractUsername(jwt)).getId())) {
                       boolean canBeDeleted=true;
                       if(ent instanceof FolderEntity){
@@ -109,6 +110,11 @@ public class ManagementService {
                         }else throw new IllegalDmlActionException("This File can not be deleted");
    
                 }
+                   } catch (java.util.NoSuchElementException ex) {
+            throw new FileNotFoundException("requested folder with id=" + id + " not found");
+        } catch (ClassCastException ex) {
+            throw new FileTypeConversionException("requested folder is not a folder id=" + id + " ");
+        }
                   return null;
         }
         @Transactional
@@ -124,6 +130,7 @@ public class ManagementService {
         
             
         }
+      @Transactional
     public FileResponse getFolder(String jwt, Integer id) throws JwtException, FileTypeConversionException, FileNotFoundException, UnAuthorizedActionException {
 
         if (jwtService.isTokenExpired(jwt)) {
@@ -147,7 +154,7 @@ public class ManagementService {
         }
          throw new UnAuthorizedActionException("you don't have access to this file") ;
     }
-
+@Transactional
     public FileResponse createFolder(String jwt, Integer parent_id, String name) throws 
             JwtException, UnAuthorizedActionException,UnstatisfiedNameException, FileTypeConversionException {
         if (jwtService.isTokenExpired(jwt)) {
@@ -192,6 +199,7 @@ public class ManagementService {
 
         return null;
     }
+    @Transactional
    public FileShareRequest shareFile(FileShareRequest req) throws JwtParseException, JwtExpiredException, FileNotFoundException, UnAuthorizedActionException{
           if (jwtService.isTokenExpired(req.getAuth_jwt())) {
             throw new JwtExpiredException("Error: token expired");
@@ -222,7 +230,7 @@ public class ManagementService {
                 return req;
             }
        
-         throw new UnAuthorizedActionException("you don't have access to this file") ;     
+         throw new UnAuthorizedActionException("you are not the owner of this file") ;     
     }
    private void updateShareRecursively(File_cEntity file,UserEntity targetUser){
          updateShareOnFile(file, targetUser);

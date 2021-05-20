@@ -84,6 +84,8 @@ export class DiagramObjectComponent
     protected editorService: GlobalEditorService
   ) {
     super(socket, commonService);
+    editorService.addListenerToEvent(this, (t) => {
+    }, '');
   }
   getId() {
     return this.model.id;

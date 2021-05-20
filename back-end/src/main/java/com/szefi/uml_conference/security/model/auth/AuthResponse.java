@@ -12,9 +12,12 @@ import com.szefi.uml_conference.security.model.User_PublicDto;
  * @author h9pbcl
  */
 public class AuthResponse {
-    private final String jwt_token;
+    private String jwt_token;
     private boolean success;
     private User_PublicDto user;
+
+    public AuthResponse() {
+    }
 
     public User_PublicDto getUser() {
         return user;

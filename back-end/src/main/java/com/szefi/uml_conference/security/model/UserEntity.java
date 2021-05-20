@@ -113,6 +113,8 @@ public class UserEntity {
         rootFolder.setOwner(this);
         rootFolder.setDate(new Date());
         rootFolder.setIs_root(true);
+                rootFolder.setSpecial(SPECIAL_FOLDER.USER_ROOT);
+
         rootFolder.setName("~");
         this.files.add(rootFolder);
           FolderEntity sharedWithmeFolder=new FolderEntity();

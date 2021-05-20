@@ -671,7 +671,6 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       // this.drawedClass = undefined;
     }
     this.lineCanvasComponent.onMouseUp(e);
-
     if (this.targetClass != null) {
       this.targetClass.viewModel.onMouseUp(e);
     }
@@ -683,6 +682,12 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       //console.log('COPY', copy);
       // this.drawedClass = null;
     }
+    this.drawedClass = null;
+    this.targetClass = null;
+    this.targetClass = null;
+    this.targetDOM = null;
+    this.targetObject_stored = null;
+    this.targetRect = null;
     if (this.targetDOM != undefined)
       this.targetDOM.style.border = `${this.editorService.clientModel.class_general.border_scaled}px solid rgba(255, 255, 255, 0.19)`;
     this.resetMouseState();

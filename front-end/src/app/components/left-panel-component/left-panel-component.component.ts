@@ -3,7 +3,7 @@ import { Component, Input, OnInit, Output } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of, Subject, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { getCookie } from 'src/app/utils/cookieUtils';
+import { getCookie, setCookie } from 'src/app/utils/cookieUtils';
 import { endP, environment } from 'src/environments/environment';
 import { FolderDto } from "../models/management/FolderDto";
 import { ProjectFolderDto } from "../models/management/project/projectFolderDto";
@@ -40,11 +40,18 @@ export class LeftPanelComponentComponent implements OnInit {
   constructor(private http: HttpClient,
     private snackBar: MatSnackBar,
     private editorService: GlobalEditorService,
-    private fileService: FileManagerService) { }
+    private fileService: FileManagerService) {
+
+    editorService.addListenerToEvent(this, (t) => {
+      t.getDgInNext = false;
+      t.onrefreshClick(false);
+    }, 'update');
+  }
   private eventsSubscription: Subscription;
   public errorMsg = "--";
   isShiftDown: boolean;
   isCtrlDown: boolean;
+  getDgInNext = true;
   /* updateEventToChild: Subject<void> = new Subject<void>();
 
    emitEventToChild() {
@@ -61,7 +68,11 @@ export class LeftPanelComponentComponent implements OnInit {
         }
 
         else if (evt.str == 'toggle') {
-          this.getRootFolder();
+          if (getCookie('actual_folder')) {
+            let f = JSON.parse(getCookie('actual_folder'));
+            this.getFile(f.id, f._type, false);
+          } else
+            this.getRootFolder();
         }
         else if (evt.str == 'keydown') {
           this.onKeyDown(evt.extra)
@@ -72,7 +83,7 @@ export class LeftPanelComponentComponent implements OnInit {
       })
   }
   actualPath: FileHeaderDto[];
-  private setActualFolder(r: FileResponse) {
+  private setActualFolderFromResponse(r: FileResponse) {
     if (r.pathFiles) {
       r.pathFiles = r.pathFiles.sort((b, a) => a.index - b.index);
       this.actualPath = r.pathFiles.map(f => { return f.file; })
@@ -80,8 +91,9 @@ export class LeftPanelComponentComponent implements OnInit {
     this.actualFolder = r.file as FolderDto;
     this.actualFolder.clientModel = new FileClientModel();
     this.actualFolder.files.map(f => { f.clientModel = new FileClientModel() })
-
+    setCookie('actual_folder', JSON.stringify({ id: this.actualFolder.id, _type: this.actualFolder._type }), 8);
   }
+
 
   containerClick(e) {
     console.log(e.target)
@@ -123,7 +135,7 @@ export class LeftPanelComponentComponent implements OnInit {
 
   }
   fileDblClick(file: File_cDto) {
-    if (file.id) this.getFile(file.id, file._type);
+    if (file.id) this.getFile(file.id, file._type, true);
 
   }
 
@@ -186,7 +198,7 @@ export class LeftPanelComponentComponent implements OnInit {
       .subscribe((r) => {
         console.log('folder arrived', r)
         if (r)
-          this.setActualFolder(r)
+          this.setActualFolderFromResponse(r)
       })
   }
   createFolderToActual(name: string) {
@@ -198,7 +210,7 @@ export class LeftPanelComponentComponent implements OnInit {
       .subscribe((r) => {
         console.log('folder arrived', r)
         if (r)
-          this.setActualFolder(r)
+          this.setActualFolderFromResponse(r)
       })
   }
   createProjectFolderToActual(name: string) {
@@ -210,7 +222,7 @@ export class LeftPanelComponentComponent implements OnInit {
       .subscribe((r) => {
         console.log('folder arrived', r)
         if (r)
-          this.setActualFolder(r)
+          this.setActualFolderFromResponse(r)
       })
   }
   deleteFile(id, _type) {
@@ -218,21 +230,23 @@ export class LeftPanelComponentComponent implements OnInit {
       .pipe(catchError(this.handleError<FileResponse>(this, 'delFile', null)))
       .subscribe((r) => {
         if (r?.file._type) {
-          this.getFile(r.file.id, r.file._type)
+          this.getFile(r.file.id, r.file._type, true)
         }
         console.log('file arrived', r)
         if (r) this.errorMsg = '';
       })
   }
-  getFile(id, _type) {
+  getFile(id, _type, refreshCanvas) {
     this.fileService.getFile(id, _type)
       .pipe(catchError(this.handleError<FileResponse>(this, 'getFile', null)))
       .subscribe((r) => {
         if (r?.file._type) {
-          if (r.file._type == 'projectFolderDto')
-            this.setActualProjectFolder(r);
+          if (r.file._type == 'projectFolderDto') {
+
+            this.setActualProjectFolder(r, refreshCanvas);
+          }
           else
-            this.setActualFolder(r);
+            this.setActualFolderFromResponse(r);
         }
         console.log('file arrived', r)
         if (r) this.errorMsg = '';
@@ -248,13 +262,16 @@ export class LeftPanelComponentComponent implements OnInit {
       .subscribe((r) => {
         if (r) {
           console.log('folder arrived', r)
-          this.setActualFolder(r)
+          this.setActualFolderFromResponse(r)
 
 
         }
       })
   }
-
+  onrefreshClick(makeDgRefresh) {
+    if (this.actualFolder)
+      this.getFile(this.actualFolder.id, this.actualFolder._type, makeDgRefresh)
+  }
 
   latestFileRequestFailed = false;
   private handleError<T>(view: LeftPanelComponentComponent, operation = 'operation', result?: T) {
@@ -264,10 +281,10 @@ export class LeftPanelComponentComponent implements OnInit {
       if (error.error.errorMsg) {
         view.errorMsg = error.error.errorMsg;
         if (error.error.file._type == 'projectFolderDto') {
-          this.setActualProjectFolder(error.error);
+          this.setActualProjectFolder(error.error, false);
         }
       }
-      else view.errorMsg = error.error.error;
+      else view.errorMsg = error.error;
       if (error.error.error == "Forbidden") { view.errorMsg += ". Log in to access your files!" }
       this.deleteRecentlyAddedFile();
       view.snackBar.open(view.errorMsg, "Error", { duration: 2000 });
@@ -283,18 +300,20 @@ export class LeftPanelComponentComponent implements OnInit {
     return getCookie('jwt_token');
   }
 
-  setActualProjectFolder(r: FileResponse) {
-    console.log('this is a project folder', r);
-    this.editorService.initFromServer((r.file as ProjectFolderDto).relatedDiagramId);
-    this.setActualFolder(r);
+  setActualProjectFolder(r: FileResponse, refreshCanvas) {
+    console.log('this is a project folder', r, this.getDgInNext);
+    if (refreshCanvas)
+      this.editorService.initFromServer((r.file as ProjectFolderDto).relatedDiagramId);
+
+    this.setActualFolderFromResponse(r);
   }
 
   fileGoBack() {
     if (this.actualFolder && this.actualFolder.parentFolder_id != null) {
       if (this.actualFolder._type == 'projectFolder') {
-        this.getFile(this.actualFolder.parentFolder_id, 'folder');
+        this.getFile(this.actualFolder.parentFolder_id, 'folder', true);
       } else
-        this.getFile(this.actualFolder.parentFolder_id, this.actualFolder._type);
+        this.getFile(this.actualFolder.parentFolder_id, this.actualFolder._type, true);
     }
   }
   unselectAll() {

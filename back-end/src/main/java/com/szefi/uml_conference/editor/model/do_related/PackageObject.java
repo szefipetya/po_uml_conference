@@ -31,6 +31,10 @@ import org.springframework.data.util.Pair;
 @JsonTypeName(value = "PackageObject")
 @Entity
 public class PackageObject extends DiagramObject {
+
+    public PackageObject() {
+        
+    }
     
     @OneToOne(mappedBy = "parent",cascade = CascadeType.ALL)
     private TitleElement titleModel; 
@@ -80,5 +84,13 @@ public class PackageObject extends DiagramObject {
         super.injectSelfToStateMap(sessionItemMap, sessionContainerMap); 
         this.titleModel.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
     }
+
+    @Override
+    public void deleteSelfFromStateMap(Map<Integer, Pair<SessionState, DynamicSerialObject>> sessionItemMap, Map<Integer, Pair<SessionState, DynamicSerialContainer_I>> sessionContainerMap) {
+        super.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap); //To change body of generated methods, choose Tools | Templates.
+                this.titleModel.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
+
+    }
+    
    
 }

@@ -413,7 +413,6 @@ export class LineCanvasComponent
     return new Point(mousex, mousey);
   }
   ngOnInit(): void {
-    this.socket.registerContainer(GlobalEditorService.L_ROOT_ID, this);
     this.socket.addListenerToEvent(this, (t) => {
       t.update();
     }, 'update');
@@ -421,6 +420,8 @@ export class LineCanvasComponent
     this.editorService.addListenerToEvent(this, (target) => {
       target.lineControllers = [];
       if (!this.ctx) this.init();
+      this.socket.registerContainer(GlobalEditorService.L_ROOT_ID, this);
+
       console.log('MODEL', target.editorService.model);
       target.editorService.model.lines.map((l) => {
 

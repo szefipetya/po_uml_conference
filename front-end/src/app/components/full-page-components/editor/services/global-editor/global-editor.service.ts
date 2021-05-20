@@ -62,6 +62,7 @@ export class GlobalEditorService {
   getUser() {
     return JSON.parse(getCookie("user"));
   }
+
   init_first() {
     this.model = new Diagram();
     this.model.dgObjects = [];

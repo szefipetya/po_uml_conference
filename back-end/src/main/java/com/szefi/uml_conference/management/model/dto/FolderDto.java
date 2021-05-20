@@ -29,7 +29,7 @@ public class FolderDto extends File_cDto{
     public List<FileHeaderDto> getFiles() {
         return files;
     }
-
+FolderDto(){}
     public FolderDto(FolderEntity ent) {
         super(ent);
         this.is_root=ent.isIs_root();

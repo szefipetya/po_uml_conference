@@ -3,6 +3,7 @@ import { Diagram } from 'src/app/components/models/Diagram/Diagram';
 import { DiagramObject } from 'src/app/components/models/DiagramObjects/DiagramObject';
 import { NoteBox } from 'src/app/components/models/DiagramObjects/NoteBox';
 import { SimpleClass } from 'src/app/components/models/DiagramObjects/SimpleClass';
+import { getCookie } from 'src/app/utils/cookieUtils';
 import { SimpleClassComponent } from '../diagram-objects/simple-class/simple-class.component';
 import { GlobalEditorService } from '../services/global-editor/global-editor.service';
 
@@ -24,9 +25,12 @@ export class EditorRootComponent implements OnInit, AfterContentInit {
 
   }
   ngAfterContentInit() {
+    this.editorService.initFromServer(getCookie("dg_id"));
+
 
   }
-  ngOnInit(): void { }
+  ngOnInit(): void {
+  }
 
 
   newButton;

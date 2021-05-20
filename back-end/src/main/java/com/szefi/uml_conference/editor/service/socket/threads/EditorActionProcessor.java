@@ -53,9 +53,9 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class EditorActionProcessor extends CustomProcessor {
 
-    ObjectMapper mapper;
+  protected  ObjectMapper mapper;
 
-    SocketSessionService service;
+   protected SocketSessionService service;
 
     @Autowired
     public EditorActionProcessor(
@@ -73,8 +73,8 @@ public class EditorActionProcessor extends CustomProcessor {
 
     }
 public EditorActionProcessor(){}
-    private BlockingQueue<EditorActionResponse> actionResponseQueue = null;
-    private BlockingQueue<SessionStateResponse> sessionStateResponseQueue = null;
+    protected BlockingQueue<EditorActionResponse> actionResponseQueue = null;
+    protected BlockingQueue<SessionStateResponse> sessionStateResponseQueue = null;
 
     private BlockingQueue<EditorAction> actionQueue = null;
 

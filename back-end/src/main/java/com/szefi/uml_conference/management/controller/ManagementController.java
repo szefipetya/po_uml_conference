@@ -187,7 +187,7 @@ public class ManagementController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
         catch(Exception ex){
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
 
         }
         

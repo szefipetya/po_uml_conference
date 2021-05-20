@@ -2,7 +2,16 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+
+
+
+
+
+
+
+
 export const environment = {
+  mockTestMode: false,
   production: false,
   api_url_http: 'http://localhost:8101/',
   api_url_raw: 'localhost:8101/', testdg_id: '5'

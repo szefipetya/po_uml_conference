@@ -51,9 +51,9 @@ import org.springframework.stereotype.Component;
 @Qualifier("NestedEditorActionProcessor")
 public class NestedEditorActionProcessor extends EditorActionProcessor {
 
-     ObjectMapper mapper;
+  //   ObjectMapper mapper;
 
-    SocketSessionService service;
+    //SocketSessionService service;
 
     @Autowired
     public NestedEditorActionProcessor(
@@ -65,13 +65,14 @@ public class NestedEditorActionProcessor extends EditorActionProcessor {
               super(socketService, nestedActionQueue, sessionStateResponseQueue, actionResponseQueue);
 
         this.nestedActionQueue = nestedActionQueue;
+       // this.mapper=new ObjecMapper();
 
     }
 NestedEditorActionProcessor(){
     
 }
-    private BlockingQueue<EditorActionResponse> actionResponseQueue = null;
-    private BlockingQueue<SessionStateResponse> sessionStateResponseQueue = null;
+ //   private BlockingQueue<EditorActionResponse> actionResponseQueue = null;
+ //   private BlockingQueue<SessionStateResponse> sessionStateResponseQueue = null;
 
     private BlockingQueue<EditorAction> nestedActionQueue = null;
 

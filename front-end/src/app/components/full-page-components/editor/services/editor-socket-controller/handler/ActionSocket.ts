@@ -124,14 +124,15 @@ export class ActionSocket implements SocketWrapper {
         case ACTION_TYPE.CREATE:
           console.log('CREATE UZENET');
           this.parent.service.containerViewModelMap.map(p => {
-            console.log(p.key + '   ' + p.value.getId())
+            //console.log(p.key + '   ' + p.value.getId())
+            console.log(p)
           })
           // console.log('containers' + this.parent.service.containerViewModelMap);
           sc = this.parent.service.containerViewModelMap.find(i => i.key == resp.action.target.parent_id)?.value;
-          console.log(resp.action.target);
+          //  console.log(resp.action.target);
           console.log(sc);
-          console.log(resp.target_user_id);
-          console.log(this.parent.service.getUser().id);
+          //console.log(resp.target_user_id);
+          //console.log(this.parent.service.getUser().id);
           if (resp.target_user_id == this.parent.service.getUser().id) {
             //we are the owner of the object
             load.edit = true;
@@ -170,7 +171,9 @@ export class ActionSocket implements SocketWrapper {
                 resp.target_type,
                 { sessionState: JSON.parse(resp.action.extra.sessionState) }
               );
-            sc.createItem(load, resp.action.extra);
+            if (sc)
+              sc.createItem(load, resp.action.extra);
+            else console.error("did not found session container, if its a TitleElement for PackageObject, then its ok.")
           }
           console.log(sc);
 
@@ -178,7 +181,7 @@ export class ActionSocket implements SocketWrapper {
         case ACTION_TYPE.DELETE:
           console.log('delete reveived');
           si = this.parent.getItem(resp.target_id);
-          si?.deleteSelfFromParent();
+          si.deleteSelfFromParent();
           break;
       }
       this.parent.service.triggerEvent('update');

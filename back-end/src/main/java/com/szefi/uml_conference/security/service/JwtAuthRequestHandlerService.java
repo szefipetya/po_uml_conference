@@ -131,6 +131,7 @@ final String PASSWORD_REG = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{4,}$";
         
         r.setUser(user);
         r.setSuccess(true);*/
+       req.setPassword(null);
         return req;
 
     }

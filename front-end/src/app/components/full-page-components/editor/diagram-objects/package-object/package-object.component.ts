@@ -44,7 +44,9 @@ export class PackageObjectComponent extends DiagramObjectComponent
       this.general.fontsize_scaled + 'px';*/
   }
 
-  update(): void { }
+  update(): void {
+    this.model.titleModel.viewModel.render();
+  }
   ngAfterViewChecked(): void {
     if (this.model.edit) {
       this.updateFont();
@@ -59,10 +61,7 @@ export class PackageObjectComponent extends DiagramObjectComponent
   inputClick(e) {
     this.model.edit = true;
   }
-  deleteSelfFromParent() {
-    // console.log("HAHAHAHAH NEM TUDSZ TÖRÖLNI")
 
-  }
   deleteMessageToServer() {
     this.commonService.putLog("You can not delete this one", MSG_TYPE.ERROR, this)
     console.log("HAHAHAHAH NEM TUDSZ TÖRÖLNI")
@@ -94,7 +93,8 @@ export class PackageObjectComponent extends DiagramObjectComponent
   ngOnInit(): void {
     //this.model._type = 'SimpleClass';
     this.model.viewModel = this;
-    super.ngOnInit();
+    //this.socket.registerContainer(this.model.id, this);
+    this.socket.register(this.model.id, this);
   }
   ngOnChanges(): void {
     console.log('changed');

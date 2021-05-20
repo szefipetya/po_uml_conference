@@ -12,8 +12,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootApplication
 @EnableAutoConfiguration
@@ -21,6 +23,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan({"com.szefi.uml_conference"})
 @EnableJpaRepositories({"com.szefi.uml_conference"})
 @EnableTransactionManagement
+@EnableWebMvc
+@PropertySource({ "classpath:application.properties", "classpath:application-${spring.profiles.active}.properties"})
+
 /*@EnableAutoConfiguration
 @ComponentScan(basePackages={""})
 @EnableJpaRepositories(basePackages="") 

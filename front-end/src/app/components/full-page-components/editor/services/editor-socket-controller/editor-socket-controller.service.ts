@@ -34,6 +34,14 @@ class Test {
     this.ping = v;
   }
 }
+export class SessionUser {
+  user: User;
+  color: string;
+  constructor(user, color) {
+    this.user = user;
+    this.color = color;
+  }
+}
 
 @Injectable({
   providedIn: 'root',

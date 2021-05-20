@@ -35,7 +35,9 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.logging.Logger;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
@@ -76,9 +78,20 @@ private PasswordEncoder passwordEncoder;
     ManagementService mService;
     @Autowired
     File_cRepository fileRepo;
- 
+    
+    @Autowired
+private Environment environment;
+
+
+    
      @EventListener(ApplicationReadyEvent.class)
     public void init(){
+        boolean good=true;
+for(String s:this.environment.getActiveProfiles()){
+        if(s.equals("dev"))good=good&&true;
+        else if(s.equals("prod"))good=good&&false;
+    }
+if(!good) return;
           UserEntity user=new UserEntity();
            user.setName("Peter");
            user.setUserName("user");
@@ -117,7 +130,7 @@ private PasswordEncoder passwordEncoder;
     
         FolderEntity folderToAdd = new FolderEntity();
         folderToAdd.setName(name);
-
+        folderToAdd.setOwner(user);;
         if (!fent.getOwner().getId().equals(user.getId())) {
           //  throw new UnAuthorizedActionException("Error: You are not te owner of the parent folder");
         }

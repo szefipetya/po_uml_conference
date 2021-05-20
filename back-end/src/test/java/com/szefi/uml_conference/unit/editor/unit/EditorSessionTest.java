@@ -3,11 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.szefi.uml_conference.unit.editor;
+package com.szefi.uml_conference.unit.editor.unit;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
+import com.szefi.uml_conference.editor.model.do_related.DiagramObject;
+import com.szefi.uml_conference.editor.model.do_related.PackageElement;
+import com.szefi.uml_conference.editor.model.do_related.PackageObject;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClassElementGroup;
+import com.szefi.uml_conference.editor.model.do_related.TitleElement;
+import com.szefi.uml_conference.editor.model.do_related.line.Line;
+import com.szefi.uml_conference.editor.model.socket.ACTION_TYPE;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.LOCK_TYPE;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
@@ -17,6 +27,9 @@ import com.szefi.uml_conference.editor.repository.AttributeElementRepository;
 import com.szefi.uml_conference.editor.repository.DiagramRepository;
 import com.szefi.uml_conference.editor.repository.DynamicSerialObjectRepository;
 import com.szefi.uml_conference.editor.service.EditorSession;
+import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
+import static java.awt.PageAttributes.MediaType.A;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,6 +38,7 @@ import javax.validation.constraints.AssertFalse;
 import javax.ws.rs.core.Application;
 import org.glassfish.hk2.classmodel.reflect.util.LinkedQueue;
 import static org.graalvm.compiler.options.OptionType.User;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -41,6 +55,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatchers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import org.mockito.Mock;
@@ -76,10 +91,11 @@ public class EditorSessionTest {
      
      UserWebSocketWrapper s2;
      UserWebSocketWrapper s;
-   
+   public static ObjectMapper mapper;
      @BeforeAll
        public static  void setUp() {
-        
+           mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     }
        
@@ -187,7 +203,7 @@ public class EditorSessionTest {
         
    } 
     @Test
-   void createItemForContainer_AttributeElementCreation() throws NotFoundException,Exception{
+   void createItemForContainer_AttributeElementCreation_Test() throws NotFoundException,Exception{
       
       
         //INIT 
@@ -229,7 +245,135 @@ public class EditorSessionTest {
         //check if the element is inserted into the databese,+ linked to the (container) group
               
     }
+   @Test
+   public void deleteObjectWhenLinesAreConnected() throws NotFoundException{
+       DiagramEntity dg=helper_initDiagram();
+       DiagramObject o1=new DiagramObject();
+       o1.setId(1);
+       DiagramObject o2=new DiagramObject();
+       o2.setId(2);
+         Line l=new Line();
+           l.setId(3);
+           l.setObject_start_id(1);
+           l.setObject_end_id(2);
+           l.setDiagram(session.getDg());
+           session.getDg().getLines().add(l);
+           session.getDg().getDgObjects().add(o1);
+           session.getDg().getDgObjects().add(o2);
+           session.init();       
+           session.lockObjectById(o1.getId(), 2, this.generateCommonLock());
+           
+           Assertions.assertEquals(o1,session.getItemById(1));
+           Assertions.assertEquals(o2,session.getItemById(2));
+           Assertions.assertEquals(l,session.getItemById(3));
+                          Assertions.assertEquals(3,session.getSessionItemMap().size());
+
+           session.deleteItemFromContainerById(2, o1.getId(), -1);//delete o1
+           
+                     Assertions.assertEquals(2,nestedQueue.size());//a packageobjectet újrefeldolgozásra a szülő sessionnak átküldésre kerül.
+                   //a vonal pedig az aktuális sessionba, törlésre.
+                
+                   Assertions.assertEquals(ACTION_TYPE.S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE,nestedQueue.poll().getAction());
+                   
+                     Assertions.assertEquals(ACTION_TYPE.DELETE,nestedQueue.poll().getAction());//itt a nestedActionProcesszor szál fogja feldolgozni ezt az üzenetet. a vonaltörlést már teszteltük.
+
+               Assertions.assertEquals(2,session.getSessionItemMap().size());//az object kitörlődött, de a vonal törlését nestedActionQueue fogja meghívni, amit már leteszteltünk.
+               
+
+    
+   }
    
+   private DiagramEntity helper_initDiagram(){
+          session.getSessionContainerMap().clear();
+       session.getSessionItemMap().clear();
+       //INIT
+          DiagramEntity dg=new DiagramEntity();
+           dg.setDgObects(new ArrayList<>());
+           dg.setLines(new ArrayList<>());
+          when(diagramRepo.save(any(DiagramEntity.class))).thenReturn(dg);
+           session.setDg(dg);
+           return dg;
+   }
+   @Test
+   public void deleteSimpleClass_Test() throws JsonProcessingException, NotFoundException{
+       session.getSessionItemMap().clear();
+       session.getSessionContainerMap().clear();
+        SimpleClass clas = mapper.readValue(this.SimpleClassTestJSON, SimpleClass.class);
+        ProjectFolderEntity parentpFolder=new ProjectFolderEntity();
+        
+        DiagramEntity parentdg=new DiagramEntity();
+        parentdg.setId(3);
+        parentdg.setDgObects(new ArrayList<>());
+        parentdg.setLines(new ArrayList<>());
+    
+        parentpFolder.setDiagram(parentdg);
+        PackageObject packageObj=new PackageObject();
+        TitleElement parentpTitle=new TitleElement();
+        parentpTitle.setName("folder1");
+        packageObj.setTitleModel(parentpTitle);
+        packageObj.setElements(new ArrayList<>());
+        PackageElement pelem=new PackageElement();
+        pelem.setReferencedObjectId(clas.getId());//set reference to SimpleClass
+        packageObj.getElements().add(pelem);
+        parentdg.getDgObjects().add(packageObj);
+           
+           ProjectFolderEntity currFolder=new ProjectFolderEntity();
+           currFolder.setName("folder1");
+           
+           currFolder.setParentProjectFolder(parentpFolder);
+        DiagramEntity dg=new DiagramEntity();
+           dg.setDgObects(new ArrayList<>());
+           dg.setLines(new ArrayList<>());
+               dg.setRelatedFolder(currFolder);
+                clas.setDiagram(dg);
+           dg.getDgObjects().add(clas);
+           session.setDg(dg);
+           session.init();
+           session.lockObjectById(clas.getId(), 2, this.generateCommonLock());
+            when(diagramRepo.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.of(parentdg));
+            when(objectRepo.saveAndFlush(ArgumentMatchers.any(PackageObject.class))).thenReturn(packageObj);
+
+           //when(diagramRepo.save(ArgumentMatchers.anyInt())).thenReturn(Optional.of(dg));
+           //TESTING
+       Assertions.assertEquals(1,packageObj.getElements().size());
+       Assertions.assertEquals(1,dg.getDgObjects().size());
+              Assertions.assertEquals(1,((PackageObject)parentdg.getDgObjects().get(0)).getElements().size());
+
+        Assertions.assertEquals(2,session.getSessionItemMap().size());//Titlemodel, SimpleClass, 
+       Assertions.assertEquals(3,session.getSessionContainerMap().size()); //SimpleClass, SimpleClassElementGroup x2
+       session.deleteItemFromContainerById(2,clas.getId(),-1);
+       
+       Assertions.assertEquals(0,packageObj.getElements().size());
+       Assertions.assertEquals(0,dg.getDgObjects().size());
+       Assertions.assertEquals(0,((PackageObject)parentdg.getDgObjects().get(0)).getElements().size());
+       Assertions.assertEquals(0,session.getSessionItemMap().size());
+       Assertions.assertEquals(0,session.getSessionContainerMap().size());
+       // SimpleClass classResult = (SimpleClass) session.createItemForContainer(2, -1, clas);//-1 means, its a global object.
+            
+
+   }
+   
+   @Test //this ona also tests init
+   public void deleteItemFromContainerById_deleteLine_Test() throws NotFoundException{
+      helper_initDiagram();
+           Line l=new Line();
+           l.setId(3);
+          
+           l.setDiagram(session.getDg());
+           session.getDg().getLines().add(l);
+                      session.init();
+           session.lockObjectById(l.getId(), 2, this.generateCommonLock());
+                Assertions.assertEquals(1,session.getDg().getLines().size());
+           Assertions.assertEquals(1,session.getSessionItemMap().size());
+           session.deleteItemFromContainerById(2,3,-2);
+           Assertions.assertEquals(0,session.getDg().getLines().size());
+           Assertions.assertEquals(0,session.getSessionItemMap().size());
+
+           
+   }
+   
+       String SimpleClassTestJSON="{\"doc\":\"\",\"_type\":\"SimpleClass\",\"id\":10,\"dimensionModel\":{\"width\":150,\"height\":200,\"x\":51.011383056640625,\"y\":148.0142059326172},\"extra\":{\"old_id\":2140236275,\"draft\":true},\"viewModel\":null,\"scaledModel\":{\"posx_scaled\":51.011383056640625,\"posy_scaled\":148.0142059326172,\"width_scaled\":150,\"height_scaled\":200,\"min_height_scaled\":75},\"z\":1,\"edit\":false,\"name\":\"Class\",\"groups\":[{\"id\":-681069448,\"group_name\":\"attributes\",\"group_syntax\":1,\"attributes\":[],\"_type\":\"SimpleClassElementGroup\",\"viewModel\":null,\"edit\":false,\"extra\":{\"old_id\":-681069448}},{\"id\":888906808,\"group_name\":\"functions\",\"group_syntax\":0,\"attributes\":[],\"_type\":\"SimpleClassElementGroup\",\"viewModel\":null,\"edit\":false,\"extra\":{\"old_id\":888906808}}],\"titleModel\":{\"extra\":{\"old_id\":1310368347,\"draft\":true},\"_type\":\"TitleElement\",\"edit\":true,\"id\":1310368347,\"name\":\"New Class\",\"viewModel\":null}}";//"{\"doc\":\"\",\"_type\":\"SimpleClass\",\"id\":11,\"dimensionModel\":{\"x\":51.011383,\"y\":148.0142,\"width\":162,\"height\":213},\"extra\":{\"old_id\":\"2140236275\",\"draft\":\"true\"},\"z\":1,\"edit\":false,\"name\":\"Class\"}";
+
 }
   /*@BeforeAll
     public static void beforeClass() {

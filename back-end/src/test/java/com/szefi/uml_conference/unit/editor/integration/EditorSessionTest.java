@@ -6,13 +6,16 @@
 package com.szefi.uml_conference.unit.editor.integration;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.szefi.uml_conference.IntegrationConfig;
 import com.szefi.uml_conference.WebOrderApplication;
+import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClassElementGroup;
+import com.szefi.uml_conference.editor.model.do_related.TitleElement;
 import com.szefi.uml_conference.editor.model.do_related.line.Line;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.LOCK_TYPE;
@@ -24,6 +27,7 @@ import com.szefi.uml_conference.editor.repository.DiagramRepository;
 import com.szefi.uml_conference.editor.repository.DynamicSerialObjectRepository;
 import com.szefi.uml_conference.editor.service.EditorSession;
 import com.szefi.uml_conference.editor.service.SocketSessionService;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,6 +41,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -74,9 +79,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 //@DataJpaTest
 //@RunWith(SpringRunner.class)
 @SpringBootTest(classes={WebOrderApplication.class})
-@RunWith(SpringRunner.class)
-
-public class EditorSessionTest_Integrated {
+@RunWith(JUnit4ClassRunner.class)
+public class EditorSessionTest {
     @Autowired
     SocketSessionService socketService;
     
@@ -100,13 +104,20 @@ public class EditorSessionTest_Integrated {
 
     }
        
-       
+         private LOCK_TYPE[] generateCommonLock(){
+        return  new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE};
+    }
  
        @BeforeEach
        public  void populateSession(){
-       
+           DiagramEntity dg=new DiagramEntity();
+           dg.setDgObects(new ArrayList<>());
+           dg.setLines(new ArrayList<>());
+           
+           diagramRepo.save(dg);
          session=new EditorSession(diagramRepo, objectRepo,nestedQueue, attrElementRepo);
-
+         session.setDg(dg);
+         session.init();
              s=new UserWebSocketWrapper();
             s.setUser_id(1);
         s.setSession_jwt("testjwt");
@@ -133,13 +144,8 @@ public class EditorSessionTest_Integrated {
    
     @Test
    void createItemForContainer__AttributeElementCreation() throws NotFoundException,Exception{
-      
-      
         //INIT 
-       
            SimpleClassElementGroup group=new SimpleClassElementGroup();
-          
-     
          group= objectRepo.save(group);
           //inject group to session
         group.injectSelfToStateMap(session.getSessionItemMap(), session.getSessionContainerMap());
@@ -151,74 +157,19 @@ public class EditorSessionTest_Integrated {
         elem.setVisibility("+");
         //TEST
            AttributeElement elemResult=(AttributeElement)session.createItemForContainer(1, group.getId(), elem);
-
          //check if elem is present in the session
-      // Assertions.assertEquals(group.getAttributes().get(0),elemResult );
+
        Assertions.assertEquals(session.getContainerById(group.getId()),elemResult.getGroup() );
        
         //check if the element is inserted into the databese,+ linked to the (container) group
        Assertions.assertTrue(((AttributeElement)objectRepo.findById(elemResult.getId()).get()).getGroup().getId().equals(group.getId()));
               
     }
+   
+   
      @Test
    void createItemForContainer__SimpleClassCreation() throws NotFoundException,Exception{
-       
-       String jsonFromClient="{\n" +
-"      doc: '',\n" +
-"      _type: 'SimpleClass',\n" +
-"      id:-20,\n" +
-"      dimensionModel: {\n" +
-"        width: 150,\n" +
-"        height: 200,\n" +
-"        x: 10,\n" +
-"        y: 10,\n" +
-"      },\n" +
-"      extra: { old_id: -20, draft: true },\n" +
-"      min_height: 75,\n" +
-"      scaledModel: {\n" +
-"        posx_scaled: 10,\n" +
-"        posy_scaled: 10,\n" +
-"        width_scaled: 1,\n" +
-"        height_scaled: 1,\n" +
-"        min_height_scaled: 75,\n" +
-"      },\n" +
-"      z: 1,\n" +
-"      edit: false,\n" +
-"      name: 'Class',\n" +
-"      groups: [\n" +
-"        {\n" +
-"          id: -19,\n" +
-"          group_name: 'attributes',\n" +
-"          group_syntax: GROUP_SYNTAX.ATTRIBUTE,\n" +
-"          attributes: [],\n" +
-"          _type: 'SimpleClassElementGroup',\n" +
-"          viewModel: null,\n" +
-"          edit: false,\n" +
-"          extra: { old_id: -19 },\n" +
-"        },\n" +
-"        {\n" +
-"          id: -18,\n" +
-"          group_name: 'functions',\n" +
-"          group_syntax: GROUP_SYNTAX.FUNCTION,\n" +
-"          attributes: [],\n" +
-"          _type: 'SimpleClassElementGroup',\n" +
-"          viewModel: null,\n" +
-"          edit: false,\n" +
-"          extra: { old_id: -18 },\n" +
-"        },\n" +
-"      ],\n" +
-"      titleModel: {\n" +
-"        extra: { old_id: -17, draft: true },\n" +
-"        _type: 'TitleElement',\n" +
-"        edit: true,\n" +
-"        id: -17,\n" +
-"        name: 'New Class',\n" +
-"        viewModel: null,\n" +
-"      },\n" +
-"    }";
-       
-   
-      SimpleClass clas=mapper.readValue(jsonFromClient, SimpleClass.class);
+      SimpleClass clas=mapper.readValue(this.SimpleClassTestJSON, SimpleClass.class);
       //TEST
            SimpleClass classResult=(SimpleClass)session.createItemForContainer(1, -1, clas);
          assertTrue(classResult.getGroups().get(0).getParentClass().equals(classResult));
@@ -229,32 +180,50 @@ public class EditorSessionTest_Integrated {
        
         //check if the element is inserted into the databese,+ linked to the (container) group
        Assertions.assertTrue(((SimpleClass)objectRepo.findById(clas.getId()).get()).getDiagram().getId().equals(session.getDg().getId()));
-       Assertions.assertEquals(1,((SimpleClass)objectRepo.findById(clas.getId()).get()).getDiagram().getDgObjects().get(0).getDimensionModel().getX());
+       Assertions.assertEquals(51,Math.round(((SimpleClass)objectRepo.findById(clas.getId()).get()).getDiagram().getDgObjects().get(0).getDimensionModel().getX()));
               
     }
    
       @Test
    void createItemForContainer__LineCreation() throws NotFoundException,Exception{
-       String json_from_client="\"{\"_type\":\"Line\",\"id\":13,\"extra\":{},\"lineType\":{\"id\":14,\"startHead\":\"NONE\",\"endHead\":\"ARROW\",\"body\":\"SOLID\",\"type\":\"DIRECTED_ASSOC\"},\"object_start_id\":11,\"object_end_id\":12,\"breaks\":[]}\"";
+       String json_from_client="{\"_type\":\"Line\",\"id\":null,\"extra\":{},\"lineType\":{\"id\":null,\"startHead\":\"NONE\",\"endHead\":\"ARROW\",\"body\":\"SOLID\",\"type\":\"DIRECTED_ASSOC\"},\"object_start_id\":11,\"object_end_id\":12,\"breaks\":[]}";
                
-       Line l=mapper.readValue(json_from_client,Line.class);
-                  Line lresult=(Line)session.createItemForContainer(1, -2, l);
+         Line l=(Line)mapper.readValue(json_from_client,DynamicSerialObject.class);
+         Line lresult=(Line)session.createItemForContainer(1, -2, l);
          assertTrue(lresult.getDiagram().getLines().get(0).getId().equals(lresult.getId()));
          assertTrue(session.getDg().getLines().get(0).getId().equals(lresult.getId()));
          assertTrue(session.getDg().getLines().get(0).getLineType().getStartHead().equals(com.szefi.uml_conference.editor.model.do_related.line.LINE_HEAD.NONE));
          assertTrue(session.getDg().getLines().get(0).getLineType().getEndHead().equals(com.szefi.uml_conference.editor.model.do_related.line.LINE_HEAD.ARROW));
-         
-                Assertions.assertEquals(true,((Line)objectRepo.findById(lresult.getId()).get()).getDiagram().getLines().get(0).equals(lresult));
-
-
-       
+         Assertions.assertEquals(true,((Line)objectRepo.findById(lresult.getId()).get()).getDiagram().getLines().get(0).equals(lresult));      
    }
    
    
    @Test
-   void updateObjectAndUnlock__SimpleClass_TitleElement_update(){
-       
-   }
+    void updateObjectAndUnlock_TitleElement_update() throws JsonProcessingException, NotFoundException {
+        //INIT
+        SimpleClass clas = mapper.readValue(this.SimpleClassTestJSON, SimpleClass.class);
+        SimpleClass classResult = (SimpleClass) session.createItemForContainer(2, -1, clas);//-1 means, its a global object.
+
+        //lock the title
+        session.lockObjectById(classResult.getTitleModel().getId(), 10, this.generateCommonLock());
+        //send modified title from client
+        String titleJSONFromClient = "{\n"
+                + "        \"extra\": { \"old_id\": -17, \"draft\": true },\n"
+                + "        \"_type\": \"TitleElement\",\n"
+                + "        \"edit\": true,\n"
+                + "        \"id\": " + classResult.getTitleModel().getId() + ",\n"
+                + "        \"name\": \"NewTitle\",\n"
+                + "        \"viewModel\": null\n"
+                + "      }";
+        TitleElement elem = mapper.readValue(titleJSONFromClient, TitleElement.class);
+        //INIT end
+        Pair<SessionState, DynamicSerialObject> resultPair = session.updateObjectAndUnlock(elem, 10);
+        //TESTS
+        Assertions.assertEquals(resultPair.getFirst().getLockerUser_id() , -1);//-1 means, the object is free.
+        Assertions.assertEquals(((TitleElement )resultPair.getSecond()).getName() ,"NewTitle");//-1 means, the object is free.
+    }
+    
+    String SimpleClassTestJSON="{\"doc\":\"\",\"_type\":\"SimpleClass\",\"id\":2140236275,\"dimensionModel\":{\"width\":150,\"height\":200,\"x\":51.011383056640625,\"y\":148.0142059326172},\"extra\":{\"old_id\":2140236275,\"draft\":true},\"viewModel\":null,\"scaledModel\":{\"posx_scaled\":51.011383056640625,\"posy_scaled\":148.0142059326172,\"width_scaled\":150,\"height_scaled\":200,\"min_height_scaled\":75},\"z\":1,\"edit\":false,\"name\":\"Class\",\"groups\":[{\"id\":-681069448,\"group_name\":\"attributes\",\"group_syntax\":1,\"attributes\":[],\"_type\":\"SimpleClassElementGroup\",\"viewModel\":null,\"edit\":false,\"extra\":{\"old_id\":-681069448}},{\"id\":888906808,\"group_name\":\"functions\",\"group_syntax\":0,\"attributes\":[],\"_type\":\"SimpleClassElementGroup\",\"viewModel\":null,\"edit\":false,\"extra\":{\"old_id\":888906808}}],\"titleModel\":{\"extra\":{\"old_id\":1310368347,\"draft\":true},\"_type\":\"TitleElement\",\"edit\":true,\"id\":1310368347,\"name\":\"New Class\",\"viewModel\":null}}";//"{\"doc\":\"\",\"_type\":\"SimpleClass\",\"id\":11,\"dimensionModel\":{\"x\":51.011383,\"y\":148.0142,\"width\":162,\"height\":213},\"extra\":{\"old_id\":\"2140236275\",\"draft\":\"true\"},\"z\":1,\"edit\":false,\"name\":\"Class\"}";
 }
   /*@BeforeAll
     public static void beforeClass() {

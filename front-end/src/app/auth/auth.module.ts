@@ -8,6 +8,8 @@ import { ResetPasswordComponent } from "./components/reset-password/reset-passwo
 import { FormsModule } from '@angular/forms';
 //Material
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from "../testing/auth.interceptor";
 
 
 @NgModule({
@@ -16,7 +18,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     CommonModule,
     AuthRoutingModule, FormsModule, MatSnackBarModule
   ],
-  exports: [LoginComponent, RegisterComponent, ResetPasswordComponent]
+  exports: [LoginComponent, RegisterComponent, ResetPasswordComponent],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ]
 })
 export class AuthModule {
 
