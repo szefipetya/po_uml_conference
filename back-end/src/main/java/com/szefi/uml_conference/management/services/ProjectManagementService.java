@@ -352,4 +352,11 @@ public class ProjectManagementService {
         // return null;
     }
 
+    void deleteProject(ProjectEntity project) {
+        
+       
+          //  diagramRepo.delete(project.getRootFolder().getDiagram());
+      //  project.getRootFolder().setDiagram(diagramRepo.save(project.getRootFolder().getDiagram()));
+    }
+
 }

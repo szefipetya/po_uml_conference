@@ -1,7 +1,12 @@
 <p>
   <mat-toolbar class="toolbar">
     <div class="nav-box">
-      <button [routerLink]="['editor']" class="glow-on-hover" type="button">
+      <button
+        [routerLink]="['editor']"
+        class="glow-on-hover"
+        type="button"
+        (click)="this.onEditorClick()"
+      >
         Editor
       </button>
     </div>

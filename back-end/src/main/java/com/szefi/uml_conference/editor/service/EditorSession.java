@@ -45,9 +45,12 @@ import java.io.OutputStream;
 import java.net.http.WebSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
@@ -74,9 +77,14 @@ import org.springframework.web.socket.WebSocketSession;
 @Component
 public class EditorSession {
 
+    
+    
     Long id;
-    @Autowired
-    @Qualifier("nestedActionQueue")
+    
+   
+     List<String> colors;
+    
+  
     BlockingQueue<EditorAction> nestedActionQueue;
     /*MAIN SESSION DECLARATION*/
     DiagramEntity dg;
@@ -85,21 +93,21 @@ public class EditorSession {
     Map<Integer, Pair<SessionState, DynamicSerialContainer_I>> sessionContainerMap = new HashMap<>();
 
     ObjectMapper objectMapper;
-    @Autowired
+  
     DiagramRepository diagramRepo;
     AttributeElementRepository attrElementRepo;
-    @Autowired
+ 
     DynamicSerialObjectRepository objectRepo;
 
     public EditorSession(DiagramRepository diagramRepo, DynamicSerialObjectRepository objectRepo, BlockingQueue<EditorAction> nestedActionQueue,
-             AttributeElementRepository attrElementRepo
+             AttributeElementRepository attrElementRepo,  List<String> colors
     ) {
         this.id = UUID.randomUUID().getLeastSignificantBits();
         this.objectRepo = objectRepo;
         this.diagramRepo = diagramRepo;
         this.attrElementRepo = attrElementRepo;
         this.nestedActionQueue = nestedActionQueue;
-
+        this.colors=colors;
     }
 
     public UserWebSocketWrapper getUserSocketByNativeSocket(SOCKET type, WebSocketSession socket) {
@@ -143,7 +151,7 @@ public class EditorSession {
      *
      * @return the unlocked items id's in a list
      */
-    public List<Integer> deleteLocksRelatedToUser(Integer user_id) {
+    public List<Integer> deleteLocksRelatedToUser(Integer user_id) throws NotFoundException {
         List<Integer> ret = new ArrayList<>();
         for (Map.Entry<Integer, Pair<SessionState, DynamicSerialObject>> e : sessionItemMap.entrySet()) {
             if (e.getValue().getFirst().getLockerUser_id() != null
@@ -169,11 +177,11 @@ public class EditorSession {
         return this.userSockets.stream().filter(u -> u.getUser_id().equals(id)).collect(Collectors.toList());
     }
 
-    public SessionState getSessionStateById(Integer id) {
+    public SessionState getSessionStateById(Integer id) throws NotFoundException {
         if (sessionItemMap.get(id) != null) {
             return sessionItemMap.get(id).getFirst();
-        }
-        return null;
+        }else throw new NotFoundException("Object with id= "+id+" not found");
+        
     }
 
     public SessionState getContainerSessionStateById(Integer id) {
@@ -183,7 +191,7 @@ public class EditorSession {
         return null;
     }
 
-    public boolean lockObjectById(Integer target_id, Integer user_id, LOCK_TYPE[] locks) {
+    public boolean lockObjectById(Integer target_id, Integer user_id, LOCK_TYPE[] locks) throws NotFoundException {
         SessionState s = this.getSessionStateById(target_id);
         if (s != null) {
             //even if someone locked it, and its me, i can still lock it again for myself
@@ -200,7 +208,7 @@ public class EditorSession {
 
     }
 
-    public boolean isLockedById(Integer id) {
+    public boolean isLockedById(Integer id) throws NotFoundException {
         SessionState s = this.getSessionStateById(id);
         if (s == null) {
             return false;
@@ -216,7 +224,7 @@ public class EditorSession {
         return s.getLockerUser_id().equals(user_id);
     }
 
-    private void injectAndLockAfterCreate(Integer user_id, DynamicSerialObject obj) {
+    private void injectAndLockAfterCreate(Integer user_id, DynamicSerialObject obj) throws NotFoundException {
         obj.injectSelfToStateMap(this.sessionItemMap, this.sessionContainerMap);
         getSessionStateById(obj.getId()).setExtra(new HashMap<>());
         getSessionStateById(obj.getId()).getExtra().put("placeholder", "c:" + user_id);
@@ -229,12 +237,15 @@ public class EditorSession {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public DynamicSerialObject createItemForContainer(Integer user_id, Integer cont_id, DynamicSerialObject obj) throws NotFoundException {
         Pair<SessionState, DynamicSerialContainer_I> s = this.sessionContainerMap.get(cont_id);
-
+        System.out.println("CREATE PARAMS:");
         if (s != null) {
             DynamicSerialContainer_I cont = s.getSecond();
             try {
                 if (obj instanceof AttributeElement) {
                     AttributeElement casted = (AttributeElement) obj;
+                
+                    casted.setVisibility("+");
+                    casted.setDoc("");
                     casted.setEdit(false);
                     casted.setGroup((SimpleClassElementGroup) cont);
                     casted = objectRepo.save(casted);//id injected  
@@ -244,8 +255,8 @@ public class EditorSession {
             } catch (org.springframework.orm.jpa.JpaObjectRetrievalFailureException ex) {
                 System.err.println(ex);
             }
-
-            injectAndLockAfterCreate(user_id, obj);
+ injectAndLockAfterCreate(user_id, obj);
+           
             //   this.dg= this.diagramRepo.save(this.dg); 
             return obj;
             //the object has no parent, therefore the container is the diagram itself
@@ -264,7 +275,6 @@ public class EditorSession {
                         cls = this.objectRepo.saveAndFlush(cls);
 
                         dgo = cls;
-                        this.lockObjectById(cls.getTitleModel().getId(), user_id, this.generateCommonLock());
                         try {
                             doSomethingWithClassHeaderToParentPackageObject(cls, ACTION_TYPE.S_INJECT_CLASS_HEADER_TO_PACKAGE);
                         } catch (JsonProcessingException ex) {
@@ -277,6 +287,7 @@ public class EditorSession {
                         dgo = this.objectRepo.save(dgo);
                     }
                     this.injectAndLockAfterCreate(user_id, obj);
+
                     obj = dgo;
                 }
 
@@ -332,8 +343,12 @@ public class EditorSession {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Pair<SessionState, DynamicSerialObject> updateObjectAndUnlock(DynamicSerialObject obj, Integer user_id) throws NullPointerException, NotFoundException {
-
-        SessionState s = this.getSessionStateById(obj.getId());
+        D.log("UPDATE ");
+        System.out.println("UPDATE");
+          SessionState s;
+        try{
+             s = this.getSessionStateById(obj.getId());
+        } catch(NotFoundException ex){return null;}
         if (s != null) {
             s.setDraft(false);
             if (this.unLockObjectById(obj.getId(), user_id)) {
@@ -374,12 +389,14 @@ public class EditorSession {
 
                 return this.sessionItemMap.get(obj.getId());
             }
+        }else{
+            throw new NotFoundException("Object not found");
         }
         // 
         return null;
     }
 
-    private boolean forceLockByUser(Integer target_id, Integer user_id){
+    private boolean forceLockByUser(Integer target_id, Integer user_id) throws NotFoundException{
          SessionState s = this.getSessionStateById(target_id);
         if (s != null) {
             //even if someone locked it, and its me, i can still lock it again for myself
@@ -599,10 +616,10 @@ public class EditorSession {
         return ss.getSecond();
     }
 
-    public boolean unLockObjectById(Integer target_id, Integer user_id) {
+    public boolean unLockObjectById(Integer target_id, Integer user_id) throws NotFoundException {
         SessionState s = getSessionStateById(target_id);
         if (s != null) {
-            if (user_id.equals(s.getLockerUser_id() == null ? "" : s.getLockerUser_id())) {
+            if (s.getLockerUser_id().equals(user_id)||s.getLockerUser_id().equals(-1)) {
                 s.setLockerUser_id(-1);
                 s.setLocks(new LOCK_TYPE[0]);
                 if (s.getExtra() != null) {
@@ -652,7 +669,7 @@ public class EditorSession {
 
     }
 
-    public List<Integer> unlockObjectsByUserId(Integer user_id) {
+    public List<Integer> unlockObjectsByUserId(Integer user_id) throws NotFoundException {
         List<Integer> ret = new ArrayList<>();
         List<Map.Entry<Integer, Pair<SessionState, DynamicSerialObject>>> items = this.getItemsByUser(user_id);
         for (Map.Entry<Integer, Pair<SessionState, DynamicSerialObject>> item : items) {
@@ -720,6 +737,9 @@ Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
             d.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
         }for(Line l:this.dg.getLines()){
             l.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
+        }
+        for(String c:colors){
+            System.out.println("COL:"+c);
         }
     }
 
@@ -820,5 +840,38 @@ Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
     public void setDg(DiagramEntity dg) {
         this.dg = dg;
         this.init();
+    }
+    String getUnUsedColor(Integer id){
+        String col=colors.get(id%49);
+      HashSet<String> notAvailable= this.userSockets.stream().map(u->u.getColor()).collect(Collectors.toCollection(HashSet::new));
+      HashSet<String> available=Set.copyOf(colors).stream().collect(Collectors.toCollection(HashSet::new));
+            available.removeAll(notAvailable);
+      if(available.contains(col)) return col;
+      //else
+      int ind=(new Random()).nextInt(available.size()-1);
+      return available.stream().collect(Collectors.toCollection(ArrayList::new)).get(ind);
+    }
+    //Ha találtunk user-t akkor true-t adunk vissza
+    boolean swapSocketsIfUserExistsById(Integer id,UserWebSocketWrapper s){
+        UserWebSocketWrapper searched=null;
+        for(UserWebSocketWrapper sock:userSockets){
+            if(sock.getUser_id().equals(id))
+                searched=sock;
+        }
+        if(searched!=null)
+        {
+            searched.setActionSocket(s.getActionSocket());
+            searched.setStateSocket(s.getStateSocket());
+            searched.setSession_jwt(s.getSession_jwt());
+            return true;
+        }
+        return false;
+    }
+    void addUserSocket(UserWebSocketWrapper userSocket) {
+       if (!swapSocketsIfUserExistsById(userSocket.getUser_id(),userSocket)){
+             userSocket.setColor(getUnUsedColor(userSocket.getUser_id()));
+        this.getUserSockets().add(userSocket);
+       }
+       
     }
 }

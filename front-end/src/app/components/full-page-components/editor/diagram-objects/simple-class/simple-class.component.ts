@@ -23,6 +23,7 @@ import { EditorSocketControllerService } from '../../services/editor-socket-cont
 import { GlobalEditorService } from '../../services/global-editor/global-editor.service';
 import { DiagramObjectComponent } from '../diagram-object/diagram-object.component';
 import { AttributeComponent } from './attribute-group/attribute/attribute.component';
+import { SessionState } from 'src/app/components/models/socket/SessionState';
 
 @Component({
   selector: 'app-simple-class',
@@ -34,6 +35,10 @@ export class SimpleClassComponent
   implements OnInit, OnChanges, AfterContentInit, SessionInteractiveContainer {
   updateItemWithOld(old_id: string, model: any) {
     throw new Error('Method not implemented.');
+
+  }
+  updateState(state: SessionState, callback_action_id = ''): void {
+    super.updateState(state, callback_action_id);
 
   }
   updateModel(model: any, action_id: string, msg?: string): void {
@@ -82,6 +87,9 @@ export class SimpleClassComponent
       this.model.dimensionModel.x * this.editorService.clientModel.canvas.scale;
     (this.getTitleVm() as AttributeComponent).render();
     this.socket.triggerEvent('update');
+
+    // this.callback_queue = [];
+
   }
   createItem(model: DynamicSerialObject, extra?: any) {
     console.log('creating:', model);
@@ -97,6 +105,7 @@ export class SimpleClassComponent
       console.log(this.model.titleModel);
       //title model
     }
+    //  this.callback_queue = [];
   }
 
   getTitleVm() {

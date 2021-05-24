@@ -65,6 +65,11 @@ private PasswordEncoder passwordEncoder;
         user.orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
         return user.get();
     }
+        public UserEntity loadUserEntityById(Integer id) throws UsernameNotFoundException {
+        Optional<UserEntity> user = userRepository.findById(id);
+        user.orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+        return user.get();
+    }
      
     public UserEntity registerUser(UserEntity newUser) throws UsernameNotFoundException {
         newUser.setPassword(  passwordEncoder.encode(newUser.getPassword()));

@@ -16,6 +16,15 @@ public class UserWebSocketWrapper {
     private WebSocketSession stateSocket;
     private Integer user_id;
     private String session_jwt;
+    private String color="#fff";
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public WebSocketSession getActionSocket() {
         return actionSocket;

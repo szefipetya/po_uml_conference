@@ -60,7 +60,7 @@ private UserEntity owner;
 @OneToMany(mappedBy = "diagram",cascade = {CascadeType.REMOVE})
 private List<DiagramObject> dgObjects;
 @LazyCollection(LazyCollectionOption.FALSE)
-@OneToMany(mappedBy = "diagram",cascade = {CascadeType.ALL})
+@OneToMany(mappedBy = "diagram",cascade = {CascadeType.REMOVE,CascadeType.PERSIST})
 private List<Line> lines;
 @ManyToMany(mappedBy="sharedDiagramsWithMe")
         @LazyCollection(LazyCollectionOption.FALSE)

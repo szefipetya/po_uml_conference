@@ -34,10 +34,13 @@ export class DiagramObjectComponent
   onMouseDown(e) {
     this.editBegin();
     this.dragged = true;
-    console.log('mousedown');
+    console.log('mousedown', super.box_shadow);
+
   }
+
   onMouseUp(e) {
     this.MouseUpEffect(e);
+
   }
   MouseUpEffect(e) {
     this.sendDimensionUpdate();
@@ -57,7 +60,7 @@ export class DiagramObjectComponent
     console.log(copy);
     action.json = JSON.stringify(copy);
     console.log('dimension update', action.json);
-    this.sendAction(action);
+    this.sendAction(action, false);
   }
   dragged = false;
   updateModel(model: any, action_id: string, msg?: string): void {
@@ -105,29 +108,32 @@ export class DiagramObjectComponent
   }
 
   editEnd() {
-    let action = new EditorAction(this.model.id, this.model._type, '');
-    action.action = ACTION_TYPE.UPDATE;
-    let copy = {};
+    if (this.sessionState != null) {
+      let action = new EditorAction(this.model.id, this.model._type, '');
+      action.action = ACTION_TYPE.UPDATE;
+      let copy = {};
 
-    soft_copy(this.model, copy, [
-      'viewModel',
-      'groups',
-      'titleModel',
-      'scaledModel',
-    ]);
+      soft_copy(this.model, copy, [
+        'viewModel',
+        'groups',
+        'titleModel',
+        'scaledModel',
+      ]);
 
-    /*   console.log('MODEL', this.model);
-    console.log('COPY', copy); */
-    action.json = JSON.stringify(copy);
-    console.log('edit ended', action.json);
-    this.sendAction(action);
+      /*   console.log('MODEL', this.model);
+      console.log('COPY', copy); */
+      action.json = JSON.stringify(copy);
+      console.log('edit ended', action.json);
+      this.sendAction(action);
+    }
   }
   isLocked(): string {
+    if (this.sessionState == null) return '';
     if (this.sessionState == undefined) return 'null';
     if (this.sessionState.lockerUser_id == this.socket.getUser().id)
-      return 'editing';
+      return '✎';
     if (this.sessionState.locks.length > 0)
-      return 'locked:' + this.sessionState.lockerUser_id;
+      return '🔒';
     else return '';
   }
 
@@ -136,14 +142,11 @@ export class DiagramObjectComponent
   deleteSelfFromParent() {
     this.editorService.deleteGlobalObject(this.model);
   }
-  callback_queue: CallbackItem[];
-  restoreModel(model: any) {
-    // throw new Error('Method not implemented.');
-  }
+
   log(msg: string) {
     //  throw new Error('Method not implemented.');
   }
-  sessionState: SessionState;
+
 
   updateScales(scale): void { }
   update(): void { }
@@ -164,6 +167,7 @@ export class DiagramObjectComponent
   }
   @Input() public contentTemplate: TemplateRef<any>;
   @Input() public model: DiagramObject;
+  @Input() public sessionState: SessionState;
   @Input() public general: DiagramObject_General;
 
   ngAfterContentInit(): void {

@@ -45,7 +45,7 @@ export class WindowManagerComponent implements OnInit {
         width: 250,
         id: 'log',
         left: 0,
-        top: window.innerHeight - 120,
+        top: window.innerHeight - 220,
         viewModelInstance: null,
         contentViewModelInstance: null,
       },
@@ -54,16 +54,33 @@ export class WindowManagerComponent implements OnInit {
         fixed: false,
         head: {
           height: 25,
-          title: 'Socket Communication',
+          title: 'Socket',
         },
         height: null,
         width: 100,
         id: 'socket',
         left: 0,
-        top: 10,
+        top: 0,
         viewModelInstance: null,
         contentViewModelInstance: null,
       },
+      {
+        selector: 'app-social-window',
+        fixed: false,
+        head: {
+          height: 25,
+          title: 'Socket',
+        },
+        height: null,
+        width: 200,
+        id: 'social',
+        left: 250,
+        top: window.innerHeight - 220,
+        viewModelInstance: null,
+        contentViewModelInstance: null,
+      },
+
+
     ];
   }
   findWindowModelById(id): Window_c {

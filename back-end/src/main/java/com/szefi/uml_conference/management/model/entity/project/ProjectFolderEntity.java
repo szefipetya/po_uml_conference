@@ -26,7 +26,7 @@ public class ProjectFolderEntity extends ProjectFileEntity {
    List<ProjectFileEntity> files;
    boolean is_projectRoot;
    
-   @OneToOne(mappedBy="relatedFolder",cascade = CascadeType.ALL)
+   @OneToOne(mappedBy="relatedFolder",cascade = {CascadeType.REMOVE,CascadeType.PERSIST})
    DiagramEntity diagram;
 
     public DiagramEntity getDiagram() {

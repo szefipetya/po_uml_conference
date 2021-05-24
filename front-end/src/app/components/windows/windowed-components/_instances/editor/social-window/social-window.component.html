@@ -1,0 +1,20 @@
+<ng-template #content>
+  <div
+    [style.height]="model.height + 'px'"
+    [style.width]="model.width + 'px'"
+    class="bg"
+  >
+    <div
+      *ngFor="let item of this.socketService.getSessionUsers()"
+      [style.display]="'flex'"
+      [style.justify-content]="'space-between'"
+    >
+      <span *ngIf="this.socketService.getUser().id == item.user.id; else normal"
+        ><b>{{ item.user.userName }}(you)</b></span
+      >
+      <ng-template #normal> {{ item.user.userName }} </ng-template
+      ><span class="mx-1" [style.color]="item.color">⬤</span>
+    </div>
+  </div>
+</ng-template>
+<app-window [contentTemplate]="content" [model]="this.model"> </app-window>

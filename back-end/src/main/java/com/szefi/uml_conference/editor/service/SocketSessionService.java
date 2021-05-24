@@ -42,6 +42,7 @@ import com.szefi.uml_conference.editor.service.socket.security.model.SocketAuthe
 import com.szefi.uml_conference.editor.service.socket.threads.SocketThreadManager;
 import com.szefi.uml_conference.editor.service.socket.threads.service.SOCKET;
 import com.szefi.uml_conference.management.model.ICON;
+import com.szefi.uml_conference.security.service.MyUserDetailsService;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -119,7 +120,14 @@ public class SocketSessionService {
  
     @Autowired
     UserRepository userRepo;//temp
- //@EventListener(ApplicationReadyEvent.class)
+    
+    @Bean
+    @Qualifier("colorList")
+    public List<String> getColors(){
+        return colors;
+    }
+    List<String> colors;
+ @EventListener(ApplicationReadyEvent.class)
     public void init() {
         try {
           //  EditorSession session=new EditorSession();
@@ -127,16 +135,22 @@ public class SocketSessionService {
          
             System.out.println("service started");
            // this.dg=new DiagramEntity();
-         
-            Resource res = new ClassPathResource("d.json");
+               objectMapper = new ObjectMapper();
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            Resource res = new ClassPathResource("json/colors.json");
             byte[] buffer = new byte[res.getInputStream().available()];
             res.getInputStream().read(buffer);
-            File targetFile = new File("src/main/resources/tmp_d.tmp");
+            File targetFile = new File("src/main/resources/json/colors.tmp");
             OutputStream outStream = new FileOutputStream(targetFile);
             outStream.write(buffer);
-            try {
+              
+           colors=   Arrays.asList(objectMapper.readValue(buffer, String[].class));
+               for(String c:colors)
+                   System.out.println(c+",");
+           /* try {
                 objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                
                        this.dg=objectMapper.readValue(targetFile, DiagramEntity.class);
 
          
@@ -161,20 +175,11 @@ public class SocketSessionService {
                 }
                
             
-                   // this.diagramRepo.save(session.getDg());   
-          /* UserEntity user=userRepo.findByUserName("user").get();
-          
-          //  user.getDiagrams().add(this.dg);
-           this.dg.setOwner(user);  
-            this.diagramRepo.save(this.dg); 
-            UserEntity user2=userRepo.findByUserName("user2").get();
-            user2.getSharedDiagramsWithMe().add(this.dg);
-            userRepo.save(user2);*/
-             // session.setDg(this.dg);
+               
             } catch (IOException ex) {
 
                 Logger.getLogger(SocketSessionService.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
         } catch (IOException ex) {
             Logger.getLogger(SocketSessionService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -198,16 +203,23 @@ public class SocketSessionService {
  
    @Autowired
    AttributeElementRepository attrElementRepo;
+   
+   @Autowired 
+   MyUserDetailsService userService;
+   
    @Bean
    @Scope("prototype")    
    EditorSession generateSession(){
-       return new EditorSession(this.diagramRepo,this.objectRepo,this.nestedActionQueue,attrElementRepo);
+       return new EditorSession(this.diagramRepo,this.objectRepo,this.nestedActionQueue,attrElementRepo,colors);
    }
 
  public List<UserWebSocketWrapper> getUserSocketsByToken(String token) throws JwtParseException{
        return this.tokenToSession(token).getUserSockets();
    }
    
+    public UserEntity getUserEntityById(Integer id){
+        return this.userService.loadUserEntityById(id);
+    }
     public String autoProcessRequest( MyUserDetails details,UserWebSocketWrapper userSocket,SocketAuthenticationRequest req) {
         //step 1 ://find a diagram that matches the req.getDiagram_id()
                   //if not found, create a new session and load the diagram from the database.
@@ -224,7 +236,7 @@ public class SocketSessionService {
           userSocket.setSession_jwt(jwtService.generateToken(claims, details));//generated a token, containing the session's id.
                     userSocket.setUser_id(details.getId());
 
-            s.getUserSockets().add(userSocket);
+            s.addUserSocket(userSocket);
       }else{
           //create new session and load diagram with given id.
            s=this.generateSession();//new EditorSession(this.diagramRepo,this.objectRepo);
@@ -235,7 +247,7 @@ public class SocketSessionService {
           claims.put("session_id",s.getId().toString());     
           userSocket.setSession_jwt(jwtService.generateToken(claims, details));//generated a token, containing the session's id.
           userSocket.setUser_id(details.getId());
-          s.getUserSockets().add(userSocket);
+          s.addUserSocket(userSocket);
       
           sessions.add(s);
       }
@@ -356,8 +368,6 @@ public class SocketSessionService {
       
       
     private void sendObjectToSessionIfExists(DiagramObject pack,Integer diagram_id){
-      
-           
         Optional<EditorSession> sessionOpt=findSessionByDiagramId(diagram_id);
         if(sessionOpt.isPresent()){
                 try {
@@ -369,15 +379,7 @@ public class SocketSessionService {
         }
      }
     
-    private  Optional<EditorSession>  findSessionWithuser_session_jwt_inside(String session_jwt){
-      /*for(EditorSession s:sessions){
-          if(s.userDisconnect(session_jwt))
-      }
-        
-        ((String)this.jwtService.extractAllClaims(session_jwt).get("session_id"))*/
-      return null;
-    }
-    
+   
     private Optional<EditorSession> findSessionByDiagramId(Integer id){
         return this.sessions.stream().filter(s->s.getDg().getId().equals(id)).findFirst();
     }

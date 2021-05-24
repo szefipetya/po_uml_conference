@@ -68,8 +68,13 @@ export class AttributeComponent
     protected commonService: CommonService
   ) {
     super(socket, commonService);
+    this.shadowVariant = InteractiveItemBase.DEFAULT_THIN_SHADOW_VARIANT;
   }
-
+  highlightMe(on: boolean, color: string): void {
+    console.log('highlight', this)
+    if (on) { this.shadowVariant = InteractiveItemBase.HIGHLIGHTED_THIN_SHADOW_VARIANT; this.sessionState.extra.color = color; }
+    else { this.shadowVariant = InteractiveItemBase.DEFAULT_SHADOW_VARIANT; this.sessionState.extra.color = this.getColor(); }
+  }
   getId() {
     return this.model.id;
   }
@@ -126,19 +131,15 @@ export class AttributeComponent
     this.render();
   }
   //view needs this to represent the remaining unended transactions
-  isLoading(): string {
-    if (this.callback_queue.length > 0)
-      return 'loading ' + this.callback_queue.length;
-    else return '';
-  }
+
   //view needs this to represent lock state
   isLocked(): string {
     if (this.isEditLockedPermanently) return '';
     if (this.sessionState == undefined) return 'null';
     if (this.sessionState.lockerUser_id == this.socket.getUser().id)
-      return 'editing';
+      return '✎';
     if (this.sessionState.locks.length > 0)
-      return 'locked:' + this.sessionState.lockerUser_id;
+      return '🔒' + this.sessionState.lockerUser_id;
     else return '';
   }
 
@@ -236,6 +237,8 @@ export class AttributeComponent
   };
   setNameAndType = (e, l) => {
     if (this.isTitle) { this.model.name = e.target.value.trim() } else {
+      let i = 0;
+
       let splitted = e.target.value.split(':');
       let namebuilded = "";
       for (let i = 0; i < splitted.length - 1; i++) {
@@ -243,16 +246,22 @@ export class AttributeComponent
         if (i < splitted.length - 2) namebuilded += ':';
         console.log(splitted[i])
       }
-      this.name = namebuilded;
-      this.model.name = namebuilded.trim();
-      if (l) {
-        this.model.name = this.model.name.substr(1);
-      }
-      if (namebuilded == '') {
-        this.model.name = e.target.value.trim()
-        this.name = e.target.value.trim()
-      }
 
+      let realName;
+
+      if (namebuilded == '') {
+
+
+        realName = e.target.value.trim();
+      } else {
+        realName = namebuilded;
+
+      }
+      if (l) {
+        realName = realName.substring(1, realName.length);
+      }
+      this.model.name = realName;
+      this.name = realName;
       console.log('builded vs normal', namebuilded, e.target.value)
 
       if (splitted[1]) this.model.attr_type = splitted[splitted.length - 1].trim();

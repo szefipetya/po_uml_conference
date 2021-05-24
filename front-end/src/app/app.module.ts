@@ -44,6 +44,7 @@ import { HomeComponentComponent } from './components/full-page-components/home-c
 import { FileManagerService } from './components/left-panel-component/service/file-manager.service';
 import { PackageObjectComponent } from './components/full-page-components/editor/diagram-objects/package-object/package-object.component';
 import { ShareDialogComponent } from "./components/left-panel-component/file/file.component";
+import { SocialWindowComponent } from './components/windows/windowed-components/_instances/editor/social-window/social-window.component';
 @NgModule({
   declarations: [ShareDialogComponent,
     AppComponent,
@@ -69,6 +70,7 @@ import { ShareDialogComponent } from "./components/left-panel-component/file/fil
     FileComponent,
     HomeComponentComponent,
     PackageObjectComponent,
+    SocialWindowComponent,
   ],
   imports: [
     //Angular core

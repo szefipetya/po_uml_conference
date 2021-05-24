@@ -62,6 +62,9 @@ export class LineCanvasComponent
   ) {
     this.mathHelper = new MathHelper(this);
   }
+  updateColorOnly() {
+    throw new Error('Method not implemented.');
+  }
   createItem(model: DynamicSerialObject, extra?: any) {
     this.createLineWithControllerLocally(model as Line);
   }
@@ -118,7 +121,7 @@ export class LineCanvasComponent
   }
   lineHeads;
   LINE_WIDTH = 3;
-  LINE_SELECTED_STROKE = 'orange';
+  // LINE_SELECTED_STROKE =  this.socket.getColorByUserId(this.sessionState.lockerUser_id);
   LINE_DEFAULT_STROKE = 'black';
   init() {
     this.ctx = this.canvasDOM.nativeElement.getContext('2d');

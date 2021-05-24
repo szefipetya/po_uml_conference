@@ -70,6 +70,7 @@ public class SessionStateHandler extends TextWebSocketHandler {
         this.latestsessionWhereUserExited=sockAndSession;
                  EditorAction action = new EditorAction();
                 action.getExtra().put("session_id",sockAndSession.getSecond().getId().toString());
+               action.setSession_jwt(sockAndSession.getFirst().getSession_jwt());
                 action.setUser_id(sockAndSession.getFirst().getUser_id());
                 action.setAction(ACTION_TYPE.S_USER_DISCONNECT);
                 threadManager.postAction(action);
@@ -112,6 +113,13 @@ SocketSecurityService socketSecurityService;
         session.sendMessage(new TextMessage(mapper.writeValueAsString(responses)));
                     System.out.println(initMap.get(session));
                  //   System.out.println("session msg" + message.getPayload());
+                 
+                 
+                 //send user List
+                        EditorAction a2=new EditorAction();
+        a2.setAction(ACTION_TYPE.S_USER_CONNECT);
+        a2.setSession_jwt(session_jwt);
+        threadManager.postAction(a2);
                 }
             }
 

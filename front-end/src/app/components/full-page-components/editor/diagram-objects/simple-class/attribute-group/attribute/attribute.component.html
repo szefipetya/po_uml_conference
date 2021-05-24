@@ -1,9 +1,21 @@
-<div style="position: relative" [style.box-shadow]="this.box_shadow">
+<div
+  style="position: relative"
+  [style.box-shadow]="this.sessionState?.extra.color + ' ' + this.shadowVariant"
+>
   <span
     style="position: absolute"
     [style.left]="this.getParentClass().model.scaledModel.width_scaled + 'px'"
+    [style.display]="'flex'"
+    class="m-1"
   >
-    {{ this.isLocked() }}{{ this.isLoading() }}{{ this.responseMsg }}
+    <span *ngIf="this.isLoading() > 0">
+      <span class="lds-hourglass" *ngIf="this.isLoading"> </span>
+      <i class="fas fa-sign-in-alt"></i>
+    </span>
+    <span *ngIf="this.isLoading() > 0" class="mx-2">
+      {{ this.isLoading() }}</span
+    >
+    <span> {{ this.isLocked() }}</span>
   </span>
   <span style="position: absolute" [style.backgroundColor]="'#333333'">
     {{ this.extra_overlay }}

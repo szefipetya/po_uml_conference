@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { FileManagerService } from 'src/app/components/left-panel-component/service/file-manager.service';
 import { eraseCookie, getCookie } from 'src/app/utils/cookieUtils';
 import { environment } from 'src/environments/environment';
 import { AuthModule } from '../auth.module';
@@ -12,7 +13,9 @@ import { LogoutResponse } from "../models/LogoutResponse";
 })
 export class AuthServiceService {
 
-  constructor(private http: HttpClient, private _snackBar: MatSnackBar) {
+  constructor(private http: HttpClient,
+    private _snackBar: MatSnackBar
+    , private fmService: FileManagerService) {
 
   }
 
@@ -44,7 +47,10 @@ export class AuthServiceService {
 
     eraseCookie("jwt_token");
     eraseCookie("user");
-
+    eraseCookie('dg_id')
+    eraseCookie('session_jwt')
+    eraseCookie('actual_folder')
+    this.fmService.triggerEvent('logout')
   }
 
 

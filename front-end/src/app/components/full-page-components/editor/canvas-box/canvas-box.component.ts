@@ -365,6 +365,9 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
 
 
   }
+  updateColorOnly() {
+    throw new Error('Method not implemented.');
+  }
   editBegin() {
     throw new Error('Method not implemented.');
   }
@@ -387,9 +390,12 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
   callback_queue: CallbackItem[];
 
   onMouseMove = (e) => {
+
     //console.dir(e);
     // e.persist();
     // ha, éppen class-t rajzol az illető
+    // onmousemove = function (e) { this.document.title = "" + e.clientX + "," + e.clientY; }
+
     if (
       this.drawedClassPositionSpecified &&
       this.editorService.clientModel.canvas.drawMode == 'class' ||

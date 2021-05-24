@@ -143,8 +143,8 @@ export class GlobalEditorService {
       console.log("canvas size updated")
     }, 'canvas_size_update');
     this.init_first();
-    if (this.getDiagramId())
-      this.initFromServer(this.getDiagramId());
+    /* if (this.getDiagramId())
+       this.initFromServer(this.getDiagramId());*/
   }
   namespace(str, scope) {
     return scope;

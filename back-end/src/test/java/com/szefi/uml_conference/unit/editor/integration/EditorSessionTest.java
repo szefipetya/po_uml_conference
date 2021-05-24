@@ -28,6 +28,7 @@ import com.szefi.uml_conference.editor.repository.DynamicSerialObjectRepository;
 import com.szefi.uml_conference.editor.service.EditorSession;
 import com.szefi.uml_conference.editor.service.SocketSessionService;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -115,7 +116,13 @@ public class EditorSessionTest {
            dg.setLines(new ArrayList<>());
            
            diagramRepo.save(dg);
-         session=new EditorSession(diagramRepo, objectRepo,nestedQueue, attrElementRepo);
+           List<String> cols=new ArrayList<>();
+           cols.add("#fff");
+           cols.add("#aaa");
+           cols.add("#bbb");
+           cols.add("#ccc");
+           cols.add("#ddd");
+         session=new EditorSession(diagramRepo, objectRepo,nestedQueue, attrElementRepo,cols);
          session.setDg(dg);
          session.init();
              s=new UserWebSocketWrapper();

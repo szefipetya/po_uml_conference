@@ -30,6 +30,7 @@ import com.szefi.uml_conference.editor.service.EditorSession;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
 import static java.awt.PageAttributes.MediaType.A;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -104,7 +105,13 @@ public class EditorSessionTest {
        @BeforeEach
        public  void populateSession(){
          MockitoAnnotations.initMocks(this); // this is needed for init of mocks, if we use @Mock 
-         session=new EditorSession(diagramRepo, objectRepo,nestedQueue, attrElementRepo);
+            List<String> cols=new ArrayList<>();
+           cols.add("#fff");
+           cols.add("#aaa");
+           cols.add("#bbb");
+           cols.add("#ccc");
+           cols.add("#ddd");
+         session=new EditorSession(diagramRepo, objectRepo,nestedQueue, attrElementRepo,cols);
 
              s=new UserWebSocketWrapper();
             s.setUser_id(1);
@@ -146,7 +153,7 @@ public class EditorSessionTest {
     }
     
     @Test
-    void deleteLocksRelatedToUser(){ 
+    void deleteLocksRelatedToUser() throws NotFoundException{ 
        
         //test
         //if the object is free

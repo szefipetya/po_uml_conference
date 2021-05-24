@@ -25,13 +25,15 @@ export class EditorRootComponent implements OnInit, AfterContentInit {
 
   }
   ngAfterContentInit() {
-    this.editorService.initFromServer(getCookie("dg_id"));
 
+    this.editorService.initFromServer(getCookie("dg_id"));
 
   }
   ngOnInit(): void {
   }
-
+  isInProject() {
+    return getCookie('dg_id');
+  }
 
   newButton;
   newButtonTransition;

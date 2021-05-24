@@ -25,16 +25,20 @@ import com.szefi.uml_conference.editor.model.socket.Response.SessionStateRespons
 import com.szefi.uml_conference.editor.model.socket.Response.TARGET_TYPE;
 import com.szefi.uml_conference.editor.model.socket.ServerSideEditorAction;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
+import com.szefi.uml_conference.editor.model.socket.tech.SessionUserDto;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import com.szefi.uml_conference.editor.service.socket.threads.ActionResponseProcessor;
 import com.szefi.uml_conference.editor.service.socket.threads.CustomProcessor;
 import com.szefi.uml_conference.editor.service.socket.threads.EditorActionProcessor;
 import com.szefi.uml_conference.editor.service.socket.threads.EditorActionProcessor.Q;
 import static com.szefi.uml_conference.editor.service.socket.threads.service.SOCKET.STATE;
+import com.szefi.uml_conference.security.model.User_PublicDto;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -276,6 +280,7 @@ NestedEditorActionProcessor(){
        case S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE:
       this.service.deleteClassSoRemoveItFromParentPackageObject((PackageObject)((ServerSideEditorAction)action).getLoad());
       break;
+       
 
                 }
             } catch (JwtParseException ex) {
@@ -284,6 +289,8 @@ NestedEditorActionProcessor(){
                 try {//ha beakad valami, akkor a hamis elem törlését még el lehessen küldeni
                     sendAll(action, Q.ACTION);
                 } catch (JwtParseException ex1) {
+                    Logger.getLogger(NestedEditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (NotFoundException ex1) {
                     Logger.getLogger(NestedEditorActionProcessor.class.getName()).log(Level.SEVERE, null, ex1);
                 }
             } catch (JsonProcessingException ex) {

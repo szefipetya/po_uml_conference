@@ -1,5 +1,5 @@
 <div
-  *ngIf="this.editorService.getUser(); else login_pls"
+  *ngIf="this.editorService.getUser() && isInProject(); else elseTemplate"
   id="app"
   tabIndex="0"
   (mousemove)="this.onMouseMove($event)"
@@ -15,11 +15,14 @@
     <app-canvas-box> </app-canvas-box>
   </div>
 </div>
-<ng-template #login_pls>
-  <div class="unauthorized-overlay">
+<ng-template #elseTemplate>
+  <div *ngIf="!isInProject()" class="unauthorized-overlay">
+    <div>Select a project in the manager to edit</div>
+  </div>
+  else
+  <div *ngIf="!this.editorService.getUser()" class="unauthorized-overlay">
     <div>
       <a [routerLink]="['/login']">Log in</a>
-
       to access This function
     </div>
   </div>

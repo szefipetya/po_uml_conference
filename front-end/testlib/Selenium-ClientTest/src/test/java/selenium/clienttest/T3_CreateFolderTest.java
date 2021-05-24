@@ -37,23 +37,54 @@ public class T3_CreateFolderTest {
       TestUtils.login("user", "pass1");
     
       Thread.sleep(1000);
-    driver.findElement(By.xpath("(//img[@alt='folder_icon'])[2]")).click();
+    driver.findElement(By.xpath("(//img[@alt='folder_open'])")).click();
      Thread.sleep(1000);
-    driver.findElement(By.xpath("(//img[@alt='folder_icon'])[6]")).click();
+    driver.findElement(By.xpath("(//img[@alt='folder_create'])")).click();
      Thread.sleep(200);
     driver.findElement(By.xpath("//input[@value='']")).clear();
     driver.findElement(By.xpath("//input[@value='']")).sendKeys("testfolder");
     driver.findElement(By.xpath("//input[@value='']")).sendKeys(Keys.ENTER);
       Thread.sleep(500);
-     Assertions.assertEquals("testfolder",driver.findElement(By.xpath("//div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer/div/div/app-left-panel-component/div/div[3]/div[3]/app-file/div/div")).getText());
+      Assertions.assertNotNull(driver.findElements(By.xpath("//*[contains(text(), 'testfolderToDel')]")));
+
      Thread.sleep(500);
       
+      }
+    @Test
+  public void testDeleteFolder() throws Exception {
+      TestUtils.login("user", "pass1");
+    
+      Thread.sleep(1000);
+    driver.findElement(By.xpath("(//img[@alt='folder_open'])")).click();
+     Thread.sleep(1000);
+    driver.findElement(By.xpath("(//img[@alt='folder_create'])")).click();
+     Thread.sleep(200);
+    driver.findElement(By.xpath("//input[@value='']")).clear();
+    driver.findElement(By.xpath("//input[@value='']")).sendKeys("testfolderToDel");
+    driver.findElement(By.xpath("//input[@value='']")).sendKeys(Keys.ENTER);
+        
       
-    // ERROR: Caught exception [ERROR: Unsupported command [doubleClick | //div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer/div/div/app-left-panel-component/div/div[3]/div[2]/app-file/div/div | ]]
-  }
+
+      Thread.sleep(1000);  
+        assertNotNull(driver.findElement(By.xpath("//*[contains(text(), 'testfolderToDel')]")));
+       driver.findElement(By.xpath("//*[contains(text(), 'testfolderToDel')]")).click();
+          driver.findElement(By.xpath("(//img[@alt='folder_trash'])")).click();
+ Thread.sleep(1000);
+         
+    
+              driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+
+       assertTrue(driver.findElements(By.xpath("//*[contains(text(), 'testfolderToDel')]")).isEmpty());
+       
+  
+   
+     Thread.sleep(500);
+      
+      }
 
   @After
   public void tearDown() throws Exception {
+          driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     driver.quit();
     String verificationErrorString = verificationErrors.toString();
     if (!"".equals(verificationErrorString)) {

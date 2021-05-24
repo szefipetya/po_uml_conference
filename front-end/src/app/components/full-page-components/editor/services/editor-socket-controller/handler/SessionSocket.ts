@@ -31,12 +31,15 @@ export class SessionSocket implements SocketWrapper {
         case 'CONTAINER':
           sc = this.parent.getContainer(resp.target_id);
           if (sc) sc.updateState(resp.sessionState, resp.action_id);
+          this.parent.service.triggerEvent('update');
           break;
 
         case 'ITEM':
           si = this.parent.getItem(resp.target_id);
           if (si) si.updateState(resp.sessionState, resp.action_id);
           console.log('ITEMS SESSION UPDATED');
+          this.parent.service.triggerEvent('update');
+
           break;
         case 'ITEM_INJECTION':
           this.parent.service.popFutureCallbackInjectionQueue(
@@ -51,7 +54,7 @@ export class SessionSocket implements SocketWrapper {
             { sessionState: resp.sessionState }
           );
       }
-      this.parent.service.triggerEvent('update');
+
     }, this.parent.service.test.ping);
   }
   onopen(m: any) {
@@ -66,7 +69,11 @@ export class SessionSocket implements SocketWrapper {
       let it = this.parent.service.itemViewModelMap.find(
         (v) => v.key == r.target_id
       );
-      if (it) { it.value.updateState(r.sessionState); }
+      if (it) {
+        it.value.updateState(r.sessionState);
+        setTimeout(() => { it.value.updateState(r.sessionState) }, 200)
+
+      }
       else console.error('No view for SessionState:', r);
     });
     this.parent.socket.onmessage = this.parent.onmessage;

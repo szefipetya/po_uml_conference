@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { getCookie } from 'src/app/utils/cookieUtils';
+import { Pair } from 'src/app/utils/utils';
 import { endP, environment } from 'src/environments/environment';
 import { FileShareRequest } from '../../models/management/request/FileShareRequest';
 import { FileResponse } from '../../models/management/response/FileResponse';
@@ -42,5 +43,17 @@ export class FileManagerService {
         headers: { 'Authorization': 'Bearer ' + getCookie("jwt_token") }
       })
   }
+  eventListenerFunctions: Pair<Pair<string, any>, Function>[] = [];
 
+  public triggerEvent(wich: string) {
+
+    this.eventListenerFunctions.map((p) => {
+      if (p.key.key == wich)
+        p.value(p.key.value);
+    });
+
+  }
+  addListenerToEvent(target, fn, alias: string = '') {
+    this.eventListenerFunctions.push(new Pair(new Pair(alias, target), fn));
+  }
 }

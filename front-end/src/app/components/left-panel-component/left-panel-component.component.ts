@@ -3,7 +3,7 @@ import { Component, Input, OnInit, Output } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of, Subject, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { getCookie, setCookie } from 'src/app/utils/cookieUtils';
+import { eraseCookie, getCookie, setCookie } from 'src/app/utils/cookieUtils';
 import { endP, environment } from 'src/environments/environment';
 import { FolderDto } from "../models/management/FolderDto";
 import { ProjectFolderDto } from "../models/management/project/projectFolderDto";
@@ -46,6 +46,9 @@ export class LeftPanelComponentComponent implements OnInit {
       t.getDgInNext = false;
       t.onrefreshClick(false);
     }, 'update');
+    fileService.addListenerToEvent(this, (t) => {
+      this.actualFolder = null;
+    }, 'logout')
   }
   private eventsSubscription: Subscription;
   public errorMsg = "--";
@@ -245,8 +248,11 @@ export class LeftPanelComponentComponent implements OnInit {
 
             this.setActualProjectFolder(r, refreshCanvas);
           }
-          else
+          else {
             this.setActualFolderFromResponse(r);
+            eraseCookie('dg_id');
+            this.editorService.triggerEvent('user_disconnect_from_session');
+          }
         }
         console.log('file arrived', r)
         if (r) this.errorMsg = '';

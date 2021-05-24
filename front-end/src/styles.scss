@@ -129,7 +129,7 @@ body {
 }
 
 .d-class-selected {
-  border: $selected 0.095em solid !important;
+  /* border: $selected 0.095em solid !important;*/
 }
 
 .d-class-selected .class-title {
@@ -184,7 +184,7 @@ body {
   font-size: 0;
   background-color: #373535eb;
   width: 100%;
-  height: 0;
+  height: 3px;
   border-radius: 0.3em;
   box-shadow: 0.1em 0.1em 0.3em 0.05em #222f !important;
   color: #fda300;
@@ -199,6 +199,7 @@ body {
   color: #363434;
   text-shadow: 1px 1px 3px grey;
   border-color: #9c6d0b !important;
+  height: 100%;
 }
 
 .class-element-group:hover .class-element-group-new_element-button {

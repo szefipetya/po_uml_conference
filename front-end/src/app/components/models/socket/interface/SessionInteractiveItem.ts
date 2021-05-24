@@ -13,4 +13,5 @@ export interface SessionInteractiveItem {
   deleteSelfFromParent();
   log(msg: string, type: MSG_TYPE);
   getId();
+  updateColorOnly();
 }

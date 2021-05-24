@@ -112,9 +112,11 @@ export class ActionSocket implements SocketWrapper {
                   if (!this.parent.editorService.hasGlobalObject(load)) {
                     console.log('STATE INJECTION PUT IN');
                     if (load?._type == 'SimpleClass')
-                      this.parent.service.createGlobalObjectAndRequestStateInjectionForSimpleClass(
-                        load
-                      );
+                      this.parent.editorService.initFromServer(getCookie('dg_id'));
+
+                    /* this.parent.service.createGlobalObjectAndRequestStateInjectionForSimpleClass(
+                       load
+                     );*/
                   }
                 }
               }
@@ -182,6 +184,10 @@ export class ActionSocket implements SocketWrapper {
           console.log('delete reveived');
           si = this.parent.getItem(resp.target_id);
           si.deleteSelfFromParent();
+          break;
+        case ACTION_TYPE.SESSION_USER_LIST_UPDATE:
+          this.parent.service.setSessionUsers(JSON.parse(resp.action.json));
+          this.parent.service.itemViewModelMap.forEach(m => { m.value.updateColorOnly(); })
           break;
       }
       this.parent.service.triggerEvent('update');

@@ -122,7 +122,7 @@ export class LineController extends InteractiveItemBase {
       this.model.breaks_scaled.map((breakPoint) => {
         if (this.lineCanvasComponent.selectedLine == this.model) {
           this.strike(
-            this.lineCanvasComponent.LINE_SELECTED_STROKE, this.lineCanvasComponent.LINE_WIDTH * 2, prevPoint.point, breakPoint.point
+            this.getColor(), this.lineCanvasComponent.LINE_WIDTH * 2, prevPoint.point, breakPoint.point
           );
           ctx.moveTo(breakPoint.point.x, breakPoint.point.y);
           ctx.beginPath();
@@ -141,7 +141,7 @@ export class LineController extends InteractiveItemBase {
         //  console.log("lockers", this.sessionState?.lockerUser_id, " --- ", this.editorservice.getUser().id)
         if (this.sessionState?.lockerUser_id != '-1' && this.sessionState?.lockerUser_id != this.editorService.getUser().id) {
           this.strike(
-            "red",
+            this.getColor(),
             this.lineCanvasComponent.LINE_WIDTH * 3,
             prevPoint.point,
             breakPoint.point
@@ -161,7 +161,7 @@ export class LineController extends InteractiveItemBase {
       //draw outline if selected
       if (this.lineCanvasComponent.selectedLine == this.model) {
         this.strike(
-          this.lineCanvasComponent.LINE_SELECTED_STROKE,
+          this.getColor(),
           this.lineCanvasComponent.LINE_WIDTH * 2,
           prevPoint.point,
           ept
@@ -169,7 +169,7 @@ export class LineController extends InteractiveItemBase {
       }//if locked
       if (this.sessionState?.lockerUser_id != '-1' && this.sessionState?.lockerUser_id != this.editorService.getUser().id) {
         this.strike(
-          "red",
+          this.getColor(),
           this.lineCanvasComponent.LINE_WIDTH * 2,
           prevPoint.point,
           ept

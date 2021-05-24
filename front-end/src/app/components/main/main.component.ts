@@ -9,11 +9,18 @@ import { Subject } from 'rxjs';
 })
 export class MainComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+    /*setTimeout(() => {
+      Array.from(document.querySelectorAll(".class-element-group-new_element-button")).forEach((g) => { g.style.height = '20px' })
+    }, 1000)*/
+
+
+  }
   eventsSubject: Subject<{ str: string, extra: any }> = new Subject<{ str: string, extra: any }>();
   @ViewChild('drawer') drawer: MatDrawer;
 
   ngOnInit(): void {
+
   }
   toggle() {
     this.drawer.toggle();

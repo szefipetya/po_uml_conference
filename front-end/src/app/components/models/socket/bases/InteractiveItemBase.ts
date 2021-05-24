@@ -15,16 +15,25 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
   model: DynamicSerialObject;
   //session requirements
   callback_queue: CallbackItem[] = [];
-  protected sessionState: SessionState;
+  sessionState: SessionState;
   queuedActionsAfterLockReceived: EditorAction[] = [];
 
   constructor(
     protected socket: EditorSocketControllerService,
     protected commonService: CommonService
-  ) { }
+  ) { this.shadowVariant = InteractiveItemBase.DEFAULT_SHADOW_VARIANT }
   getId() {
     return this.model.id;
   }
+  updateColorOnly() {
+    if (this.sessionState)
+      this.sessionState.extra.color = this.socket.getColorByUserId(this.sessionState.lockerUser_id);
+  }
+  getColor() {
+    //  if (this.overrideshadow) return this.overrideshadow;
+    return this.socket.getColorByUserId(this.sessionState.lockerUser_id);
+  }
+
   //Session funcions---------------------------------
   updateState(state: SessionState, callback_action_id = ''): void {
     if (state == undefined) return;
@@ -33,7 +42,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
       (q) => q.action_id != callback_action_id
     );
     //TEMP
-    this.callback_queue = [];
+    // this.callback_queue = [];
     this.sessionState = state;
     console.log('my new session state');
     while (this.queuedActionsAfterLockReceived.length > 0) {
@@ -57,6 +66,10 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
         this.sessionState.extra.placeholder = null;
       }
     }
+    if (!this.sessionState.extra) this.sessionState.extra = {};
+    this.sessionState.extra.color = this.socket.getColorByUserId(state.lockerUser_id);
+
+    console.log('new col:' + this.box_shadow)
     this.render();
   }
   public abstract editBegin(): void;
@@ -69,7 +82,7 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     this.callback_queue = this.callback_queue.filter(
       (q) => q.action_id != action_id
     );
-    if (msg) this.log(msg, MSG_TYPE.ERROR);
+    this.log(msg, MSG_TYPE.ERROR);
     this.render();
   }
   isEditLockedByMe(): boolean {
@@ -80,16 +93,25 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
   //Logging Utils-------------------------------------
   box_shadow: string = '';
   log(msg: string, type: MSG_TYPE) {
+    console.log("MSG_", msg)
     this.commonService.putLog(msg, type, this);
   }
+  prevcolor;
+  shadowVariant;
+  public static HIGHLIGHTED_SHADOW_VARIANT = "0 0 10px 5px"
+  public static DEFAULT_SHADOW_VARIANT = "0 0 2px 3px"
+  public static HIGHLIGHTED_THIN_SHADOW_VARIANT = "0 0 6px 3px"
+  public static DEFAULT_THIN_SHADOW_VARIANT = "0 0 0px 2px"
   highlightMe(on: boolean, color: string): void {
+
     console.log('highlight', this)
-    if (on) this.box_shadow = ' 0px 0px 21px 1px ' + color;
-    else this.box_shadow = '';
+    if (on) { this.shadowVariant = InteractiveItemBase.HIGHLIGHTED_SHADOW_VARIANT; this.sessionState.extra.color = color; }
+    else { this.shadowVariant = InteractiveItemBase.DEFAULT_SHADOW_VARIANT; this.sessionState.extra.color = this.getColor(); }
   }
   //_Logging Utils--------------------------------------
-  sendAction(action: EditorAction) {
-    this.callback_queue.push(new CallbackItem(action.id));
+  sendAction(action: EditorAction, needCallBack = true) {
+    if (needCallBack)
+      this.callback_queue.push(new CallbackItem(action.id));
     if (this.sessionState == null) {
       this.queuedActionsAfterLockReceived.push(action);
     } else {
@@ -155,10 +177,9 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
     this.model.viewModel = this;
     return action;
   }
-  isLoading(): string {
-    if (this.callback_queue.length > 0)
-      return 'loading ' + this.callback_queue.length;
-    else return '';
+  isLoading(): any {
+    if (this.callback_queue.length == 0) return '';
+    return this.callback_queue.length.toString();
   }
   isAccessible(): boolean {
     if (this.sessionState == null) {

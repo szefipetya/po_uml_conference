@@ -34,6 +34,10 @@ class Test {
     this.ping = v;
   }
 }
+class SocialSessionState {
+  sessionUsers: SessionUser[] = [];
+}
+
 export class SessionUser {
   user: User;
   color: string;
@@ -68,10 +72,15 @@ export class EditorSocketControllerService {
       },
       'diagram_fetch'
     );
+
+    this.editorService.addListenerToEvent(
+      this, (target) => {
+
+        target.disconnect();
+      }, 'user_disconnect_from_session'
+    );
     this.addListenerToEvent(this, (target) => {
-      target.injectionQueue = [];
-      target.itemViewModelMap = [];
-      target.containerViewModelMap = [];
+
       target.disconnect();
       console.log("megvan az init");
     }, 'pre_setup')
@@ -213,6 +222,10 @@ export class EditorSocketControllerService {
     this.actionSocket.connect(this.url_pre + 'action');
   }
   public disconnect() {
+    this.injectionQueue = [];
+    this.itemViewModelMap = [];
+    this.containerViewModelMap = [];
+    this.sessionUsers = [];
     this.sessionSocket?.socket?.close();
     this.actionSocket?.socket?.close();
   }
@@ -242,8 +255,19 @@ export class EditorSocketControllerService {
   getDiagramId() {
     return this.editorService.getDiagramId();
   }
-
-
+  getSessionUsers() {
+    return this.sessionUsers;
+  }
+  getColorByUserId(id): string {
+    let col;
+    if (id == -1) return 'transparent'
+    this.sessionUsers.map(u => { if (u.user.id == id) col = u.color; return col; })
+    return col;
+  }
+  setSessionUsers(l: SessionUser[]) {
+    this.sessionUsers = l;
+  }
+  private sessionUsers: SessionUser[] = [];
   addListenerToEvent(target, fn, alias: string = '') {
     this.editorService.addListenerToEvent(target, fn, alias);
   }

@@ -40,7 +40,7 @@ public class SimpleClassElementGroup extends DynamicSerialObject
      @Enumerated(EnumType.ORDINAL)
     private GROUP_SYNTAX group_syntax;
      @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "group",cascade =CascadeType.PERSIST)
+    @OneToMany(mappedBy = "group",cascade ={CascadeType.PERSIST,CascadeType.REMOVE})
      private List<AttributeElement> attributes=new ArrayList<>();
     
     

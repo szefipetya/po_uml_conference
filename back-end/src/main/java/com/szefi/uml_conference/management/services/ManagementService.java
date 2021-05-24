@@ -102,9 +102,12 @@ public class ManagementService {
                         if(ent.getParentFolder()!=null&&canBeDeleted){
                             Integer parent_id=ent.getParentFolder().getId();
                             //delete folder
+                             
+                             if(ent instanceof ProjectEntity)
+                                 projectService.deleteProject((ProjectEntity)ent);
                              deleteShareRuleRecursively(ent);
                             fileRepo.delete(ent);
-                      
+                           
                             //return parent folderű
                             return getFolder(jwt,parent_id);
                         }else throw new IllegalDmlActionException("This File can not be deleted");

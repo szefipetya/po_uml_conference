@@ -15,9 +15,18 @@
     <div
       style="position: absolute"
       [style.left]="this.model.scaledModel.width_scaled + 'px'"
-      [style.top]="'-20' + 'px'"
+      [style.top]="'-1em'"
+      [style.display]="'flex'"
+      class="m-1"
     >
-      {{ this.isLocked() }} {{ this.isLoading() }}
+      <span *ngIf="this.isLoading() > 0">
+        <span class="lds-hourglass" *ngIf="this.isLoading"> </span>
+        <i class="fas fa-sign-in-alt"></i>
+      </span>
+      <span *ngIf="this.isLoading() > 0" class="mx-2">
+        {{ this.isLoading() }}</span
+      >
+      <span> {{ this.isLocked() }}</span>
     </div>
     <div *ngFor="let item of this.model.elements" class="m-0">
       <pre
@@ -30,6 +39,7 @@
   [style.box-shadow]="this.box_shadow"
   [contentTemplate]="contentc"
   [model]="this.model"
+  [sessionState]="this.sessionState"
   [general]="this.general"
 >
 </app-diagram-object>

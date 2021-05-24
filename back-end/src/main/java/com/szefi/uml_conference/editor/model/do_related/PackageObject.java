@@ -36,7 +36,7 @@ public class PackageObject extends DiagramObject {
         
     }
     
-    @OneToOne(mappedBy = "parent",cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "parent",cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH})
     private TitleElement titleModel; 
 
     public TitleElement getTitleModel() {

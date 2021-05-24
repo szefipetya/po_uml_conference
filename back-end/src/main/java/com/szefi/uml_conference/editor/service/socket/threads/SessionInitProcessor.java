@@ -17,6 +17,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javassist.NotFoundException;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,8 @@ public class SessionInitProcessor extends CustomProcessor {
                          System.out.println(service.tokenToSession(action.getSession_jwt()).isLockedById(action.getTarget().getTarget_id()));
                      } catch (JwtParseException ex) {
                          Logger.getLogger(SessionInitProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                     } catch (NotFoundException ex) {
+                         Logger.getLogger(SessionInitProcessor.class.getName()).log(Level.SEVERE, null, ex);
                      }
                  
                   try{
@@ -125,6 +128,8 @@ public class SessionInitProcessor extends CustomProcessor {
                              //Can not update
                          }
                      } catch (JwtParseException ex) {
+                         Logger.getLogger(SessionInitProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                     } catch (NotFoundException ex) {
                          Logger.getLogger(SessionInitProcessor.class.getName()).log(Level.SEVERE, null, ex);
                      }
                         
