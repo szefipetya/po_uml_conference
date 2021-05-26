@@ -14,7 +14,7 @@ export class TopMenuComponent implements OnInit {
 
   }
   isLoggedIn() {
-    return JSON.parse(getCookie('user'))?.id && getCookie('jwt_token')
+    return JSON.parse(getCookie('user')) && getCookie('jwt_token')
   }
   ngOnInit(): void {
   }

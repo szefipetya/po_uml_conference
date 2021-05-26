@@ -151,8 +151,10 @@ export class GlobalEditorService {
   }
 
   public async initFromServer(dg_id) {
+    if (dg_id == null) return;
     this.init_first();
     await this.triggerEvent('pre_setup');
+
     this.model = new Diagram();
     let response = await this.getDiagramFromServer(dg_id);
     console.log('response:', response);

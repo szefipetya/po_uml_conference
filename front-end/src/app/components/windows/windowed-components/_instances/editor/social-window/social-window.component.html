@@ -9,7 +9,8 @@
       [style.display]="'flex'"
       [style.justify-content]="'space-between'"
     >
-      <span *ngIf="this.socketService.getUser().id == item.user.id; else normal"
+      <span
+        *ngIf="this.socketService.getUser()?.id == item.user.id; else normal"
         ><b>{{ item.user.userName }}(you)</b></span
       >
       <ng-template #normal> {{ item.user.userName }} </ng-template

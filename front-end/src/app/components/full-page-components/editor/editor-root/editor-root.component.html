@@ -16,10 +16,13 @@
   </div>
 </div>
 <ng-template #elseTemplate>
-  <div *ngIf="!isInProject()" class="unauthorized-overlay">
+  <div
+    *ngIf="!isInProject() && this.editorService.getUser()"
+    class="unauthorized-overlay"
+  >
     <div>Select a project in the manager to edit</div>
   </div>
-  else
+
   <div *ngIf="!this.editorService.getUser()" class="unauthorized-overlay">
     <div>
       <a [routerLink]="['/login']">Log in</a>

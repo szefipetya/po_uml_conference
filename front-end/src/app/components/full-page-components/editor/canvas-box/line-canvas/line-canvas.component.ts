@@ -36,6 +36,7 @@ import { CommonService, MSG_TYPE } from '../../services/common/common.service';
 import { EditorSocketControllerService } from '../../services/editor-socket-controller/editor-socket-controller.service';
 import { TARGET_TYPE } from 'src/app/components/models/socket/response/TARGET_TYPE';
 import { MathHelper } from "./MathHelper";
+import { getCookie } from 'src/app/utils/cookieUtils';
 @Component({
   selector: 'app-line-canvas',
   templateUrl: './line-canvas.component.html',
@@ -53,6 +54,7 @@ export class LineCanvasComponent
     console.log('controllers', this.lineControllers)
 
   }
+
   LINE_LOCKED_STROKE: '#f00'
   constructor(
     private resourceLoader: ResourceLoaderService,
@@ -117,6 +119,7 @@ export class LineCanvasComponent
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.init();
+      this.editorService.initFromServer(getCookie("dg_id"));
     }, 100);
   }
   lineHeads;

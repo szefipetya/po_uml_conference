@@ -311,10 +311,13 @@ export class LeftPanelComponentComponent implements OnInit {
 
   setActualProjectFolder(r: FileResponse, refreshCanvas) {
     console.log('this is a project folder', r, this.getDgInNext);
-    if (refreshCanvas)
-      this.editorService.initFromServer((r.file as ProjectFolderDto).relatedDiagramId);
-
     this.setActualFolderFromResponse(r);
+
+    if (refreshCanvas) {
+      console.log('project received', r);
+      this.editorService.initFromServer((r.file as ProjectFolderDto).relatedDiagramId);
+    }
+
   }
 
   fileGoBack() {

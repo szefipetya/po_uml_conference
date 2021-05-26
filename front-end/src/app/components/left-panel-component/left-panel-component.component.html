@@ -1,78 +1,35 @@
 <div class="commander-container">
-  <div
-    class="commander-tools"
-    *ngIf="this.actualFolder?._type == 'FolderDto'; else project_tools"
-  >
-    <div class="tool" (click)="onCreateFolderClick()">
-      <span>
-        <img
-          class="icon-square"
-          src="../../../assets/svg/folder+.svg"
-          alt="folder_create"
-          srcset=""
-        />
-      </span>
-    </div>
-    <div class="tool" (click)="onCreateProjectClick()">
-      <span>
-        <img
-          class="icon-square"
-          src="../../../assets/svg/add-project.svg"
-          alt="project_create"
-          srcset=""
-        />
-      </span>
-    </div>
-    <div class="tool" (click)="onDeleteClick()">
-      <span>
-        <img
-          class="icon-square"
-          src="../../../assets/svg/trash.svg"
-          alt="folder_trash"
-          srcset=""
-        />
-      </span>
-    </div>
-    <div class="tool" (click)="onrefreshClick(true)">
-      <span>
-        <img
-          class="icon-square"
-          src="../../../assets/svg/management/refresh.svg"
-          alt="folder_refresh"
-          srcset=""
-        />
-      </span>
-    </div>
-    <div class="tool" (click)="this.getRootFolder()">
-      <span>
-        <img
-          class="icon-square"
-          src="../../../assets/svg/home.svg"
-          alt="go_root_refresh"
-          srcset=""
-        />
-      </span>
-    </div>
-  </div>
-  <ng-template #project_tools>
-    <div class="commander-tools">
+  <div *ngIf="this.isAuthenticated()">
+    <div
+      class="commander-tools"
+      *ngIf="this.actualFolder?._type == 'FolderDto'; else project_tools"
+    >
       <div class="tool" (click)="onCreateFolderClick()">
         <span>
           <img
             class="icon-square"
             src="../../../assets/svg/folder+.svg"
-            alt="pfolder_create"
+            alt="folder_create"
             srcset=""
           />
         </span>
       </div>
-
+      <div class="tool" (click)="onCreateProjectClick()">
+        <span>
+          <img
+            class="icon-square"
+            src="../../../assets/svg/add-project.svg"
+            alt="project_create"
+            srcset=""
+          />
+        </span>
+      </div>
       <div class="tool" (click)="onDeleteClick()">
         <span>
           <img
             class="icon-square"
             src="../../../assets/svg/trash.svg"
-            alt="project_trash"
+            alt="folder_trash"
             srcset=""
           />
         </span>
@@ -82,7 +39,7 @@
           <img
             class="icon-square"
             src="../../../assets/svg/management/refresh.svg"
-            alt="project_refresh"
+            alt="folder_refresh"
             srcset=""
           />
         </span>
@@ -98,38 +55,83 @@
         </span>
       </div>
     </div>
-  </ng-template>
-  <div class="path">
-    <span
-      class="pathElement"
-      (click)="fileDblClick(file)"
-      *ngFor="let file of this.actualPath"
-    >
-      <app-file [model]="file" [renderMode]="'path'"> </app-file>
-    </span>
-  </div>
-  <div class="commander-main" *ngIf="this.actualFolder; else errors">
-    <div
-      (click)="fileGoBack()"
-      class="back"
-      *ngIf="this.actualFolder.parentFolder_id"
-    >
-      back
-    </div>
-    <div class="file" *ngFor="let file of this.actualFolder.files">
-      <app-file
-        [model]="file"
-        (dblClickEvent)="this.fileDblClick($event)"
-        (focusEvent)="fileFocusEventHandler($event)"
-        (destroyEvent)="fileDestroyHandler($event)"
-        (clickEvent)="this.fileClick($event)"
+    <ng-template #project_tools>
+      <div class="commander-tools">
+        <div class="tool" (click)="onCreateFolderClick()">
+          <span>
+            <img
+              class="icon-square"
+              src="../../../assets/svg/folder+.svg"
+              alt="pfolder_create"
+              srcset=""
+            />
+          </span>
+        </div>
+
+        <div class="tool" (click)="onDeleteClick()">
+          <span>
+            <img
+              class="icon-square"
+              src="../../../assets/svg/trash.svg"
+              alt="project_trash"
+              srcset=""
+            />
+          </span>
+        </div>
+        <div class="tool" (click)="onrefreshClick(true)">
+          <span>
+            <img
+              class="icon-square"
+              src="../../../assets/svg/management/refresh.svg"
+              alt="project_refresh"
+              srcset=""
+            />
+          </span>
+        </div>
+        <div class="tool" (click)="this.getRootFolder()">
+          <span>
+            <img
+              class="icon-square"
+              src="../../../assets/svg/home.svg"
+              alt="go_root_refresh"
+              srcset=""
+            />
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <div class="path">
+      <span
+        class="pathElement"
+        (click)="fileDblClick(file)"
+        *ngFor="let file of this.actualPath"
       >
-      </app-file>
+        <app-file [model]="file" [renderMode]="'path'"> </app-file>
+      </span>
     </div>
+    <div class="commander-main" *ngIf="this.actualFolder; else errors">
+      <div
+        (click)="fileGoBack()"
+        class="back"
+        *ngIf="this.actualFolder.parentFolder_id"
+      >
+        back
+      </div>
+      <div class="file" *ngFor="let file of this.actualFolder.files">
+        <app-file
+          [model]="file"
+          (dblClickEvent)="this.fileDblClick($event)"
+          (focusEvent)="fileFocusEventHandler($event)"
+          (destroyEvent)="fileDestroyHandler($event)"
+          (clickEvent)="this.fileClick($event)"
+        >
+        </app-file>
+      </div>
+    </div>
+    <ng-template class="error" #errors>
+      <!--   {{ this.errorMsg }} -->
+    </ng-template>
   </div>
-  <ng-template class="error" #errors>
-    <!--   {{ this.errorMsg }} -->
-  </ng-template>
   <div class="unauthorized-overlay" *ngIf="!this.isAuthenticated()">
     <div class="m-3">
       <a [routerLink]="['/login']" (click)="clickEvent.emit('close')"

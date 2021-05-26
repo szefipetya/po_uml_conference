@@ -26,7 +26,7 @@ export class EditorRootComponent implements OnInit, AfterContentInit {
   }
   ngAfterContentInit() {
 
-    this.editorService.initFromServer(getCookie("dg_id"));
+
 
   }
   ngOnInit(): void {
