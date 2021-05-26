@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDrawer } from '@angular/material/sidenav';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -9,7 +10,7 @@ import { Subject } from 'rxjs';
 })
 export class MainComponent implements OnInit {
 
-  constructor() {
+  constructor(public router: Router) {
     /*setTimeout(() => {
       Array.from(document.querySelectorAll(".class-element-group-new_element-button")).forEach((g) => { g.style.height = '20px' })
     }, 1000)*/
@@ -18,7 +19,9 @@ export class MainComponent implements OnInit {
   }
   eventsSubject: Subject<{ str: string, extra: any }> = new Subject<{ str: string, extra: any }>();
   @ViewChild('drawer') drawer: MatDrawer;
-
+  isEditorActive() {
+    return this.router.url == '/editor'
+  }
   ngOnInit(): void {
 
   }

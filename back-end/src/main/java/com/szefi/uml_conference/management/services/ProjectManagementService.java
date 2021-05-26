@@ -35,6 +35,7 @@ import com.szefi.uml_conference.management.model.entity.project.ProjectEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFileEntity;
 import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
 import com.szefi.uml_conference.management.model.ICON;
+import com.szefi.uml_conference.management.model.entity.SPECIAL_FOLDER;
 import com.szefi.uml_conference.security.model.UserEntity;
 import com.szefi.uml_conference.security.repository.UserRepository;
 import com.szefi.uml_conference.security.service.JwtUtilService;
@@ -87,6 +88,8 @@ public class ProjectManagementService {
             if (parentFolderEnt.getFiles().stream().filter(f -> f.getName().equalsIgnoreCase(name)).collect(Collectors.toList()).size() > 0) {
                 throw new UnstatisfiedNameException(" name [" + name + "] is used by another file in the folder.");
             }
+             if(parentFolderEnt.getSpecial().equals(SPECIAL_FOLDER.SHARED))
+                                throw new UnstatisfiedNameException("You can not create files here");
             parentFolderEnt.addFile(projectToAdd);
             //inherit share rules
             projectToAdd.getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());

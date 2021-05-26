@@ -1,1 +1,1 @@
-c:/#DEV/#SZAKDOLI/#PROJEKT/postgreSQL_minimal/bin/postgres.exe "-D" "./postgreSQL_minimal/data"
+c:/Program Files/PostgreSQL/13/bin/postgres.exe "-D" "./postgreSQL_minimal/data"

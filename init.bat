@@ -1,1 +1,1 @@
-./npm_minimal/npm install http-server -g
+npm install http-server -g

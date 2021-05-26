@@ -1,0 +1,73 @@
+2021-05-26 20:42:28.070 CEST [4156] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-26 20:42:28.071 CEST [4156] LOG:  listening on IPv6 address "::", port 8102
+2021-05-26 20:42:28.072 CEST [4156] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-26 20:42:28.117 CEST [4712] LOG:  database system was interrupted; last known up at 2021-05-10 13:39:56 CEST
+2021-05-26 20:42:28.479 CEST [4712] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-26 20:42:28.481 CEST [4712] LOG:  redo starts at 0/3EA98F0
+2021-05-26 20:42:28.482 CEST [4712] LOG:  invalid record length at 0/3EA99D8: wanted 24, got 0
+2021-05-26 20:42:28.482 CEST [4712] LOG:  redo done at 0/3EA99A0
+2021-05-26 20:42:28.506 CEST [4156] LOG:  database system is ready to accept connections
+2021-05-26 20:43:39.102 CEST [7040] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.106 CEST [5480] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.108 CEST [2856] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.109 CEST [1416] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.112 CEST [628] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.113 CEST [4868] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.116 CEST [10624] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.117 CEST [9564] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.118 CEST [5060] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:39.124 CEST [4480] LOG:  could not receive data from client: unrecognized winsock error 10054
+2021-05-26 20:43:45.314 CEST [4156] LOG:  background worker "logical replication launcher" (PID 8228) was terminated by exception 0xC000013A
+2021-05-26 20:43:45.314 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:43:45.314 CEST [4156] LOG:  terminating any other active server processes
+2021-05-26 20:43:45.316 CEST [4156] LOG:  statistics collector process (PID 2336) was terminated by exception 0xC000013A
+2021-05-26 20:43:45.316 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:43:45.319 CEST [4156] LOG:  all server processes terminated; reinitializing
+2021-05-26 20:43:45.357 CEST [7160] LOG:  database system was interrupted; last known up at 2021-05-26 20:42:28 CEST
+2021-05-26 20:43:45.689 CEST [7160] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-26 20:43:45.692 CEST [7160] LOG:  redo starts at 0/3EA9A50
+2021-05-26 20:43:45.768 CEST [7160] LOG:  invalid record length at 0/3FA0358: wanted 24, got 0
+2021-05-26 20:43:45.768 CEST [7160] LOG:  redo done at 0/3FA0320
+2021-05-26 20:43:45.827 CEST [4156] LOG:  database system is ready to accept connections
+2021-05-26 20:55:18.174 CEST [4156] LOG:  background worker "logical replication launcher" (PID 9396) was terminated by exception 0xC000013A
+2021-05-26 20:55:18.174 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:55:18.174 CEST [4156] LOG:  terminating any other active server processes
+2021-05-26 20:55:18.178 CEST [4156] LOG:  statistics collector process (PID 10032) was terminated by exception 0xC000013A
+2021-05-26 20:55:18.178 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:55:18.181 CEST [4156] LOG:  all server processes terminated; reinitializing
+2021-05-26 20:55:18.222 CEST [7148] LOG:  database system was interrupted; last known up at 2021-05-26 20:43:45 CEST
+2021-05-26 20:55:18.627 CEST [7148] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-26 20:55:18.629 CEST [7148] LOG:  redo starts at 0/3FA03D0
+2021-05-26 20:55:18.630 CEST [7148] LOG:  invalid record length at 0/3FA0408: wanted 24, got 0
+2021-05-26 20:55:18.630 CEST [7148] LOG:  redo done at 0/3FA03D0
+2021-05-26 20:55:18.654 CEST [4156] LOG:  database system is ready to accept connections
+2021-05-26 20:55:22.943 CEST [4156] LOG:  background worker "logical replication launcher" (PID 10228) was terminated by exception 0xC000013A
+2021-05-26 20:55:22.943 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:55:22.944 CEST [4156] LOG:  terminating any other active server processes
+2021-05-26 20:55:22.946 CEST [4156] LOG:  statistics collector process (PID 6640) was terminated by exception 0xC000013A
+2021-05-26 20:55:22.946 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:55:22.949 CEST [4156] LOG:  all server processes terminated; reinitializing
+2021-05-26 20:55:22.985 CEST [4720] LOG:  database system was interrupted; last known up at 2021-05-26 20:55:18 CEST
+2021-05-26 20:55:23.317 CEST [4720] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-26 20:55:23.319 CEST [4720] LOG:  invalid record length at 0/3FA0480: wanted 24, got 0
+2021-05-26 20:55:23.320 CEST [4720] LOG:  redo is not required
+2021-05-26 20:55:23.348 CEST [4156] LOG:  database system is ready to accept connections
+2021-05-26 20:55:26.725 CEST [4156] LOG:  statistics collector process (PID 8580) was terminated by exception 0xC000013A
+2021-05-26 20:55:26.725 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:55:26.728 CEST [4156] LOG:  background worker "logical replication launcher" (PID 11816) was terminated by exception 0xC000013A
+2021-05-26 20:55:26.728 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:55:26.728 CEST [4156] LOG:  terminating any other active server processes
+2021-05-26 20:55:26.736 CEST [4156] LOG:  all server processes terminated; reinitializing
+2021-05-26 20:55:26.883 CEST [5836] LOG:  database system was interrupted; last known up at 2021-05-26 20:55:23 CEST
+2021-05-26 20:55:27.220 CEST [5836] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-26 20:55:27.222 CEST [5836] LOG:  invalid record length at 0/3FA04F8: wanted 24, got 0
+2021-05-26 20:55:27.223 CEST [5836] LOG:  redo is not required
+2021-05-26 20:55:27.243 CEST [4156] LOG:  database system is ready to accept connections
+2021-05-26 20:55:35.728 CEST [4156] LOG:  received fast shutdown request
+2021-05-26 20:55:35.730 CEST [4156] LOG:  aborting any active transactions
+2021-05-26 20:55:35.732 CEST [124] ERROR:  canceling statement due to user request
+2021-05-26 20:55:35.732 CEST [6044] ERROR:  canceling statement due to user request
+2021-05-26 20:55:35.736 CEST [4156] LOG:  background worker "logical replication launcher" (PID 6044) exited with exit code 1
+2021-05-26 20:55:37.710 CEST [4156] LOG:  autovacuum launcher process (PID 124) was terminated by exception 0xC000013A
+2021-05-26 20:55:37.710 CEST [4156] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 20:55:37.710 CEST [4156] LOG:  terminating any other active server processes

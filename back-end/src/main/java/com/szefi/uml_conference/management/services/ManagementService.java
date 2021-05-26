@@ -112,13 +112,14 @@ public class ManagementService {
                             return getFolder(jwt,parent_id);
                         }else throw new IllegalDmlActionException("This File can not be deleted");
    
-                }
+                } else
+                      throw new UnAuthorizedActionException("Error: You are not the owner of the file");
                    } catch (java.util.NoSuchElementException ex) {
             throw new FileNotFoundException("requested folder with id=" + id + " not found");
         } catch (ClassCastException ex) {
             throw new FileTypeConversionException("requested folder is not a folder id=" + id + " ");
         }
-                  return null;
+                  //return null;
         }
         @Transactional
       private void  deleteShareRuleRecursively(File_cEntity ent){
@@ -176,10 +177,14 @@ public class ManagementService {
         if (!fent.getOwner().getId().equals(user.getId())) {
             throw new UnAuthorizedActionException("Error: You are not te owner of the parent folder");
         }
+        
         if (fent instanceof FolderEntity) {
             FolderEntity parentFolderEnt = (FolderEntity) fent;
             if(parentFolderEnt.getFiles().stream().filter(f->f.getName().equalsIgnoreCase(name)).collect(Collectors.toList()).size()>0)
                 throw new UnstatisfiedNameException(" name ["+name+"] is used by another file in the folder.");
+            if(parentFolderEnt.getSpecial().equals(SPECIAL_FOLDER.SHARED))
+                                throw new UnstatisfiedNameException("You can not create files here");
+
             //inherit share rules
                 folderToAdd.getUsersIamSaredWith().addAll(parentFolderEnt.getUsersIamSaredWith());
                       parentFolderEnt.addFile(folderToAdd);    

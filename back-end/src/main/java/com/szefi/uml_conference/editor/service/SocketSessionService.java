@@ -137,16 +137,16 @@ public class SocketSessionService {
            // this.dg=new DiagramEntity();
                objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            Resource res = new ClassPathResource("json/colors.json");
-            byte[] buffer = new byte[res.getInputStream().available()];
+            Resource res = new ClassPathResource("colors.json");
+         /*   byte[] buffer = new byte[res.getInputStream().available()];
             res.getInputStream().read(buffer);
             File targetFile = new File("src/main/resources/json/colors.tmp");
             OutputStream outStream = new FileOutputStream(targetFile);
-            outStream.write(buffer);
+            outStream.write(buffer);*/
               
-           colors=   Arrays.asList(objectMapper.readValue(buffer, String[].class));
-               for(String c:colors)
-                   System.out.println(c+",");
+           colors=   Arrays.asList(objectMapper.readValue(res.getInputStream(), String[].class));
+             /*  for(String c:colors)
+                   System.out.println(c+",");*/
            /* try {
                 objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

@@ -77,14 +77,10 @@ import org.springframework.web.socket.WebSocketSession;
 @Component
 public class EditorSession {
 
-    
-    
     Long id;
-    
-   
-     List<String> colors;
-    
-  
+
+    List<String> colors;
+
     BlockingQueue<EditorAction> nestedActionQueue;
     /*MAIN SESSION DECLARATION*/
     DiagramEntity dg;
@@ -93,21 +89,21 @@ public class EditorSession {
     Map<Integer, Pair<SessionState, DynamicSerialContainer_I>> sessionContainerMap = new HashMap<>();
 
     ObjectMapper objectMapper;
-  
+
     DiagramRepository diagramRepo;
     AttributeElementRepository attrElementRepo;
- 
+
     DynamicSerialObjectRepository objectRepo;
 
     public EditorSession(DiagramRepository diagramRepo, DynamicSerialObjectRepository objectRepo, BlockingQueue<EditorAction> nestedActionQueue,
-             AttributeElementRepository attrElementRepo,  List<String> colors
+            AttributeElementRepository attrElementRepo, List<String> colors
     ) {
         this.id = UUID.randomUUID().getLeastSignificantBits();
         this.objectRepo = objectRepo;
         this.diagramRepo = diagramRepo;
         this.attrElementRepo = attrElementRepo;
         this.nestedActionQueue = nestedActionQueue;
-        this.colors=colors;
+        this.colors = colors;
     }
 
     public UserWebSocketWrapper getUserSocketByNativeSocket(SOCKET type, WebSocketSession socket) {
@@ -180,8 +176,10 @@ public class EditorSession {
     public SessionState getSessionStateById(Integer id) throws NotFoundException {
         if (sessionItemMap.get(id) != null) {
             return sessionItemMap.get(id).getFirst();
-        }else throw new NotFoundException("Object with id= "+id+" not found");
-        
+        } else {
+            throw new NotFoundException("Object with id= " + id + " not found");
+        }
+
     }
 
     public SessionState getContainerSessionStateById(Integer id) {
@@ -243,7 +241,7 @@ public class EditorSession {
             try {
                 if (obj instanceof AttributeElement) {
                     AttributeElement casted = (AttributeElement) obj;
-                
+
                     casted.setVisibility("+");
                     casted.setDoc("");
                     casted.setEdit(false);
@@ -255,17 +253,14 @@ public class EditorSession {
             } catch (org.springframework.orm.jpa.JpaObjectRetrievalFailureException ex) {
                 System.err.println(ex);
             }
- injectAndLockAfterCreate(user_id, obj);
-           
+            injectAndLockAfterCreate(user_id, obj);
+
             //   this.dg= this.diagramRepo.save(this.dg); 
             return obj;
             //the object has no parent, therefore the container is the diagram itself
         } else if (cont_id.equals(SocketSessionService.ROOT_ID)) {
-            //most akkor a Diagramra bízzam a beinjektálást vagy csinááljam meg itt?
 
             if (obj instanceof AutoSessionInjectable_I) {
-                // AutoSessionInjectable_I casted=(AutoSessionInjectable_I)obj;
-                //  casted.injectIdWithPrefix(rand_id);
                 if (obj instanceof DiagramObject) {
                     DiagramObject dgo = (DiagramObject) obj;
 
@@ -290,9 +285,7 @@ public class EditorSession {
 
                     obj = dgo;
                 }
-
                 System.out.println("obj created and locked for" + user_id);
-
                 return obj;
             }
             return null;
@@ -345,18 +338,15 @@ public class EditorSession {
     public Pair<SessionState, DynamicSerialObject> updateObjectAndUnlock(DynamicSerialObject obj, Integer user_id) throws NullPointerException, NotFoundException {
         D.log("UPDATE ");
         System.out.println("UPDATE");
-          SessionState s;
-        try{
-             s = this.getSessionStateById(obj.getId());
-        } catch(NotFoundException ex){return null;}
+        SessionState s;
+        try {
+            s = this.getSessionStateById(obj.getId());
+        } catch (NotFoundException ex) {
+            return null;
+        }
         if (s != null) {
             s.setDraft(false);
             if (this.unLockObjectById(obj.getId(), user_id)) {
-
-                /* if(obj instanceof SimpleClass)
-                  this.objectRepo.save((SimpleClass)this.getItemById(obj.getId()));
-                    else if(obj instanceof NoteBox)
-                  this.objectRepo.save((NoteBox)this.getItemById(obj.getId()));*/
                 if (obj instanceof TitleElement) {
                     this.getItemById(obj.getId()).update(obj);
                     //TitleElement real=(TitleElement)this.getItemById(obj.getId()); 
@@ -380,8 +370,6 @@ public class EditorSession {
                     this.getItemById(obj.getId()).update(obj);
 
                     objectRepo.save(this.getItemById(obj.getId()));
-                    //     this.dg= this.diagramRepo.save(this.dg);  
-
                 } else {
                     this.getItemById(obj.getId()).update(obj);
                     this.objectRepo.save(this.getItemById(obj.getId()));
@@ -389,34 +377,34 @@ public class EditorSession {
 
                 return this.sessionItemMap.get(obj.getId());
             }
-        }else{
+        } else {
             throw new NotFoundException("Object not found");
         }
-        // 
         return null;
     }
 
-    private boolean forceLockByUser(Integer target_id, Integer user_id) throws NotFoundException{
-         SessionState s = this.getSessionStateById(target_id);
+    private boolean forceLockByUser(Integer target_id, Integer user_id) throws NotFoundException {
+        SessionState s = this.getSessionStateById(target_id);
         if (s != null) {
             //even if someone locked it, and its me, i can still lock it again for myself
-         
-                System.out.println("locks are set for object" + target_id);
-                s.setLockerUser_id(user_id);
-                s.setLocks(this.generateCommonLock());
-                return true;
-            
+
+            System.out.println("locks are set for object" + target_id);
+            s.setLockerUser_id(user_id);
+            s.setLocks(this.generateCommonLock());
+            return true;
+
         }
         return false;
     }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean deleteItemFromContainerById(Integer user_id, Integer target_id, Integer parent_id) throws NotFoundException {
         try {
             //fast bugfix to delete PackageObjects properly
-               DynamicSerialObject _o = getItemById(target_id);
-               if(_o instanceof PackageObject){
-                   forceLockByUser(target_id,user_id);
-               }
+            DynamicSerialObject _o = getItemById(target_id);
+            if (_o instanceof PackageObject) {
+                forceLockByUser(target_id, user_id);
+            }
             if (this.isItemLockedByMe(target_id, user_id)) {
                 DynamicSerialContainer_I cont = getContainerById(parent_id);
                 if (cont != null) {
@@ -435,15 +423,13 @@ public class EditorSession {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-
-                            //clear the ones with empty name
                             return l;
                         }
                     }
                 } else {
                     if (parent_id.equals(SocketSessionService.ROOT_ID)) {//global object
 
-                       return deleteDiagramObject(user_id,target_id);
+                        return deleteDiagramObject(user_id, target_id);
                     } else if (parent_id.equals(SocketSessionService.L_ROOT_ID)) {//global line
 
                         DynamicSerialObject item = this.getItemById(target_id);
@@ -461,9 +447,6 @@ public class EditorSession {
 
                             this.dg = this.diagramRepo.save(this.dg);
                             //clear the ones with empty name
-
-                            // this.dg=this.diagramRepo.save(dg);
-                            //     this.dg=this.diagramRepo.save(this.dg);
                             return l;
                         }
                     }
@@ -498,108 +481,105 @@ public class EditorSession {
         return false;
     }
 
- private boolean deleteDiagramObject(Integer user_id, Integer target_id) throws NotFoundException{
-     DynamicSerialObject item = this.getItemById(target_id);
+    private boolean deleteDiagramObject(Integer user_id, Integer target_id) throws NotFoundException {
+        DynamicSerialObject item = this.getItemById(target_id);
 
-                        if (item instanceof SimpleClass) {
-                            SimpleClass casted = (SimpleClass) item;
-                           deleteSimpleClass(casted);
-                            //the normal object
+        if (item instanceof SimpleClass) {
+            SimpleClass casted = (SimpleClass) item;
+            deleteSimpleClass(casted);
+            //the normal object
+        }
+
+        this.dg.getDgObjects().remove((DiagramObject) item);
+        List<Line> filteredList = new ArrayList<>();
+        for (Line l : this.dg.getLines()) {
+            if ((l.getObject_start_id() == null ? "" : l.getObject_start_id()).equals(item.getId())
+                    || (l.getObject_end_id() == null ? "" : l.getObject_end_id()).equals(item.getId())) {
+                //send a delete event to the actionprocessor
+                filteredList.add(l);
+
+            }
+        }
+        for (Line l : filteredList) {
+            this.lockObjectById(l.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
+            EditorAction action = new EditorAction(ACTION_TYPE.DELETE);
+            action.getTarget().setParent_id(SocketSessionService.L_ROOT_ID);
+            action.setSession_jwt(this.getUserSockets().stream().filter(u -> u.getUser_id().equals(user_id)).findFirst().get().getSession_jwt());
+            action.getTarget().setTarget_id(l.getId());
+            action.getTarget().setType("Line");
+            action.setUser_id(user_id);
+            nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW
+        }
+        filteredList.clear();
+
+        //  if(!(item instanceof SimpleClass)){
+        this.dg.getDgObjects().remove((DiagramObject) item);
+        this.objectRepo.delete(item);
+
+        //  }
+        item.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
+
+        try {
+
+            dg = this.diagramRepo.save(this.dg);
+        } catch (Exception e) {
+            D.log(e.getMessage(), e.getClass(), DLEVEL.ERR);
+        }
+        //   this.dg= this.diagramRepo.save(this.dg);
+        return true;
+    }
+
+    public boolean deletePackageObjectBypassLocks(Integer target_id) throws NotFoundException {
+        return deleteDiagramObject(target_id, userSockets.get(0).getUser_id());
+    }
+
+    private SimpleClass deleteSimpleClass(SimpleClass casted) {
+        if (casted.getDiagram().getRelatedFolder().getParentProjectFolder() != null) {
+            DiagramEntity diag = this.diagramRepo.findById(casted.getDiagram().getRelatedFolder()
+                    .getParentProjectFolder().getDiagram().getId()).get();
+
+            Optional<PackageObject> savedPackageOpt = diag.getDgObjects().stream().map(o -> {
+                if (o instanceof PackageObject) {
+
+                    PackageObject pack = (PackageObject) o;
+                    if (pack.getTitleModel().getName().equals(casted.getDiagram().getRelatedFolder().getName())) {
+                        Optional<PackageElement> elemopt = pack.getElements().stream()
+                                .filter(e -> e.getReferencedObjectId().equals(casted.getId())).findFirst();
+                        System.out.println("pause");
+                        if (elemopt.isPresent()) {
+                            PackageElement elem = elemopt.get();
+                            pack.getElements().remove(elem);
                         }
+                        return objectRepo.saveAndFlush(pack);
+                    }
+                }
+                return null;
+            }).findFirst();
 
-                        //  this.dg=diagramRepo.save(this.dg);
-                        //find any related lines. Delete them first.       
-                        this.dg.getDgObjects().remove((DiagramObject) item);
+            try {
+                doSomethingWithClassHeaderToParentPackageObject(savedPackageOpt.get(), ACTION_TYPE.S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE);
+            } catch (JsonProcessingException ex) {
+                Logger.getLogger(EditorSession.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        System.out.println("this is a SimpleClass delete");
 
-                        List<Line> filteredList = new ArrayList<>();
-                        for (Line l : this.dg.getLines()) {
-                            if ((l.getObject_start_id() == null ? "" : l.getObject_start_id()).equals(item.getId())
-                                    || (l.getObject_end_id() == null ? "" : l.getObject_end_id()).equals(item.getId())) {
-                                //send a delete event to the actionprocessor
-                                filteredList.add(l);
+        for (SimpleClassElementGroup g : casted.getGroups()) {
+            g.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
+            for (AttributeElement e : g.getAttributes()) {
+                e.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
+                this.objectRepo.delete(e);
 
-                            }
-                        }
-                        for (Line l : filteredList) {
-                            this.lockObjectById(l.getId(), user_id, new LOCK_TYPE[]{LOCK_TYPE.NO_EDIT, LOCK_TYPE.NO_MOVE});
-                            EditorAction action = new EditorAction(ACTION_TYPE.DELETE);
-                            action.getTarget().setParent_id(SocketSessionService.L_ROOT_ID);
-                            action.setSession_jwt(this.getUserSockets().stream().filter(u -> u.getUser_id().equals(user_id)).findFirst().get().getSession_jwt());
-                            action.getTarget().setTarget_id(l.getId());
-                            action.getTarget().setType("Line");
-                            action.setUser_id(user_id);
-                            nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW
-                        }
-                        filteredList.clear();
+            }
+            this.objectRepo.delete(g);
 
-                        //  if(!(item instanceof SimpleClass)){
-                        this.dg.getDgObjects().remove((DiagramObject) item);
-                        this.objectRepo.delete(item);
+        }
+        this.sessionItemMap.remove(casted.getTitleModel().getId());
+        this.objectRepo.delete(casted.getTitleModel());
+        casted.getGroups().clear();
+        return casted;
+    }
 
-                        //  }
-                        item.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
-
-                        try {
-
-                            dg = this.diagramRepo.save(this.dg);
-                        } catch (Exception e) {
-                            D.log(e.getMessage(), e.getClass(), DLEVEL.ERR);
-                        }
-                        //   this.dg= this.diagramRepo.save(this.dg);
-                        return true;
-}
- 
- public boolean deletePackageObjectBypassLocks(Integer target_id) throws NotFoundException{
-     return deleteDiagramObject(target_id,userSockets.get(0).getUser_id());
- }
- 
-  private SimpleClass deleteSimpleClass(SimpleClass casted){
-     if (casted.getDiagram().getRelatedFolder().getParentProjectFolder() != null) {
-                                DiagramEntity diag = this.diagramRepo.findById(casted.getDiagram().getRelatedFolder()
-                                        .getParentProjectFolder().getDiagram().getId()).get();
-
-                                Optional<PackageObject> savedPackageOpt = diag.getDgObjects().stream().map(o -> {
-                                    if (o instanceof PackageObject) {
-
-                                        PackageObject pack = (PackageObject) o;
-                                        if (pack.getTitleModel().getName().equals(casted.getDiagram().getRelatedFolder().getName())) {
-                                            Optional<PackageElement> elemopt = pack.getElements().stream()
-                                                    .filter(e -> e.getReferencedObjectId().equals(casted.getId())).findFirst();
-                                            System.out.println("pause");
-                                            if (elemopt.isPresent()) {
-                                                PackageElement elem = elemopt.get();
-                                                pack.getElements().remove(elem);
-                                            }
-                                            return objectRepo.saveAndFlush(pack);
-                                        }
-                                    }
-                                    return null;
-                                }).findFirst();
-
-                                try {
-                                    doSomethingWithClassHeaderToParentPackageObject(savedPackageOpt.get(), ACTION_TYPE.S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE);
-                                } catch (JsonProcessingException ex) {
-                                    Logger.getLogger(EditorSession.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                            }
-                            System.out.println("this is a SimpleClass delete");
-
-                            for (SimpleClassElementGroup g : casted.getGroups()) {
-                                g.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
-                                for (AttributeElement e : g.getAttributes()) {
-                                    e.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
-                                    this.objectRepo.delete(e);
-
-                                }
-                                this.objectRepo.delete(g);
-
-                            }
-                            this.sessionItemMap.remove(casted.getTitleModel().getId());
-                            this.objectRepo.delete(casted.getTitleModel());
-                            casted.getGroups().clear();
-                            return casted;
-}
-    
     public DynamicSerialObject getItemById(Integer target_id) throws NotFoundException {
         Pair<SessionState, DynamicSerialObject> ss = sessionItemMap.get(target_id);
         if (ss == null) {
@@ -619,7 +599,7 @@ public class EditorSession {
     public boolean unLockObjectById(Integer target_id, Integer user_id) throws NotFoundException {
         SessionState s = getSessionStateById(target_id);
         if (s != null) {
-            if (s.getLockerUser_id().equals(user_id)||s.getLockerUser_id().equals(-1)) {
+            if (s.getLockerUser_id().equals(user_id) || s.getLockerUser_id().equals(-1)) {
                 s.setLockerUser_id(-1);
                 s.setLocks(new LOCK_TYPE[0]);
                 if (s.getExtra() != null) {
@@ -714,17 +694,17 @@ public class EditorSession {
         obj.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
 
         EditorAction action = new EditorAction(ACTION_TYPE.CREATE);
-Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
+        Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
         if (opt.isPresent()) {
             action.setSession_jwt(opt.get().getSession_jwt());
 
-        action.getTarget().setParent_id(SocketSessionService.ROOT_ID);
-        action.getTarget().setTarget_id(obj.getId());
-        action.setJson(this.objectMapper.writeValueAsString(obj));
-        action.getTarget().setType("PackageObject");
-        action.setUser_id(-1);
-        action.getExtra().put("create_method", "nested");
-        nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW
+            action.getTarget().setParent_id(SocketSessionService.ROOT_ID);
+            action.getTarget().setTarget_id(obj.getId());
+            action.setJson(this.objectMapper.writeValueAsString(obj));
+            action.getTarget().setType("PackageObject");
+            action.setUser_id(-1);
+            action.getExtra().put("create_method", "nested");
+            nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW
         }
     }
 
@@ -735,16 +715,14 @@ Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         for (DiagramObject d : this.dg.getDgObjects()) {
             d.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
-        }for(Line l:this.dg.getLines()){
+        }
+        for (Line l : this.dg.getLines()) {
             l.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
         }
-        for(String c:colors){
-            System.out.println("COL:"+c);
-        }
+      
     }
 
     /*_MAIN SESSION LOGIC*/
-
     public void updateObjectAndSend_Internal(DiagramObject o) throws NotFoundException, JsonProcessingException {
         this.getItemById(o.getId()).update(o);
         //o.injectSelfToStateMap(sessionItemMap, sessionContainerMap);
@@ -767,16 +745,16 @@ Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
         // obj.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
 
         EditorAction action = new EditorAction(ACTION_TYPE.DELETE);
-Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
+        Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
         if (opt.isPresent()) {
             action.setSession_jwt(opt.get().getSession_jwt());
             action.getTarget().setParent_id(SocketSessionService.ROOT_ID);
-        action.getTarget().setTarget_id(obj.getId());
-        action.setJson(this.objectMapper.writeValueAsString(obj));
-        action.getTarget().setType("PackageObject");
-        action.setUser_id(-1);
-        // action.getExtra().put("create_method", "nested");
-        nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW
+            action.getTarget().setTarget_id(obj.getId());
+            action.setJson(this.objectMapper.writeValueAsString(obj));
+            action.getTarget().setType("PackageObject");
+            action.setUser_id(-1);
+            // action.getExtra().put("create_method", "nested");
+            nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW
         }
     }
 
@@ -841,25 +819,29 @@ Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
         this.dg = dg;
         this.init();
     }
-    String getUnUsedColor(Integer id){
-        String col=colors.get(id%49);
-      HashSet<String> notAvailable= this.userSockets.stream().map(u->u.getColor()).collect(Collectors.toCollection(HashSet::new));
-      HashSet<String> available=Set.copyOf(colors).stream().collect(Collectors.toCollection(HashSet::new));
-            available.removeAll(notAvailable);
-      if(available.contains(col)) return col;
-      //else
-      int ind=(new Random()).nextInt(available.size()-1);
-      return available.stream().collect(Collectors.toCollection(ArrayList::new)).get(ind);
-    }
-    //Ha találtunk user-t akkor true-t adunk vissza
-    boolean swapSocketsIfUserExistsById(Integer id,UserWebSocketWrapper s){
-        UserWebSocketWrapper searched=null;
-        for(UserWebSocketWrapper sock:userSockets){
-            if(sock.getUser_id().equals(id))
-                searched=sock;
+
+    String getUnUsedColor(Integer id) {
+        String col = colors.get(id % 49);
+        HashSet<String> notAvailable = this.userSockets.stream().map(u -> u.getColor()).collect(Collectors.toCollection(HashSet::new));
+        HashSet<String> available = Set.copyOf(colors).stream().collect(Collectors.toCollection(HashSet::new));
+        available.removeAll(notAvailable);
+        if (available.contains(col)) {
+            return col;
         }
-        if(searched!=null)
-        {
+        //else
+        int ind = (new Random()).nextInt(available.size() - 1);
+        return available.stream().collect(Collectors.toCollection(ArrayList::new)).get(ind);
+    }
+
+    //Ha találtunk user-t akkor true-t adunk vissza
+    boolean swapSocketsIfUserExistsById(Integer id, UserWebSocketWrapper s) {
+        UserWebSocketWrapper searched = null;
+        for (UserWebSocketWrapper sock : userSockets) {
+            if (sock.getUser_id().equals(id)) {
+                searched = sock;
+            }
+        }
+        if (searched != null) {
             searched.setActionSocket(s.getActionSocket());
             searched.setStateSocket(s.getStateSocket());
             searched.setSession_jwt(s.getSession_jwt());
@@ -867,11 +849,12 @@ Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
         }
         return false;
     }
+
     void addUserSocket(UserWebSocketWrapper userSocket) {
-       if (!swapSocketsIfUserExistsById(userSocket.getUser_id(),userSocket)){
-             userSocket.setColor(getUnUsedColor(userSocket.getUser_id()));
-        this.getUserSockets().add(userSocket);
-       }
-       
+        if (!swapSocketsIfUserExistsById(userSocket.getUser_id(), userSocket)) {
+            userSocket.setColor(getUnUsedColor(userSocket.getUser_id()));
+            this.getUserSockets().add(userSocket);
+        }
+
     }
 }

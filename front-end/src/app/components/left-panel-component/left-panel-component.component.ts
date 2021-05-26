@@ -20,6 +20,7 @@ import { FileManagerService } from "./service/file-manager.service";
 import { ICON } from '../models/management/ICON';
 import { GlobalEditorService } from '../full-page-components/editor/services/global-editor/global-editor.service';
 import { FileComponent } from './file/file.component';
+import { Router } from '@angular/router';
 export class RequestEvent {
   constructor(alias, id, _type) {
     this.alias = alias;
@@ -40,7 +41,8 @@ export class LeftPanelComponentComponent implements OnInit {
   constructor(private http: HttpClient,
     private snackBar: MatSnackBar,
     private editorService: GlobalEditorService,
-    private fileService: FileManagerService) {
+    private fileService: FileManagerService
+  ) {
 
     editorService.addListenerToEvent(this, (t) => {
       t.getDgInNext = false;
@@ -50,6 +52,7 @@ export class LeftPanelComponentComponent implements OnInit {
       this.actualFolder = null;
     }, 'logout')
   }
+
   private eventsSubscription: Subscription;
   public errorMsg = "--";
   isShiftDown: boolean;

@@ -1,0 +1,47 @@
+2021-05-26 20:55:48.980 CEST [2860] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-26 20:55:48.981 CEST [2860] LOG:  listening on IPv6 address "::", port 8102
+2021-05-26 20:55:48.982 CEST [2860] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-26 20:55:49.023 CEST [10736] LOG:  database system was interrupted; last known up at 2021-05-26 20:55:27 CEST
+2021-05-26 20:55:49.347 CEST [10736] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-26 20:55:49.349 CEST [10736] LOG:  invalid record length at 0/3FA0570: wanted 24, got 0
+2021-05-26 20:55:49.349 CEST [10736] LOG:  redo is not required
+2021-05-26 20:55:49.369 CEST [2860] LOG:  database system is ready to accept connections
+2021-05-26 20:58:43.629 CEST [5244] ERROR:  constraint "fkiycvlr9b2endmmp5ue826hpd0" of relation "file_share_table" does not exist
+2021-05-26 20:58:43.629 CEST [5244] STATEMENT:  
+	    alter table file_share_table 
+	       drop constraint FKiycvlr9b2endmmp5ue826hpd0
+2021-05-26 20:58:43.644 CEST [5244] ERROR:  constraint "fkr47etd4igdgvw1yxd6ksiirl" of relation "folder_entity" does not exist
+2021-05-26 20:58:43.644 CEST [5244] STATEMENT:  
+	    alter table folder_entity 
+	       drop constraint FKr47etd4igdgvw1yxd6ksiirl
+2021-05-26 20:58:43.656 CEST [5244] ERROR:  constraint "fk1ykug0clkqh53ul8558do2x78" of relation "project_entity" does not exist
+2021-05-26 20:58:43.656 CEST [5244] STATEMENT:  
+	    alter table project_entity 
+	       drop constraint FK1ykug0clkqh53ul8558do2x78
+2021-05-26 20:58:43.663 CEST [5244] ERROR:  constraint "fkij6mm2nr8tgyosxqtnumm79jv" of relation "project_file_entity" does not exist
+2021-05-26 20:58:43.663 CEST [5244] STATEMENT:  
+	    alter table project_file_entity 
+	       drop constraint FKij6mm2nr8tgyosxqtnumm79jv
+2021-05-26 20:58:43.666 CEST [5244] ERROR:  constraint "fkjtof2a9xx7bl9atvyegd0ymbi" of relation "project_folder_entity" does not exist
+2021-05-26 20:58:43.666 CEST [5244] STATEMENT:  
+	    alter table project_folder_entity 
+	       drop constraint FKjtof2a9xx7bl9atvyegd0ymbi
+2021-05-26 21:06:35.884 CEST [2860] LOG:  background worker "logical replication launcher" (PID 10020) was terminated by exception 0xC000013A
+2021-05-26 21:06:35.884 CEST [2860] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 21:06:35.884 CEST [2860] LOG:  terminating any other active server processes
+2021-05-26 21:06:35.889 CEST [2860] LOG:  statistics collector process (PID 8752) was terminated by exception 0xC000013A
+2021-05-26 21:06:35.889 CEST [2860] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 21:06:35.892 CEST [2860] LOG:  all server processes terminated; reinitializing
+2021-05-26 21:06:35.933 CEST [7464] LOG:  database system was interrupted; last known up at 2021-05-26 21:06:11 CEST
+2021-05-26 21:06:36.317 CEST [7464] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-26 21:06:36.320 CEST [7464] LOG:  redo starts at 0/43D2E50
+2021-05-26 21:06:36.544 CEST [7464] LOG:  invalid record length at 0/458B5E8: wanted 24, got 0
+2021-05-26 21:06:36.545 CEST [7464] LOG:  redo done at 0/458B5B0
+2021-05-26 21:06:36.604 CEST [2860] LOG:  database system is ready to accept connections
+2021-05-26 21:06:36.737 CEST [2860] LOG:  background worker "logical replication launcher" (PID 2252) was terminated by exception 0xC000013A
+2021-05-26 21:06:36.737 CEST [2860] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 21:06:36.737 CEST [2860] LOG:  terminating any other active server processes
+2021-05-26 21:06:36.742 CEST [2860] LOG:  statistics collector process (PID 3024) was terminated by exception 0xC000013A
+2021-05-26 21:06:36.742 CEST [2860] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-26 21:06:36.744 CEST [2860] LOG:  all server processes terminated; reinitializing
+2021-05-26 21:06:36.781 CEST [9684] LOG:  database system was interrupted; last known up at 2021-05-26 21:06:36 CEST
