@@ -23,7 +23,7 @@
         <app-tool-box-window
           (toolSelectedEvent)="onToolSelected($event)"
           [model]="win"
-          *ngIf="win.id == 'tools'"
+          *ngIf="win.id == 'tools' && isWindowVisible('tools')"
           [lineCanvasModel]="this.editorService.clientModel.lineCanvas"
           [canvasModel]="this.editorService.clientModel.canvas"
         >
@@ -31,12 +31,18 @@
         <app-socket-communication-window
           (toolSelectedEvent)="onToolSelected($event)"
           [model]="win"
-          *ngIf="win.id == 'socket'"
+          *ngIf="win.id == 'socket' && isWindowVisible('socket')"
         >
         </app-socket-communication-window>
-        <app-session-message-window [model]="win" *ngIf="win.id == 'log'">
+        <app-session-message-window
+          [model]="win"
+          *ngIf="win.id == 'log' && isWindowVisible('log')"
+        >
         </app-session-message-window>
-        <app-social-window [model]="win" *ngIf="win.id == 'social'">
+        <app-social-window
+          [model]="win"
+          *ngIf="win.id == 'social' && isWindowVisible('social')"
+        >
         </app-social-window>
       </div>
     </div>

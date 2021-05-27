@@ -8,8 +8,8 @@ package com.szefi.uml_conference.editor.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.D;
-import com.szefi.uml_conference.DLEVEL;
+import com.szefi.uml_conference.debug.D;
+import com.szefi.uml_conference.debug.DLEVEL;
 import com.szefi.uml_conference.editor.model.diagram.Diagram;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
@@ -743,7 +743,6 @@ public class EditorSession {
 
     public void deleteFromStateMapAndSendToAll(DiagramObject obj) throws JsonProcessingException {
         // obj.deleteSelfFromStateMap(sessionItemMap, sessionContainerMap);
-
         EditorAction action = new EditorAction(ACTION_TYPE.DELETE);
         Optional<UserWebSocketWrapper> opt = this.getUserSockets().stream().findFirst();
         if (opt.isPresent()) {

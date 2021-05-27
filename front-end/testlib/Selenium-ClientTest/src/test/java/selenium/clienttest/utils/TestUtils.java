@@ -23,7 +23,7 @@ import org.openqa.selenium.interactions.Actions;
 public class TestUtils {
     static private WebDriver driver;
     static private Actions actions;
-    public static String MANAGER_XPATH="//div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer/div/div/app-left-panel-component";
+    public static String MANAGER_XPATH="//*[contains(@class, 'commander-main')]";
 
     public static WebDriver getDriver() {
         return driver;
@@ -55,20 +55,21 @@ public class TestUtils {
     driver.findElement(By.id("loginUsername")).click();
         String startVal= driver.findElement(By.cssSelector(".errors")).getText();
 
-    driver.findElement(By.xpath("//div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer-content/div/app-login/div/div/div/div/form/button/div")).click();
+    driver.findElement(By.xpath("//button[@id='login_btn_submit']")).click();
          TestUtils.waitUntilValueChanges(By.cssSelector(".errors"),startVal);
    }
    
      public static void createProject(String name) throws Exception {
-       TestUtils.login("user", "pass1");    
-                  driver.findElement(By.xpath("//div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer-content/app-top-menu/p/mat-toolbar/div/button")).click();//click editor
-
+   TestUtils.login("test1", "test1pass");
+ driver.findElement(By.xpath("//button[@id='editor_menu_btn']")).click();
+     Thread.sleep(1000);
     driver.findElement(By.xpath("(//img[@alt='folder_open'])")).click();
     Thread.sleep(500);
     driver.findElement(By.xpath("(//img[@alt='project_create'])")).click();
-    driver.findElement(By.xpath("//input[@value='']")).clear();
-    driver.findElement(By.xpath("//input[@value='']")).sendKeys(name);
-    driver.findElement(By.xpath("//input[@value='']")).sendKeys(Keys.ENTER);
+      
+    driver.findElement(By.xpath("//input[@id='manager_input']")).clear();
+    driver.findElement(By.xpath("//input[@id='manager_input']")).sendKeys(name);
+    driver.findElement(By.xpath("//input[@id='manager_input']")).sendKeys(Keys.ENTER);
         Thread.sleep(500);
     actions.doubleClick(driver.findElement(By.xpath("//*[contains(text(), '"+name+"')]"))).perform();
        Thread.sleep(500);
@@ -80,11 +81,12 @@ public class TestUtils {
   }
   public static void createProjectFolder(String name) throws InterruptedException{
       
-    driver.findElement(By.xpath("//div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer-content/app-top-menu/p/mat-toolbar/div/button")).click();
+    driver.findElement(By.xpath("//button[@id='editor_menu_btn']")).click();//editor btn
+    Thread.sleep(1000);
     driver.findElement(By.xpath("(//img[@alt='pfolder_create'])")).click();//create project folder
-    driver.findElement(By.xpath("//input[@value='']")).clear();
-    driver.findElement(By.xpath("//input[@value='']")).sendKeys(name);
-    driver.findElement(By.xpath("//input[@value='']")).sendKeys(Keys.ENTER);
+    driver.findElement(By.xpath("//input[@id='manager_input']")).clear();
+    driver.findElement(By.xpath("//input[@id='manager_input']")).sendKeys(name);
+    driver.findElement(By.xpath("//input[@id='manager_input']")).sendKeys(Keys.ENTER);
        Thread.sleep(1000);
   }
  
@@ -95,12 +97,12 @@ public class TestUtils {
           driver.findElement(By.xpath("//*[contains(text(), '"+name+"')]")).click();
   }
    public static WebElement nthElementInFileManager(int n){
-  return  driver.findElement(By.xpath("//div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer/div/div/app-left-panel-component/div/div["+n+3+"]/div"));
+  return  driver.findElement(By.xpath("//*[contains(@class, 'commander-main')]/div["+(n+1)+"]"));
 }
     public static WebElement getElemInManagerByName(String name) throws NoSuchElementException{
         int i=0;
        while(i<100){
-       WebElement   elem=driver.findElement(By.xpath("//div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer/div/div/app-left-panel-component/div/div[3]/div["+(i+1)+"]/app-file/div/div"));
+       WebElement   elem=driver.findElement(By.xpath("//*[contains(@class, 'commander-main')]/div["+(i+1)+"]/app-file/div/div"));
             if(elem.getText().equalsIgnoreCase(name)){
            return elem;
             }  i++;

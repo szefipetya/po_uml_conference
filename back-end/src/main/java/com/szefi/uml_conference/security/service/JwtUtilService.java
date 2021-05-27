@@ -113,11 +113,6 @@ public class JwtUtilService {
         return (ent==null&&username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
     
-    
        
-       @EventListener(ApplicationReadyEvent.class)
-    private void init(){
-       // blackListRepo.save(new BlackListedJwtCollectorEntity() );
-    }
     
 }

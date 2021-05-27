@@ -34,7 +34,7 @@ public class T3_CreateFolderTest {
 
   @Test
   public void testCreateFolder() throws Exception {
-      TestUtils.login("user", "pass1");
+       TestUtils.login("test1", "test1pass");
     
       Thread.sleep(1000);
     driver.findElement(By.xpath("(//img[@alt='folder_open'])")).click();
@@ -45,14 +45,14 @@ public class T3_CreateFolderTest {
     driver.findElement(By.xpath("//input[@value='']")).sendKeys("testfolder");
     driver.findElement(By.xpath("//input[@value='']")).sendKeys(Keys.ENTER);
       Thread.sleep(500);
-      Assertions.assertNotNull(driver.findElements(By.xpath("//*[contains(text(), 'testfolderToDel')]")));
+      Assertions.assertNotNull(driver.findElements(By.xpath("//*[contains(text(), 'testfolder')]")));
 
      Thread.sleep(500);
       
       }
     @Test
   public void testDeleteFolder() throws Exception {
-      TestUtils.login("user", "pass1");
+      TestUtils.login("test1", "test1pass");
     
       Thread.sleep(1000);
     driver.findElement(By.xpath("(//img[@alt='folder_open'])")).click();
@@ -72,7 +72,7 @@ public class T3_CreateFolderTest {
  Thread.sleep(1000);
          
     
-              driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+              driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 
        assertTrue(driver.findElements(By.xpath("//*[contains(text(), 'testfolderToDel')]")).isEmpty());
        
@@ -92,36 +92,5 @@ public class T3_CreateFolderTest {
     }
   }
 
-  private boolean isElementPresent(By by) {
-    try {
-      driver.findElement(by);
-      return true;
-    } catch (NoSuchElementException e) {
-      return false;
-    }
-  }
-
-  private boolean isAlertPresent() {
-    try {
-      driver.switchTo().alert();
-      return true;
-    } catch (NoAlertPresentException e) {
-      return false;
-    }
-  }
-
-  private String closeAlertAndGetItsText() {
-    try {
-      Alert alert = driver.switchTo().alert();
-      String alertText = alert.getText();
-      if (acceptNextAlert) {
-        alert.accept();
-      } else {
-        alert.dismiss();
-      }
-      return alertText;
-    } finally {
-      acceptNextAlert = true;
-    }
-  }
+ 
 }

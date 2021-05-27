@@ -9,7 +9,7 @@ package com.szefi.uml_conference.tests.editor.integration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.WebOrderApplication;
+import com.szefi.uml_conference.UmlConferenceApplication;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
 import com.szefi.uml_conference.editor.model.do_related.AttributeElement;
 import com.szefi.uml_conference.editor.model.do_related.SimpleClass;
@@ -80,7 +80,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 //@DataJpaTest
 //@RunWith(SpringRunner.class)
-@SpringBootTest(classes={WebOrderApplication.class})
+@SpringBootTest(classes={UmlConferenceApplication.class})
 @RunWith(JUnit4ClassRunner.class)
 public class EditorSessionTest {
     @Autowired

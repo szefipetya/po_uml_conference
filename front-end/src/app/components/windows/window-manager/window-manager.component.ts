@@ -6,6 +6,7 @@ import {
   ɵALLOW_MULTIPLE_PLATFORMS,
 } from '@angular/core';
 import { AppModule } from 'src/app/app.module';
+import { getCookie, setCookie } from 'src/app/utils/cookieUtils';
 import { GlobalEditorService } from '../../full-page-components/editor/services/global-editor/global-editor.service';
 import { Window_c } from '../../models/windows/Window_c';
 
@@ -33,6 +34,7 @@ export class WindowManagerComponent implements OnInit {
         top: 0,
         viewModelInstance: null,
         contentViewModelInstance: null,
+        defaultVisible: true
       },
       {
         selector: 'app-session-message-window',
@@ -48,6 +50,7 @@ export class WindowManagerComponent implements OnInit {
         top: window.innerHeight - 220,
         viewModelInstance: null,
         contentViewModelInstance: null,
+        defaultVisible: true
       },
       {
         selector: 'app-socket-communication-window',
@@ -63,6 +66,7 @@ export class WindowManagerComponent implements OnInit {
         top: 370,
         viewModelInstance: null,
         contentViewModelInstance: null,
+        defaultVisible: false
       },
       {
         selector: 'app-social-window',
@@ -78,13 +82,21 @@ export class WindowManagerComponent implements OnInit {
         top: window.innerHeight - 220,
         viewModelInstance: null,
         contentViewModelInstance: null,
+        defaultVisible: true
       },
 
 
     ];
+
+    if (!getCookie('window_toggle')) {
+      setCookie('window_toggle', JSON.stringify(this.windows.map(w => { return { id: w.id, visible: w.defaultVisible }; })), 8);
+    }
   }
   findWindowModelById(id): Window_c {
     return this.windows.filter((w) => w.id == id)[0];
+  }
+  isWindowVisible(id) {
+    return JSON.parse(getCookie('window_toggle')).find(w => w.id == id)?.visible;
   }
   draggedWindowModel: Window_c;
   onMouseDown(e) {

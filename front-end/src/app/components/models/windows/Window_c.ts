@@ -14,4 +14,5 @@ export class Window_c {
   };
   viewModelInstance: WindowComponent;
   contentViewModelInstance: any;
+  defaultVisible: boolean;
 }

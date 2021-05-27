@@ -482,7 +482,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       this.targetClass.dimensionModel.width =
         this.targetClass.scaledModel.width_scaled /
         this.editorService.clientModel.canvas.scale;
-      this.targetDOM.style.borderRight = this.borderString_scale;
+      //  this.targetDOM.style.borderRight = this.borderString_scale;
       this.updateCanvas();
       // return;
     }
@@ -505,7 +505,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       const mx = e.clientX - this.targetRect.left;
       this.targetObject_stored.scaledModel.width_scaled =
         this.targetWidth_stored - (mx - this.stored_mx);
-      this.targetDOM.style.borderLeft = this.borderString_scale;
+      // this.targetDOM.style.borderLeft = this.borderString_scale;
       this.targetObject_stored.scaledModel.posx_scaled = round(
         this.targetObject_stored.scaledModel.posx_scaled,
         this.editorService.clientModel.canvas.gridSize
@@ -541,7 +541,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
         this.targetClass.scaledModel.height_scaled /
         this.editorService.clientModel.canvas.scale;
 
-      this.targetDOM.style.borderBottom = this.borderString_scale;
+      //this.targetDOM.style.borderBottom = this.borderString_scale;
     }
 
     //  }
@@ -565,7 +565,7 @@ export class CanvasBoxComponent implements OnInit, SessionInteractiveContainer {
       const my = e.clientY - this.targetRect.top;
       this.targetObject_stored.scaledModel.height_scaled =
         this.targetHeight_stored - (my - this.stored_my);
-      this.targetDOM.style.borderTop = this.borderString_scale;
+      // this.targetDOM.style.borderTop = this.borderString_scale;
       this.targetObject_stored.scaledModel.posy_scaled = round(
         this.targetObject_stored.scaledModel.posy_scaled,
         this.editorService.clientModel.canvas.gridSize

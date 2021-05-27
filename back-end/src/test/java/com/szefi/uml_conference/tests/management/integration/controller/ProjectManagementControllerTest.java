@@ -6,7 +6,7 @@
 package com.szefi.uml_conference.tests.management.integration.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.WebOrderApplication;
+import com.szefi.uml_conference.UmlConferenceApplication;
 import com.szefi.uml_conference.management.controller.ManagementController;
 import com.szefi.uml_conference.management.model.ICON;
 import com.szefi.uml_conference.management.model.dto.FileHeaderDto;

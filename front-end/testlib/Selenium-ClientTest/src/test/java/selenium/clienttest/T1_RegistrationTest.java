@@ -67,10 +67,10 @@ public class T1_RegistrationTest {
     driver.findElement(By.id("registerPassword")).click();
     driver.findElement(By.id("registerPassword")).clear();
     driver.findElement(By.id("registerPassword")).sendKeys("test1pass");
-    String startVal= driver.findElement(By.cssSelector("pre")).getText();
-    driver.findElement(By.xpath("//div[@id='root']/app-root/div/app-main/div/mat-drawer-container/mat-drawer-content/div/app-register/div/div/div/div/form/button/div")).click();
-      TestUtils.waitUntilValueChanges(By.cssSelector("pre"),startVal);
-    Assertions.assertEquals("Registration for test1 succesful",driver.findElement(By.cssSelector("pre")).getText());
+    String startVal= driver.findElement(By.cssSelector(".errors")).getText();
+    driver.findElement(By.xpath("//button[@id='register_submit']/div")).click();
+      TestUtils.waitUntilValueChanges(By.cssSelector(".errors"),startVal);
+    Assertions.assertEquals("Registration for test1 succesful",driver.findElement(By.cssSelector(".errors")).getText());
   }
 
   @After
@@ -82,36 +82,5 @@ public class T1_RegistrationTest {
     }
   }
 
-  private boolean isElementPresent(By by) {
-    try {
-      driver.findElement(by);
-      return true;
-    } catch (NoSuchElementException e) {
-      return false;
-    }
-  }
-
-  private boolean isAlertPresent() {
-    try {
-      driver.switchTo().alert();
-      return true;
-    } catch (NoAlertPresentException e) {
-      return false;
-    }
-  }
-
-  private String closeAlertAndGetItsText() {
-    try {
-      Alert alert = driver.switchTo().alert();
-      String alertText = alert.getText();
-      if (acceptNextAlert) {
-        alert.accept();
-      } else {
-        alert.dismiss();
-      }
-      return alertText;
-    } finally {
-      acceptNextAlert = true;
-    }
-  }
+  
 }

@@ -2,3 +2,7 @@
 2021-05-26 22:20:38.415 CEST [10748] LOG:  listening on IPv6 address "::", port 8102
 2021-05-26 22:20:38.416 CEST [10748] LOG:  listening on IPv4 address "0.0.0.0", port 8102
 2021-05-26 22:20:38.468 CEST [6744] LOG:  database system was interrupted; last known up at 2021-05-26 22:19:18 CEST
+2021-05-26 22:20:38.878 CEST [6744] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-26 22:20:38.881 CEST [6744] LOG:  invalid record length at 0/48342C0: wanted 24, got 0
+2021-05-26 22:20:38.882 CEST [6744] LOG:  redo is not required
+2021-05-26 22:20:38.912 CEST [10748] LOG:  database system is ready to accept connections

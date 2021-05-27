@@ -48,9 +48,9 @@ public class T2_LoginTest {
     driver.get("http://localhost:8099");
     driver.findElement(By.xpath("(//button[@type='button'])[2]")).click();
     driver.findElement(By.id("loginUsername")).clear();
-    driver.findElement(By.id("loginUsername")).sendKeys("user");
+    driver.findElement(By.id("loginUsername")).sendKeys("test1");
     driver.findElement(By.id("loginPassword")).clear();
-    driver.findElement(By.id("loginPassword")).sendKeys("pass1");
+    driver.findElement(By.id("loginPassword")).sendKeys("test1pass");
     driver.findElement(By.id("loginUsername")).click();
         String startVal= driver.findElement(By.cssSelector(".errors")).getText();
 
@@ -69,36 +69,4 @@ public class T2_LoginTest {
     }
   }
 
-  private boolean isElementPresent(By by) {
-    try {
-      driver.findElement(by);
-      return true;
-    } catch (NoSuchElementException e) {
-      return false;
-    }
-  }
-
-  private boolean isAlertPresent() {
-    try {
-      driver.switchTo().alert();
-      return true;
-    } catch (NoAlertPresentException e) {
-      return false;
-    }
-  }
-
-  private String closeAlertAndGetItsText() {
-    try {
-      Alert alert = driver.switchTo().alert();
-      String alertText = alert.getText();
-      if (acceptNextAlert) {
-        alert.accept();
-      } else {
-        alert.dismiss();
-      }
-      return alertText;
-    } finally {
-      acceptNextAlert = true;
-    }
-  }
 }

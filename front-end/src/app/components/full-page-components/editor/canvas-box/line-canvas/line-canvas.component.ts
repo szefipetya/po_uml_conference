@@ -105,6 +105,7 @@ export class LineCanvasComponent
   sessionState: SessionState;
   callback_queue: CallbackItem[];
 
+
   @ViewChild('canvas')
   public canvasDOM: ElementRef<HTMLCanvasElement>;
   public ctx: CanvasRenderingContext2D;

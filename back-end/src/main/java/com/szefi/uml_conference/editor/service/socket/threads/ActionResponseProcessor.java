@@ -2,8 +2,8 @@ package com.szefi.uml_conference.editor.service.socket.threads;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szefi.uml_conference.D;
-import com.szefi.uml_conference.DLEVEL;
+import com.szefi.uml_conference.debug.D;
+import com.szefi.uml_conference.debug.DLEVEL;
 import com.szefi.uml_conference.editor.model.socket.EditorAction;
 import com.szefi.uml_conference.editor.model.socket.Response.EditorActionResponse;
 import com.szefi.uml_conference.editor.model.socket.Response.RESPONSE_SCOPE;

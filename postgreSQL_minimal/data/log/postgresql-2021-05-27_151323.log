@@ -1,0 +1,8 @@
+2021-05-27 15:13:23.597 CEST [15180] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-27 15:13:23.600 CEST [15180] LOG:  could not bind IPv6 address "::": unrecognized winsock error 10048
+2021-05-27 15:13:23.600 CEST [15180] HINT:  Is another postmaster already running on port 8102? If not, wait a few seconds and retry.
+2021-05-27 15:13:23.600 CEST [15180] LOG:  could not bind IPv4 address "0.0.0.0": unrecognized winsock error 10048
+2021-05-27 15:13:23.600 CEST [15180] HINT:  Is another postmaster already running on port 8102? If not, wait a few seconds and retry.
+2021-05-27 15:13:23.601 CEST [15180] WARNING:  could not create listen socket for "*"
+2021-05-27 15:13:23.601 CEST [15180] FATAL:  could not create any TCP/IP sockets
+2021-05-27 15:13:23.603 CEST [15180] LOG:  database system is shut down
