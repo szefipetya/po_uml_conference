@@ -309,7 +309,7 @@ public class SocketSessionService {
     
     
     
-      public void updateClassHeaderToParentsPackageObject(Integer class_id){
+      public void updateClassHeaderToParentsPackageObject(Integer class_id,String name){
         SimpleClass clas=(SimpleClass)objectRepo.findById(class_id).get();
       if(clas.getDiagram().getRelatedFolder().getParentProjectFolder()!=null){
        Optional<PackageObject> savedPackageOpt=clas.getDiagram().getRelatedFolder().getParentProjectFolder().getDiagram().getDgObjects().stream().map(obj->{
@@ -320,7 +320,7 @@ public class SocketSessionService {
               Optional<PackageElement> elemopt= pack.getElements().stream().filter(e->e.getReferencedObjectId().equals(class_id)).findFirst();
               if(elemopt.isPresent()){
               PackageElement elem=elemopt.get();
-              elem.setName(clas.getTitleModel().getName());
+              elem.setName(name);
               }        
                         return objectRepo.save(pack);
         }

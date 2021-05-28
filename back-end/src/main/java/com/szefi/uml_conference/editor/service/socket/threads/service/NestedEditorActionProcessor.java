@@ -275,7 +275,7 @@ NestedEditorActionProcessor(){
       //.S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE
       break;
   case S_UPDATE_CLASS_HEADER_TO_PARENT_PACKAGE:
-      this.service.updateClassHeaderToParentsPackageObject((action.getTarget().getTarget_id()));
+      this.service.updateClassHeaderToParentsPackageObject(action.getTarget().getTarget_id(),action.getExtra().get("name"));
       break;
        case S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE:
       this.service.deleteClassSoRemoveItFromParentPackageObject((PackageObject)((ServerSideEditorAction)action).getLoad());

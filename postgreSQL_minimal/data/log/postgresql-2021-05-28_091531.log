@@ -1,0 +1,4 @@
+2021-05-28 09:15:31.459 CEST [22196] LOG:  starting PostgreSQL 13.2, compiled by Visual C++ build 1914, 64-bit
+2021-05-28 09:15:31.461 CEST [22196] LOG:  listening on IPv6 address "::", port 8102
+2021-05-28 09:15:31.461 CEST [22196] LOG:  listening on IPv4 address "0.0.0.0", port 8102
+2021-05-28 09:15:31.564 CEST [18804] LOG:  database system was interrupted; last known up at 2021-05-26 22:55:54 CEST

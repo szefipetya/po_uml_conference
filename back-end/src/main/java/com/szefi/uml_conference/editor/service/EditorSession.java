@@ -156,7 +156,6 @@ public class EditorSession {
                     ret.add(e.getKey());
                 }
             }
-
         }
         for (UserWebSocketWrapper w : this.getUserById(user_id)) {
             this.userSockets.remove(w);
@@ -320,17 +319,14 @@ public class EditorSession {
 
     /**
      * Transaction need to be flushed before using this to work properly
-     *
      */
     private void doSomethingWithClassHeaderToParentPackageObject(DiagramObject obj, ACTION_TYPE type) throws JsonProcessingException {
         ServerSideEditorAction action = new ServerSideEditorAction(type);
         action.getTarget().setParent_id(SocketSessionService.ROOT_ID);
         action.getTarget().setTarget_id(obj.getId());
-        //action.setJson(this.objectMapper.writeValueAsString(clas.getTitleModel()));
-        //action.getTarget().setType();
         action.setLoad(obj);
         action.setUser_id(-1);
-
+       if(obj instanceof SimpleClass) action.getExtra().put("name", ((SimpleClass)obj).getTitleModel().getName());
         nestedActionQueue.add(action);// TODO: PASS THE USERS TO SEND SOMEHOW                         
     }
 
@@ -534,11 +530,12 @@ public class EditorSession {
     }
 
     private SimpleClass deleteSimpleClass(SimpleClass casted) {
+            Optional<PackageObject> savedPackageOpt=null;
         if (casted.getDiagram().getRelatedFolder().getParentProjectFolder() != null) {
             DiagramEntity diag = this.diagramRepo.findById(casted.getDiagram().getRelatedFolder()
                     .getParentProjectFolder().getDiagram().getId()).get();
 
-            Optional<PackageObject> savedPackageOpt = diag.getDgObjects().stream().map(o -> {
+            savedPackageOpt = diag.getDgObjects().stream().map(o -> {
                 if (o instanceof PackageObject) {
 
                     PackageObject pack = (PackageObject) o;
@@ -556,11 +553,6 @@ public class EditorSession {
                 return null;
             }).findFirst();
 
-            try {
-                doSomethingWithClassHeaderToParentPackageObject(savedPackageOpt.get(), ACTION_TYPE.S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE);
-            } catch (JsonProcessingException ex) {
-                Logger.getLogger(EditorSession.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
         System.out.println("this is a SimpleClass delete");
 
@@ -577,6 +569,14 @@ public class EditorSession {
         this.sessionItemMap.remove(casted.getTitleModel().getId());
         this.objectRepo.delete(casted.getTitleModel());
         casted.getGroups().clear();
+        
+        if(savedPackageOpt!=null&&savedPackageOpt.isPresent())
+            try {
+                doSomethingWithClassHeaderToParentPackageObject(savedPackageOpt.get(), ACTION_TYPE.S_DELETE_CLASS_HEADER_FROM_PARENT_PACKAGE);
+            } catch (JsonProcessingException ex) {
+                Logger.getLogger(EditorSession.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
         return casted;
     }
 

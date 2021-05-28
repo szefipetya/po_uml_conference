@@ -171,13 +171,13 @@ public class T4ProjectManagerAndEditorTest {
         driver.findElement(By.id("editor-input")).sendKeys("TestClass");
         driver.findElement(By.id("editor-input")).sendKeys(Keys.ENTER);
 //class title changed
-        Thread.sleep(500);
+        Thread.sleep(1500);
         actions.click(driver.findElement(By.xpath("//div[@id='dgbox']//*[contains(text(), 'TestClass')]"))).perform();//click to select
         Thread.sleep(500);
         actions.sendKeys(Keys.DELETE);
 
         Thread.sleep(500);
-        actions.click(driver.findElement(By.xpath("//div[@id='dgbox']//*[contains(text(), 'nestedFolder')]"))).perform();//dblclick on title to change it
+        actions.doubleClick(driver.findElement(By.xpath("//div[@id='dgbox']//*[contains(text(), 'nestedFolder')]"))).perform();//dblclick on title to change it
         Thread.sleep(500);
 
         assertTrue(driver.findElements(By.xpath(TestUtils.MANAGER_XPATH + "//*[contains(text(), 'TestClass')]")).isEmpty());
@@ -428,8 +428,9 @@ public class T4ProjectManagerAndEditorTest {
 
     public void createNestedProkectStructureAndGoToRoot(String name) throws Exception {
         TestUtils.createProject(name);
+                Thread.sleep(500);
+
         TestUtils.createProjectFolder("baseFolder");
-        Thread.sleep(500);
         TestUtils.dblClickByText("baseFolder");
         Thread.sleep(500);
 

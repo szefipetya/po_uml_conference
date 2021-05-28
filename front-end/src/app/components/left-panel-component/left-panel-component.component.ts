@@ -141,7 +141,8 @@ export class LeftPanelComponentComponent implements OnInit {
 
   }
   fileDblClick(file: File_cDto) {
-    if (file.id) this.getFile(file.id, file._type, true);
+    if (file._type != 'projectFile')
+      if (file.id) this.getFile(file.id, file._type, true);
 
   }
 
