@@ -5,12 +5,14 @@
  */
 package com.szefi.uml_conference.editor.model.do_related;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.szefi.uml_conference.editor.model.socket.SessionState;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialContainer_I;
 import com.szefi.uml_conference.editor.model.top.DynamicSerialObject;
 import com.szefi.uml_conference.editor.model.converter.PackageElementsListConverter;
 import com.szefi.uml_conference.editor.model.converter.RectConverter;
+import com.szefi.uml_conference.management.model.entity.project.ProjectFolderEntity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,18 @@ public class PackageObject extends DiagramObject {
     
     @OneToOne(mappedBy = "parent",cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH})
     private TitleElement titleModel; 
+    
+       @OneToOne
+       @JsonIgnore
+       private ProjectFolderEntity pFolder; 
+
+    public ProjectFolderEntity getpFolder() {
+        return pFolder;
+    }
+
+    public void setpFolder(ProjectFolderEntity pFolder) {
+        this.pFolder = pFolder;
+    }
 
     public TitleElement getTitleModel() {
         return titleModel;

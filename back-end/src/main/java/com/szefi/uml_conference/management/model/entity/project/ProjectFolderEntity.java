@@ -5,7 +5,9 @@
  */
 package com.szefi.uml_conference.management.model.entity.project;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.szefi.uml_conference.editor.model.diagram.DiagramEntity;
+import com.szefi.uml_conference.editor.model.do_related.PackageObject;
 import com.szefi.uml_conference.management.model.entity.File_cEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,18 @@ public class ProjectFolderEntity extends ProjectFileEntity {
    
    @OneToOne(mappedBy="relatedFolder",cascade = {CascadeType.REMOVE,CascadeType.PERSIST})
    DiagramEntity diagram;
+   
+   @JsonIgnore
+    @OneToOne(mappedBy = "pFolder",cascade = {CascadeType.REMOVE})
+    private PackageObject relatedPackageObject; 
+
+    public PackageObject getRelatedPackageObject() {
+        return relatedPackageObject;
+    }
+
+    public void setRelatedPackageObject(PackageObject relatedPackageObject) {
+        this.relatedPackageObject = relatedPackageObject;
+    }
 
     public DiagramEntity getDiagram() {
         return diagram;

@@ -2,3 +2,13 @@
 2021-05-28 09:15:31.461 CEST [22196] LOG:  listening on IPv6 address "::", port 8102
 2021-05-28 09:15:31.461 CEST [22196] LOG:  listening on IPv4 address "0.0.0.0", port 8102
 2021-05-28 09:15:31.564 CEST [18804] LOG:  database system was interrupted; last known up at 2021-05-26 22:55:54 CEST
+2021-05-28 09:15:37.878 CEST [18804] LOG:  database system was not properly shut down; automatic recovery in progress
+2021-05-28 09:15:37.886 CEST [18804] LOG:  redo starts at 0/49B30D0
+2021-05-28 09:15:37.888 CEST [18804] LOG:  invalid record length at 0/49B31B8: wanted 24, got 0
+2021-05-28 09:15:37.888 CEST [18804] LOG:  redo done at 0/49B3180
+2021-05-28 09:15:37.931 CEST [22196] LOG:  database system is ready to accept connections
+2021-05-28 19:23:10.244 CEST [22196] LOG:  checkpointer process (PID 6104) was terminated by exception 0xC000013A
+2021-05-28 19:23:10.244 CEST [22196] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2021-05-28 19:23:10.283 CEST [22196] LOG:  terminating any other active server processes
+2021-05-28 19:23:10.394 CEST [22196] LOG:  statistics collector process (PID 21896) was terminated by exception 0xC000013A
+2021-05-28 19:23:10.394 CEST [22196] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.

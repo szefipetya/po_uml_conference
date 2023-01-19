@@ -11,6 +11,7 @@ import {
 import { ACTION_TYPE } from '../ACTION_TYPE';
 import { DynamicSerialObject } from '../../common/DynamicSerialObject';
 import { TARGET_TYPE } from '../response/TARGET_TYPE';
+import { getQueryPredicate } from '@angular/compiler/src/render3/view/util';
 export abstract class InteractiveItemBase implements SessionInteractiveItem {
   model: DynamicSerialObject;
   //session requirements
@@ -27,11 +28,13 @@ export abstract class InteractiveItemBase implements SessionInteractiveItem {
   }
   updateColorOnly() {
     if (this.sessionState)
-      this.sessionState.extra.color = this.socket.getColorByUserId(this.sessionState.lockerUser_id);
+      this.sessionState.extra.color = this.socket.getColorByUserId(this.sessionState?.lockerUser_id);
   }
   getColor() {
     //  if (this.overrideshadow) return this.overrideshadow;
-    return this.socket.getColorByUserId(this.sessionState.lockerUser_id);
+
+    return this.socket.getColorByUserId(this.sessionState?.lockerUser_id);
+
   }
 
   //Session funcions---------------------------------

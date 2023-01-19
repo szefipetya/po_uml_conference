@@ -482,6 +482,7 @@ public class EditorSession {
 
         if (item instanceof SimpleClass) {
             SimpleClass casted = (SimpleClass) item;
+            if(casted.getTitleModel().equals("")) return false;
             deleteSimpleClass(casted);
             //the normal object
         }
@@ -551,7 +552,8 @@ public class EditorSession {
                     }
                 }
                 return null;
-            }).findFirst();
+               
+            }).collect(Collectors.toList()).stream().filter(c->c!=null).findFirst();//__POST
 
         }
         System.out.println("this is a SimpleClass delete");

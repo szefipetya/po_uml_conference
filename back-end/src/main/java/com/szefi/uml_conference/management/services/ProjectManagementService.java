@@ -172,6 +172,8 @@ public class ProjectManagementService {
     void injectPackageObjectToParentDiagram(ProjectFolderEntity parentFolder, ProjectFolderEntity newFolder) {
         PackageObject pobject = new PackageObject();
         pobject.setDiagram(parentFolder.getDiagram());
+        pobject.setpFolder(newFolder);
+        newFolder.setRelatedPackageObject(pobject);
         pobject.setDimensionModel(DiagramObject.StandardDimensionModel());
         TitleElement title = new TitleElement();
         title.setName(newFolder.getName());

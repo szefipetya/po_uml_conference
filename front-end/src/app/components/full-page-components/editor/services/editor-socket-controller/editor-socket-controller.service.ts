@@ -260,7 +260,7 @@ export class EditorSocketControllerService {
   }
   getColorByUserId(id): string {
     let col;
-    if (id == -1) return 'transparent'
+    if (id == -1 || id == undefined) return 'transparent'
     this.sessionUsers.map(u => { if (u.user.id == id) col = u.color; return col; })
     return col;
   }
