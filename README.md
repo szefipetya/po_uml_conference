@@ -25,4 +25,4 @@ Uml conference is a Java based webapplication
 - Run the http server | `http-server ./frontend/dist/front-end --port=8100`
 - open up a browser at http://localhost:8100
 
-The documentation is in hungarian language. can 
+The [documentation](https://github.com/szefipetya/po_uml_conference/blob/master/doc/Szakdoli_szoveg_.pdf) is in hungarian language.
