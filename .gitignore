@@ -1,2 +1,5 @@
 /front-end/node_modules
 /front-end/testlib/Selenium-ClientTest/target/
+
+*.doc
+*.docx
